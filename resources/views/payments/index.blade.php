@@ -3,7 +3,10 @@
 
 @section('content')
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
-  <h4 class="mb-0">Payments</h4>
+  <div class="mb-3">
+    <h4 class="mb-1">Payment List</h4>
+    <div class="text-muted">Track monthly rental payments, due dates, and payment status.</div>
+  </div>
   <form class="d-flex gap-2" method="get" action="{{ route('payments.index') }}">
     <input type="month" class="form-control" name="month" value="{{ $month }}">
     <button class="btn btn-dark">Filter</button>

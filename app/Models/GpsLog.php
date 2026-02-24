@@ -19,6 +19,8 @@ class GpsLog extends Model
 
     protected $casts = [
         'log_date' => 'date',
+        'opening_km' => 'float',
+        'closing_km' => 'float',
     ];
 
     protected $appends = ['distance_km'];
@@ -28,8 +30,8 @@ class GpsLog extends Model
         return $this->belongsTo(Car::class);
     }
 
-    public function getDistanceKmAttribute(): int
+    public function getDistanceKmAttribute(): float
     {
-        return max(0, (int) $this->closing_km - (int) $this->opening_km);
+        return max(0, (float) $this->closing_km - (float) $this->opening_km);
     }
 }

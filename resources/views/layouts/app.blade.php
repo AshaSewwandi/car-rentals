@@ -358,9 +358,6 @@
           @if(\Illuminate\Support\Facades\Route::has('dashboard'))
             <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="menu-dot"></span>Dashboard</a>
           @endif
-          @if(auth()->user()->canAccess('tracking') && \Illuminate\Support\Facades\Route::has('tracking.index'))
-            <a class="menu-link {{ request()->routeIs('tracking.*') ? 'active' : '' }}" href="{{ route('tracking.index') }}"><span class="menu-dot"></span>Live Tracking</a>
-          @endif
           @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
             <a class="menu-link {{ request()->routeIs('gps-logs.*') ? 'active' : '' }}" href="{{ route('gps-logs.index') }}"><span class="menu-dot"></span>DAGPS KM Logs</a>
           @endif
@@ -403,6 +400,9 @@
     <main class="col-12 p-3 p-lg-4 app-main app-main-col">
       @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
+      @endif
+      @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
       @endif
 
       @yield('content')

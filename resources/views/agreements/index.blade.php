@@ -13,75 +13,19 @@
     font-weight: 600;
   }
 </style>
-<div class="row g-3">
-  <div class="col-12 col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-header">Add Agreement</div>
-      <div class="card-body">
-        <form method="post" action="{{ route('agreements.store') }}" enctype="multipart/form-data">
-          @csrf
-          <div class="mb-2">
-            <label class="form-label">Agreement No</label>
-            <input type="text" name="agreement_no" class="form-control" value="{{ old('agreement_no') }}">
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Car</label>
-            <select name="car_id" class="form-select" required>
-              <option value="">Select Car</option>
-              @foreach($cars as $car)
-                <option value="{{ $car->id }}" @selected(old('car_id') == $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Customer</label>
-            <select name="customer_id" class="form-select" required>
-              <option value="">Select Customer</option>
-              @foreach($customers as $customer)
-                <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->name }}</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Start Date</label>
-            <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->format('Y-m-d')) }}" required>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">End Date</label>
-            <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}">
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Monthly Rent</label>
-            <input type="number" step="0.01" min="0" name="monthly_rent" class="form-control" value="{{ old('monthly_rent') }}" required>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Deposit</label>
-            <input type="number" step="0.01" min="0" name="deposit" class="form-control" value="{{ old('deposit', 0) }}">
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-select" required>
-              <option value="active" @selected(old('status') === 'active')>Active</option>
-              <option value="ended" @selected(old('status') === 'ended')>Ended</option>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Agreement File (PDF/Image)</label>
-            <input type="file" name="agreement_file" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Note</label>
-            <input type="text" name="note" class="form-control" value="{{ old('note') }}">
-          </div>
-          <button class="btn btn-dark w-100">Save Agreement</button>
-        </form>
-      </div>
-    </div>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+  <div class="mb-3">
+    <h4 class="mb-1">Agreements</h4>
+    <div class="text-muted">Manage rental contracts, active periods, monthly rent, deposits, and agreement files.</div>
   </div>
-
-  <div class="col-12 col-lg-8">
+</div>
+<div class="row g-3">
+  <div class="col-12">
     <div class="card shadow-sm">
-      <div class="card-header">Agreement List</div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Agreement List</span>
+        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addAgreementModal">Add Agreement</button>
+      </div>
       <div class="card-body p-3">
         @forelse($agreements as $agreement)
           <div class="card mb-3">
@@ -194,4 +138,91 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="addAgreementModal" tabindex="-1" aria-labelledby="addAgreementModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAgreementModalLabel">Add Agreement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{{ route('agreements.store') }}" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Agreement No</label>
+            <input type="text" name="agreement_no" class="form-control" value="{{ old('agreement_no') }}">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Car</label>
+            <select name="car_id" class="form-select" required>
+              <option value="">Select Car</option>
+              @foreach($cars as $car)
+                <option value="{{ $car->id }}" @selected(old('car_id') == $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Customer</label>
+            <select name="customer_id" class="form-select" required>
+              <option value="">Select Customer</option>
+              @foreach($customers as $customer)
+                <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Start Date</label>
+              <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->format('Y-m-d')) }}" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">End Date</label>
+              <input type="date" name="end_date" class="form-control" value="{{ old('end_date') }}">
+            </div>
+          </div>
+          <div class="row g-2 mt-0">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Monthly Rent</label>
+              <input type="number" step="0.01" min="0" name="monthly_rent" class="form-control" value="{{ old('monthly_rent') }}" required>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Deposit</label>
+              <input type="number" step="0.01" min="0" name="deposit" class="form-control" value="{{ old('deposit', 0) }}">
+            </div>
+          </div>
+          <div class="mb-2 mt-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select" required>
+              <option value="active" @selected(old('status') === 'active')>Active</option>
+              <option value="ended" @selected(old('status') === 'ended')>Ended</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Agreement File (PDF/Image)</label>
+            <input type="file" name="agreement_file" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Note</label>
+            <input type="text" name="note" class="form-control" value="{{ old('note') }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-dark">Save Agreement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@if ($errors->any() && old('car_id'))
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('addAgreementModal');
+    if (!modalEl || typeof bootstrap === 'undefined') return;
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  });
+</script>
+@endif
 @endsection

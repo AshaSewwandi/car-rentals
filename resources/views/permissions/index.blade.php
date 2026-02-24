@@ -3,7 +3,10 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">Permission Management</h4>
+  <div>
+    <h4 class="mb-1">Permission Management</h4>
+    <div class="text-muted">Set module access for each role to control what users can view and manage.</div>
+  </div>
 </div>
 
 <div class="row g-3">

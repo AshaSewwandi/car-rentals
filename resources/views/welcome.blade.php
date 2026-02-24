@@ -423,13 +423,13 @@
                     <span class="badge">Fleet Operations Platform</span>
                     <h1>Run a premium rental business without operational chaos.</h1>
                     <p>
-                        Manage cars, customers, agreements, expenses, and live tracking from one place.
+                        Manage cars, customers, agreements, expenses, and kilometer logs from one place.
                         Built for teams that want cleaner workflows, faster collections, and better visibility.
                     </p>
                     <div class="cta-row">
                         @auth
                             <a class="btn btn-primary" href="{{ route('dashboard') }}">Go To Dashboard</a>
-                            <a class="btn btn-secondary" href="{{ route('tracking.index') }}">See Live Tracking</a>
+                            <a class="btn btn-secondary" href="{{ route('gps-logs.index') }}">Open KM Logs</a>
                         @else
                             <a class="btn btn-primary" href="{{ route('register') }}">Create Account</a>
                             <a class="btn btn-secondary" href="{{ route('login') }}">Login</a>
@@ -479,8 +479,8 @@
                     <span>Fleet availability control</span>
                 </article>
                 <article class="stat">
-                    <strong>24/7</strong>
-                    <span>Live GPS visibility</span>
+                    <strong>Daily</strong>
+                    <span>KM activity logging</span>
                 </article>
                 <article class="stat">
                     <strong>3x</strong>
@@ -522,8 +522,8 @@
                     <p>Log recurring and one-time expenses to keep profitability clear at all times.</p>
                 </article>
                 <article class="feature">
-                    <h3>Live Vehicle Tracking</h3>
-                    <p>Use integrated tracking feeds to check movement and improve route-level oversight.</p>
+                    <h3>DAGPS KM Logs</h3>
+                    <p>Record daily mileage and generate monthly per-car reports for operational control.</p>
                 </article>
             </div>
         </section>

@@ -13,6 +13,12 @@
     font-weight: 600;
   }
 </style>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+  <div class="mb-3">
+    <h4 class="mb-1">Cars</h4>
+    <div class="text-muted">Manage fleet information, tracker details, and current rental status.</div>
+  </div>
+</div>
 <div class="card shadow-sm">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span>Car List</span>

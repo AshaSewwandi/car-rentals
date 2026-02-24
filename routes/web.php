@@ -9,7 +9,6 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GpsLogController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PermissionManagementController;
-use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +25,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
-    Route::get('/tracking', [TrackingController::class, 'index'])->middleware('permission:tracking')->name('tracking.index');
-
     Route::middleware('permission:cars')->group(function () {
         Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
         Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
@@ -66,6 +63,9 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:gps_logs')->group(function () {
         Route::get('/gps-logs', [GpsLogController::class, 'index'])->name('gps-logs.index');
+        Route::get('/gps-logs/report', [GpsLogController::class, 'monthlyReport'])->name('gps-logs.report');
+        Route::post('/gps-logs/sheet', [GpsLogController::class, 'saveSheet'])->name('gps-logs.sheet');
+        Route::post('/gps-logs/service', [GpsLogController::class, 'saveService'])->name('gps-logs.service');
         Route::post('/gps-logs', [GpsLogController::class, 'store'])->name('gps-logs.store');
         Route::put('/gps-logs/{gpsLog}', [GpsLogController::class, 'update'])->name('gps-logs.update');
         Route::delete('/gps-logs/{gpsLog}', [GpsLogController::class, 'destroy'])->name('gps-logs.destroy');

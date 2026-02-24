@@ -3,7 +3,6 @@
 return [
     'modules' => [
         'dashboard' => 'Dashboard',
-        'tracking' => 'Live Tracking',
         'cars' => 'Cars',
         'customers' => 'Customers',
         'payments' => 'Payments',
@@ -17,7 +16,6 @@ return [
     'defaults' => [
         'admin' => [
             'dashboard' => true,
-            'tracking' => true,
             'cars' => true,
             'customers' => true,
             'payments' => true,
@@ -29,7 +27,6 @@ return [
         ],
         'customer' => [
             'dashboard' => true,
-            'tracking' => true,
             'cars' => false,
             'customers' => false,
             'payments' => false,
