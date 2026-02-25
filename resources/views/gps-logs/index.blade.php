@@ -34,33 +34,34 @@
     font-weight: 700;
     text-align: center;
     padding: .55rem .65rem;
-    border-bottom: 1px solid rgba(23, 35, 50, 0.12);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
     color: var(--text);
-    background: rgba(244, 239, 228, 0.96);
-    box-shadow: inset 0 3px 0 rgba(232, 74, 36, 0.45);
+    background: #f8fbff;
+    box-shadow: inset 0 3px 0 rgba(59, 130, 246, 0.55);
   }
 
   .sheet-palette-0,
   .sheet-palette-1,
   .sheet-palette-2,
   .sheet-palette-3 {
-    background: rgba(248, 243, 233, 0.9);
-    border: 1px solid rgba(23, 35, 50, 0.12) !important;
-    box-shadow: 0 8px 20px rgba(23, 35, 50, 0.05);
+    background: #ffffff;
+    border: 1px solid #dbe4ef !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
   }
 
   .sheet-block table thead th {
-    background: rgba(239, 230, 214, 0.95);
-    color: #3f5873;
+    background: #f1f6ff;
+    color: #33547a;
     font-weight: 700;
   }
 
   .sheet-block table tbody td {
-    background: rgba(244, 239, 228, 0.62);
+    background: #ffffff;
+    border-color: #e2e8f0;
   }
 
   .sheet-block table tbody tr:nth-child(even) td {
-    background: rgba(239, 230, 214, 0.72);
+    background: #f8fbff;
   }
 
   .sheet-km-cell {
@@ -72,19 +73,21 @@
     width: 100%;
     max-width: none;
     text-align: right;
+    border-color: #cbd5e1;
+    background: #ffffff;
   }
 
   .sheet-service {
-    background: rgba(23, 35, 50, 0.16) !important;
+    background: rgba(37, 99, 235, 0.08) !important;
   }
 
   .sheet-service td {
     border-left: 0 !important;
-    background: rgba(23, 35, 50, 0.12) !important;
+    background: rgba(219, 234, 254, 0.62) !important;
   }
 
   .sheet-service td:first-child {
-    border-left: 3px solid rgba(232, 74, 36, 0.7) !important;
+    border-left: 3px solid rgba(37, 99, 235, 0.72) !important;
   }
 
   .service-badge {
@@ -95,7 +98,7 @@
     font-size: .68rem;
     font-weight: 700;
     color: #fff;
-    background: #172332;
+    background: #0a3f8f;
   }
 
   .service-action-btn {
@@ -110,7 +113,7 @@
 
   .service-icon {
     margin-left: 6px;
-    color: #be3614;
+    color: #0f66c3;
     font-size: .85rem;
   }
 
@@ -126,7 +129,7 @@
     }
   }
 </style>
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+<div class="page-toolbar">
   <h4 class="mb-0">Mileage Report</h4>
   <div class="d-flex flex-wrap gap-2">
   <form class="d-flex gap-2" method="get" action="{{ route('gps-logs.index') }}">
@@ -149,7 +152,7 @@
 
 <div class="row g-3 mb-1">
   <div class="col-12 col-md-4">
-    <div class="card shadow-sm">
+    <div class="card list-card">
       <div class="card-body">
         <div class="text-muted small">Period</div>
         <div class="fs-5 fw-bold">{{ $periodLabel }}</div>
@@ -157,7 +160,7 @@
     </div>
   </div>
   <div class="col-12 col-md-3">
-    <div class="card shadow-sm">
+    <div class="card list-card">
       <div class="card-body">
         <div class="text-muted small">Total Mileage</div>
         <div class="fs-5 fw-bold">{{ number_format($totalDistance, 2) }} km</div>
@@ -165,7 +168,7 @@
     </div>
   </div>
   <div class="col-12 col-md-2">
-    <div class="card shadow-sm">
+    <div class="card list-card">
       <div class="card-body">
         <div class="text-muted small">Days Logged</div>
         <div class="fs-5 fw-bold">{{ number_format($daysLogged) }}</div>
@@ -173,7 +176,7 @@
     </div>
   </div>
   <div class="col-12 col-md-3">
-    <div class="card shadow-sm">
+    <div class="card list-card">
       <div class="card-body">
         <div class="text-muted small">Monthly Average ({{ $periodMonthsCount }} month{{ $periodMonthsCount > 1 ? 's' : '' }})</div>
         <div class="fs-5 fw-bold">{{ number_format($avgKmPerMonth, 2) }} km</div>
@@ -183,8 +186,8 @@
 </div>
 
 @if(!empty($serviceStats))
-  <div class="card shadow-sm mt-3">
-    <div class="card-header">Service Tracker</div>
+  <div class="card list-card mt-3">
+    <div class="card-header"><span class="header-title">Service Tracker</span></div>
     <div class="card-body">
       <div class="row g-2">
         <div class="col-12 col-md-2">
@@ -218,9 +221,9 @@
   </div>
 @endif
 
-<div class="card shadow-sm mt-3 mb-3">
+<div class="card list-card mt-3 mb-3">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <span>Daily Mileage Sheet</span>
+    <span class="header-title">Daily Mileage Sheet</span>
     <!-- <span class="small text-muted">Select one car to input day-by-day KM</span> -->
   </div>
   <div class="card-body">

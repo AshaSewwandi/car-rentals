@@ -2,9 +2,9 @@
 @section('title', 'Payments')
 
 @section('content')
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+<div class="page-toolbar">
   <div class="mb-3">
-    <h4 class="mb-1">Payment List</h4>
+    <h4 class="mb-1">Manage Payments</h4>
     <div class="text-muted">Track monthly rental payments, due dates, and payment status.</div>
   </div>
   <form class="d-flex gap-2" method="get" action="{{ route('payments.index') }}">
@@ -23,9 +23,9 @@
   </div>
 @endif
 
-<div class="card shadow-sm">
+<div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <span>Payment List</span>
+    <span class="header-title">Payment List</span>
     <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">Add Payment</button>
   </div>
   <div class="card-body p-0">

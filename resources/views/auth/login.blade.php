@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | Car Rentals</title>
+  <title>Login | R&A Auto Rentals</title>
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +14,7 @@
       font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
       color: #172332;
       background:
-        radial-gradient(45rem 25rem at 8% -10%, rgba(232, 74, 36, 0.22), transparent 70%),
+        radial-gradient(45rem 25rem at 8% -10%, rgba(15, 118, 110, 0.22), transparent 70%),
         radial-gradient(34rem 18rem at 90% 3%, rgba(19, 111, 122, 0.24), transparent 70%),
         linear-gradient(180deg, #f8f3e9 0%, #efe6d6 100%);
       display: grid;
@@ -38,7 +38,7 @@
       border-radius: .7rem;
     }
     .btn-dark {
-      background: linear-gradient(135deg, #e84a24, #f08f25) !important;
+      background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
       border-color: transparent !important;
     }
   </style>

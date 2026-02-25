@@ -1,166 +1,234 @@
 @extends('layouts.app')
-@section('title', 'Car Rentals')
+@section('title', 'R&A Auto Rentals')
 
 @section('content')
 <style>
   .dashboard-page {
-    --dash-panel: rgba(246, 241, 232, 0.94);
-    --dash-panel-soft: rgba(242, 235, 224, 0.9);
-    --dash-line: rgba(23, 35, 50, 0.1);
-    --dash-head: #46617b;
-    --dash-row-text: #234d73;
+    --dash-border: #dbe4ef;
+    --dash-muted: #64748b;
+    --dash-text: #0f172a;
+    --dash-head-bg: #f8fbff;
+    --dash-row-alt: #f8fbff;
+    --dash-green: #059669;
+    --dash-green-bg: #dcfce7;
+    --dash-red: #dc2626;
+    --dash-red-bg: #fee2e2;
   }
 
-  .dashboard-page h4 {
+  .dashboard-page h4,
+  .dashboard-page h5 {
     font-weight: 700;
-    color: #25415c;
+    color: var(--dash-text);
   }
 
-  .dashboard-page .metric-card {
-    background: linear-gradient(180deg, rgba(248, 243, 235, 0.96), rgba(240, 232, 218, 0.92));
-    border: 1px solid rgba(23, 35, 50, 0.08);
-    border-top: 2px solid rgba(232, 74, 36, 0.18);
-    box-shadow: 0 6px 14px rgba(23, 35, 50, 0.04) !important;
+  .dashboard-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
   }
 
-  .dashboard-page .metric-card .text-muted {
-    color: #65819b !important;
+  .dashboard-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    flex-wrap: wrap;
+  }
+
+  .dash-search {
+    min-width: 280px;
+    border: 1px solid var(--dash-border);
+    border-radius: .65rem;
+    background: #f1f5f9;
+    color: #475569;
+    padding: .58rem .78rem;
+  }
+
+  .dashboard-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-page .kpi-card {
+    background: #fff;
+    border: 1px solid var(--dash-border);
+    border-radius: .9rem;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .dashboard-page .kpi-label {
+    color: var(--dash-muted) !important;
     font-weight: 600;
+    margin-bottom: .4rem;
   }
 
-  .dashboard-page .metric-card .fs-4,
-  .dashboard-page .metric-card .fs-5 {
-    color: #2d4a67;
-    font-weight: 700 !important;
-    letter-spacing: 0.01em;
+  .dashboard-page .kpi-value {
+    color: var(--dash-text);
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1;
   }
 
-  .dashboard-page .section-card {
-    background: linear-gradient(180deg, var(--dash-panel), var(--dash-panel-soft));
-    border: 1px solid var(--dash-line);
-    box-shadow: 0 10px 24px rgba(23, 35, 50, 0.07) !important;
-  }
-
-  .dashboard-page .section-card .card-header {
-    background: rgba(241, 233, 219, 0.9);
-    border-bottom: 1px solid var(--dash-line);
-    color: #203c56;
+  .dashboard-page .delta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 54px;
+    padding: .22rem .52rem;
+    border-radius: .45rem;
+    font-size: .85rem;
     font-weight: 700;
   }
 
-  .dashboard-page .section-card .table thead th {
-    background: rgba(238, 230, 214, 0.94);
-    color: var(--dash-head);
-    font-weight: 700;
+  .dashboard-page .delta.up {
+    color: var(--dash-green);
+    background: var(--dash-green-bg);
   }
 
-  .dashboard-page .section-card .table td {
-    background: rgba(250, 247, 241, 0.72);
-    border-color: rgba(23, 35, 50, 0.1);
-    color: var(--dash-row-text);
+  .dashboard-page .delta.down {
+    color: var(--dash-red);
+    background: var(--dash-red-bg);
+  }
+
+  .dashboard-page .kpi-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .65rem;
+  }
+
+  .dashboard-page .panel-card {
+    background: #fff;
+    border: 1px solid var(--dash-border);
+    border-radius: .9rem;
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  .dashboard-page .panel-card .card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--dash-border);
+    color: var(--dash-text);
+    font-weight: 700;
+    padding: 1rem 1.1rem;
+  }
+
+  .dashboard-page .panel-link {
+    color: #0f66c3;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .95rem;
+  }
+
+  .dashboard-page .panel-card .table thead th {
+    background: var(--dash-head-bg);
+    color: #64748b;
+    font-weight: 700;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .dashboard-page .panel-card .table td {
+    background: #fff;
+    border-color: var(--dash-border);
+    color: #334155;
     font-weight: 500;
+    padding-top: .9rem;
+    padding-bottom: .9rem;
   }
 
-  .dashboard-page .section-card .table td.text-end {
-    color: var(--dash-row-text);
+  .dashboard-page .panel-card .table td.text-end {
+    color: var(--dash-text);
     font-weight: 600;
   }
 
-  .dashboard-page .section-card .table-striped > tbody > tr:nth-of-type(odd) > * {
-    background: rgba(244, 238, 228, 0.78);
-  }
-
-  .dashboard-page .btn-outline-dark {
-    background: rgba(236, 226, 207, 0.9);
-    border-color: rgba(23, 35, 50, 0.24);
-  }
-
-  .dashboard-page .btn-outline-dark:hover {
-    background: rgba(244, 236, 222, 0.98) !important;
-    border-color: rgba(23, 35, 50, 0.24) !important;
-    color: #1f3953 !important;
+  .dashboard-page .panel-card .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background: var(--dash-row-alt);
   }
 
   @media (max-width: 991.98px) {
-    .dashboard-page .metric-card {
-      border-top-width: 2px;
+    .dashboard-toolbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .dashboard-toolbar-right {
+      width: 100%;
+    }
+
+    .dash-search {
+      min-width: 100%;
     }
   }
 </style>
 <div class="dashboard-page">
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
-  <h4 class="mb-0">Dashboard Summary</h4>
-  <form class="d-flex gap-2" method="get" action="{{ route('dashboard') }}">
-    <input type="month" class="form-control" name="month" value="{{ $month }}">
-    <button class="btn btn-dark">Filter</button>
-  </form>
-</div>
+@php
+  $collectionDelta = $expected > 0 ? (($received - $expected) / $expected) * 100 : 0;
+  $expenseDelta = $monthExpenses > 0 ? (($dueThisWeekExpenses - $monthExpenses) / $monthExpenses) * 100 : 0;
+  $pendingDelta = $pendingPaymentsCount > 0 ? min(99, ($pendingPaymentsCount * 7.5)) : 0;
+@endphp
 
-<div class="row g-3 mb-3">
-  <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
-      <div class="card-body">
-        <div class="text-muted">Expected Payments ({{ $month }})</div>
-        <div class="fs-4 fw-bold">Rs {{ number_format($expected, 2) }}</div>
-      </div>
-    </div>
+<div class="dashboard-toolbar">
+  <div class="dashboard-toolbar-left">
+    <h4 class="mb-0">Overview</h4>
+    <input class="dash-search" type="text" placeholder="Search cars, users..." aria-label="Search">
   </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
-      <div class="card-body">
-        <div class="text-muted">Received Payments ({{ $month }})</div>
-        <div class="fs-4 fw-bold">Rs {{ number_format($received, 2) }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
-      <div class="card-body">
-        <div class="text-muted">Expenses ({{ $month }})</div>
-        <div class="fs-4 fw-bold">Rs {{ number_format($monthExpenses, 2) }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
-      <div class="card-body">
-        <div class="text-muted">Pending Payments</div>
-        <div class="fs-4 fw-bold">{{ number_format($pendingPaymentsCount) }}</div>
-      </div>
-    </div>
+  <div class="dashboard-toolbar-right">
+    <form class="d-flex gap-2" method="get" action="{{ route('dashboard') }}">
+      <input type="month" class="form-control" name="month" value="{{ $month }}">
+      <button class="btn btn-dark">Filter</button>
+    </form>
+    @if(auth()->user()->canAccess('payments'))
+      <a class="btn btn-dark" href="{{ route('payments.index') }}">+ Add Payment</a>
+    @endif
   </div>
 </div>
 
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-4">
   <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
+    <div class="card kpi-card h-100">
       <div class="card-body">
-        <div class="text-muted">Upcoming Payments</div>
-        <div class="fs-5 fw-bold">Rs {{ number_format($upcomingPaymentsTotal, 2) }}</div>
+        <div class="kpi-label">Expected Payments</div>
+        <div class="kpi-row">
+          <div class="kpi-value">Rs {{ number_format($expected, 0) }}</div>
+          <span class="delta {{ $collectionDelta >= 0 ? 'up' : 'down' }}">{{ $collectionDelta >= 0 ? '+' : '' }}{{ number_format($collectionDelta, 0) }}%</span>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
+    <div class="card kpi-card h-100">
       <div class="card-body">
-        <div class="text-muted">Upcoming Expenses</div>
-        <div class="fs-5 fw-bold">Rs {{ number_format($upcomingExpensesTotal, 2) }}</div>
+        <div class="kpi-label">Received Payments</div>
+        <div class="kpi-row">
+          <div class="kpi-value">Rs {{ number_format($received, 0) }}</div>
+          <span class="delta {{ $collectionDelta >= 0 ? 'up' : 'down' }}">{{ $collectionDelta >= 0 ? '+' : '' }}{{ number_format($collectionDelta, 0) }}%</span>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
+    <div class="card kpi-card h-100">
       <div class="card-body">
-        <div class="text-muted">Due Payments (Next 7 Days)</div>
-        <div class="fs-5 fw-bold">Rs {{ number_format($dueThisWeekPayments, 2) }}</div>
+        <div class="kpi-label">Expenses</div>
+        <div class="kpi-row">
+          <div class="kpi-value">Rs {{ number_format($monthExpenses, 0) }}</div>
+          <span class="delta {{ $expenseDelta <= 0 ? 'up' : 'down' }}">{{ $expenseDelta > 0 ? '+' : '' }}{{ number_format($expenseDelta, 0) }}%</span>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-12 col-md-6 col-xl-3">
-    <div class="card metric-card h-100">
+    <div class="card kpi-card h-100">
       <div class="card-body">
-        <div class="text-muted">Planned Expenses (Next 7 Days)</div>
-        <div class="fs-5 fw-bold">Rs {{ number_format($dueThisWeekExpenses, 2) }}</div>
+        <div class="kpi-label">Pending Tasks</div>
+        <div class="kpi-row">
+          <div class="kpi-value">{{ number_format($pendingPaymentsCount) }}</div>
+          <span class="delta {{ $pendingPaymentsCount > 0 ? 'up' : 'down' }}">+{{ number_format($pendingDelta, 0) }}%</span>
+        </div>
       </div>
     </div>
   </div>
@@ -168,11 +236,11 @@
 
 <div class="row g-3">
   <div class="col-12 col-xl-7">
-    <div class="card section-card">
+    <div class="card panel-card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span>Upcoming Payments</span>
         @if(auth()->user()->canAccess('payments'))
-          <a class="btn btn-sm btn-outline-dark" href="{{ route('payments.index') }}">Open Payments</a>
+          <a class="panel-link" href="{{ route('payments.index') }}">View All</a>
         @endif
       </div>
       <div class="card-body p-0">
@@ -207,11 +275,11 @@
   </div>
 
   <div class="col-12 col-xl-5">
-    <div class="card section-card">
+    <div class="card panel-card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span>Upcoming Expenses</span>
         @if(auth()->user()->canAccess('expenses'))
-          <a class="btn btn-sm btn-outline-dark" href="{{ route('expenses.index') }}">Open Expenses</a>
+          <a class="panel-link" href="{{ route('expenses.index') }}">View All</a>
         @endif
       </div>
       <div class="card-body p-0">

@@ -2,7 +2,7 @@
 @section('title', 'Expenses Management')
 
 @section('content')
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+<div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Manage Expenses</h4>
     <div class="text-muted">Track service and operational costs by car, month, and expense type.</div>
@@ -23,9 +23,9 @@
   </div>
 @endif
 
-<div class="card shadow-sm">
+<div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <span>Expense List ({{ $month }})</span>
+    <span class="header-title">Expense List ({{ $month }})</span>
     <div class="d-flex align-items-center gap-2">
       <strong>Rs {{ number_format($total, 2) }}</strong>
       <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add Expense</button>

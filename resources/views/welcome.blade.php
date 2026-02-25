@@ -3,400 +3,462 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Car Rentals | Move Smarter</title>
+    <title>R&A Auto Rentals | Premium Fleet</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>
         :root {
-            --bg: #f4efe4;
-            --bg-accent: #f6d6a8;
-            --panel: rgba(255, 255, 255, 0.82);
-            --text: #172332;
-            --muted: #4f6174;
-            --primary: #e84a24;
-            --primary-deep: #b93413;
-            --teal: #136f7a;
-            --line: rgba(23, 35, 50, 0.12);
-            --shadow: 0 18px 48px rgba(23, 35, 50, 0.12);
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fbff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --line: #dbe6f3;
+            --primary: #0a3f8f;
+            --primary-2: #0f66c3;
+            --primary-soft: #eaf2ff;
+            --accent: #f1f6ff;
+            --shadow: 0 18px 46px rgba(10, 63, 143, 0.12);
+            --radius: 16px;
+            --radius-sm: 12px;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
             color: var(--text);
             font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
-            background:
-                radial-gradient(55rem 35rem at 8% -10%, rgba(232, 74, 36, 0.2), transparent 70%),
-                radial-gradient(40rem 20rem at 88% 4%, rgba(19, 111, 122, 0.24), transparent 70%),
-                linear-gradient(180deg, #f8f3e9 0%, #efe6d6 100%);
-            min-height: 100vh;
-        }
-
-        .grain {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image: radial-gradient(rgba(23, 35, 50, 0.05) 0.6px, transparent 0.6px);
-            background-size: 5px 5px;
-            opacity: 0.25;
+            background: radial-gradient(68rem 30rem at 100% -20%, rgba(15, 102, 195, 0.14), transparent 70%), var(--bg);
         }
 
         .container {
-            width: min(1150px, calc(100% - 2.8rem));
+            width: min(1180px, calc(100% - 2rem));
             margin: 0 auto;
         }
 
         .topbar {
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 20;
             backdrop-filter: blur(10px);
-            background: rgba(248, 243, 233, 0.78);
+            background: rgba(255, 255, 255, 0.92);
             border-bottom: 1px solid var(--line);
         }
 
         .topbar-inner {
+            min-height: 74px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1.25rem;
-            padding: 1rem 0;
+            gap: 1rem;
         }
 
         .brand {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.7rem;
+            gap: .72rem;
             text-decoration: none;
             color: inherit;
-            font-weight: 700;
+        }
+
+        .brand img {
+            width: 56px;
+            height: 34px;
+            object-fit: contain;
+        }
+
+        .brand-name {
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            letter-spacing: 0.03em;
+            font-size: 1.25rem;
+            line-height: .88;
+            letter-spacing: -.02em;
+            font-weight: 700;
+            color: #0b1f3a;
         }
 
-        .brand-mark {
-            width: 1.85rem;
-            height: 1.85rem;
-            border-radius: 0.55rem;
-            background: linear-gradient(135deg, var(--primary) 0%, #f08f25 100%);
-            box-shadow: 0 6px 14px rgba(232, 74, 36, 0.34);
-        }
-
-        .top-links {
+        .nav {
             display: flex;
+            gap: .45rem;
             align-items: center;
-            gap: 0.5rem;
             flex-wrap: wrap;
             justify-content: flex-end;
         }
 
-        .top-links a {
+        .nav a {
             text-decoration: none;
+            color: #475569;
             font-weight: 600;
-            color: var(--muted);
-            padding: 0.55rem 0.85rem;
-            border-radius: 0.65rem;
-            transition: 150ms ease;
+            font-size: .95rem;
+            padding: .55rem .8rem;
+            border-radius: 10px;
         }
 
-        .top-links a:hover {
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.75);
-        }
+        .nav a:hover { background: var(--surface-soft); color: var(--text); }
 
-        .top-links a.primary {
+        .nav .cta {
             color: #fff;
-            background: linear-gradient(135deg, var(--primary), #f08f25);
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            box-shadow: 0 10px 20px rgba(10, 63, 143, 0.24);
         }
 
         .hero {
-            padding: 4rem 0 2.5rem;
+            padding: 2rem 0 1rem;
         }
 
         .hero-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 2rem;
-            align-items: center;
+            grid-template-columns: 1.06fr .94fr;
+            gap: 1.3rem;
+            align-items: stretch;
         }
 
-        .badge {
+        .hero-copy {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .kicker {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            color: var(--teal);
-            padding: 0.45rem 0.75rem;
+            gap: .4rem;
+            padding: .35rem .62rem;
+            border: 1px solid #c7daf4;
             border-radius: 999px;
-            border: 1px solid rgba(19, 111, 122, 0.35);
-            background: rgba(19, 111, 122, 0.08);
+            font-size: .72rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: .08em;
+            color: var(--primary-2);
+            background: var(--primary-soft);
         }
 
         h1 {
+            margin: .9rem 0 .8rem;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: clamp(2.2rem, 5vw, 4.3rem);
-            line-height: 1.05;
-            letter-spacing: -0.02em;
-            margin: 1rem 0 1rem;
-            max-width: 16ch;
+            font-size: clamp(2rem, 4.8vw, 3.55rem);
+            line-height: .96;
+            letter-spacing: -.03em;
+            max-width: 12ch;
         }
 
-        .hero p {
-            font-size: clamp(1rem, 2.1vw, 1.18rem);
-            line-height: 1.72;
+        .brand-highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .hero-copy p {
             color: var(--muted);
-            max-width: 52ch;
-            margin: 0 0 1.6rem;
+            line-height: 1.7;
+            margin: 0 0 1.25rem;
+            max-width: 54ch;
         }
 
-        .cta-row {
-            display: flex;
-            align-items: center;
-            gap: 0.85rem;
-            flex-wrap: wrap;
-        }
+        .hero-actions { display: flex; gap: .65rem; flex-wrap: wrap; }
 
         .btn {
-            border: 0;
-            text-decoration: none;
-            font-weight: 700;
-            padding: 0.85rem 1.2rem;
-            border-radius: 0.75rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: transform 140ms ease, box-shadow 140ms ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
+            justify-content: center;
+            gap: .45rem;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-weight: 700;
+            padding: .78rem 1.1rem;
+            border-radius: 12px;
+            font-size: .95rem;
         }
 
         .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: #fff;
-            background: linear-gradient(135deg, var(--primary), #f08f25);
-            box-shadow: 0 10px 20px rgba(232, 74, 36, 0.28);
+            box-shadow: 0 8px 18px rgba(10, 63, 143, 0.26);
         }
 
         .btn-secondary {
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--line);
+            background: var(--surface-soft);
+            color: #1e293b;
+            border-color: var(--line);
         }
 
-        .hero-panel {
-            background: var(--panel);
-            border: 1px solid rgba(255, 255, 255, 0.72);
-            border-radius: 1.25rem;
-            box-shadow: var(--shadow);
-            padding: 1.35rem;
-            animation: rise 700ms ease both;
-        }
-
-        .trip-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.85rem;
-        }
-
-        .trip-form label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--muted);
-            display: block;
-            margin: 0 0 0.4rem;
-        }
-
-        .trip-form input, .trip-form select {
-            width: 100%;
-            border: 1px solid rgba(23, 35, 50, 0.16);
-            background: rgba(255, 255, 255, 0.86);
-            border-radius: 0.7rem;
-            padding: 0.74rem 0.8rem;
-            font: inherit;
-            color: var(--text);
-        }
-
-        .address-field {
+        .hero-art {
             position: relative;
+            border-radius: var(--radius);
+            border: 1px solid #bfd4ef;
+            background:
+                radial-gradient(32rem 13rem at 70% -5%, rgba(255, 255, 255, 0.76), transparent 65%),
+                linear-gradient(140deg, #0a3f8f 0%, #0f66c3 48%, #8ac8ff 100%);
+            box-shadow: var(--shadow);
+            min-height: 430px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .address-suggestions {
+        .hero-art::before {
+            content: "";
             position: absolute;
-            top: calc(100% + 0.25rem);
-            left: 0;
-            right: 0;
-            z-index: 20;
-            max-height: 220px;
-            overflow-y: auto;
-            background: #fff;
-            border: 1px solid rgba(23, 35, 50, 0.16);
-            border-radius: 0.7rem;
-            box-shadow: 0 10px 24px rgba(23, 35, 50, 0.12);
-            display: none;
+            inset: auto -30% -42% -30%;
+            height: 220px;
+            background: radial-gradient(closest-side, rgba(255, 255, 255, 0.42), transparent 75%);
+            z-index: 1;
+            pointer-events: none;
         }
 
-        .address-suggestion-item {
+        .hero-art::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, rgba(10, 63, 143, 0.28) 4%, rgba(10, 63, 143, 0.08) 42%, rgba(15, 102, 195, 0.12) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero-art img {
             width: 100%;
-            text-align: left;
-            border: 0;
-            background: transparent;
+            height: 100%;
+            object-fit: cover;
+            object-position: 64% center;
+            transform: scale(1.03);
+            filter: saturate(1.08) contrast(1.06);
+        }
+
+        .hero-art .chip {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: #fff;
+            font-weight: 700;
+            font-size: .8rem;
+            padding: .35rem .6rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .32);
+            background: rgba(7, 45, 107, 0.36);
+            z-index: 3;
+        }
+
+        .availability {
+            margin-top: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+            padding: 1rem;
+        }
+
+        .availability-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0 0 .75rem;
+        }
+
+        .availability-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr auto;
+            gap: .65rem;
+        }
+
+        .control label {
+            display: block;
+            margin-bottom: .35rem;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #64748b;
+        }
+
+        .control input {
+            width: 100%;
+            border: 1px solid #c8d7ea;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: .72rem .8rem;
             font: inherit;
             color: var(--text);
-            padding: 0.55rem 0.7rem;
-            cursor: pointer;
         }
 
-        .address-suggestion-item:hover {
-            background: rgba(232, 74, 36, 0.08);
-        }
-
-        .trip-form .full {
-            grid-column: 1 / -1;
-        }
-
-        .trip-form button {
+        .control .btn {
             width: 100%;
-            cursor: pointer;
-            margin-top: 0.25rem;
+            margin-top: 1.42rem;
+            white-space: nowrap;
         }
 
-        .stats {
-            padding: 1rem 0 3.3rem;
+        .section {
+            padding: 2.6rem 0 0;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 0.9rem;
-        }
-
-        .stat {
-            background: rgba(255, 255, 255, 0.72);
-            border: 1px solid var(--line);
-            border-radius: 1rem;
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
-
-        .stat strong {
-            display: block;
+        .section h2 {
+            margin: 0 0 .45rem;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
+            letter-spacing: -.02em;
+            font-size: clamp(1.5rem, 3vw, 2.05rem);
         }
 
-        .section-title {
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: clamp(1.7rem, 3vw, 2.4rem);
-            margin: 0 0 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        .section-note {
-            max-width: 60ch;
+        .section p.head-note {
+            margin: 0;
             color: var(--muted);
-            margin: 0 0 1.5rem;
+            max-width: 60ch;
             line-height: 1.7;
         }
 
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-            padding-bottom: 4rem;
+            gap: .9rem;
+            margin-top: 1rem;
         }
 
         .feature {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--surface);
             border: 1px solid var(--line);
-            border-radius: 1rem;
-            padding: 1.1rem 1rem;
-            box-shadow: 0 10px 24px rgba(23, 35, 50, 0.08);
-            animation: rise 800ms ease both;
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .feature .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary-soft);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: .55rem;
         }
 
         .feature h3 {
-            margin: 0 0 0.35rem;
+            margin: 0 0 .35rem;
             font-size: 1.05rem;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
         }
 
-        .feature p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.6;
-            font-size: 0.94rem;
+        .feature p { margin: 0; color: var(--muted); line-height: 1.62; font-size: .93rem; }
+
+        .fleet-grid {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .9rem;
         }
 
-        .footer {
-            padding: 2rem 0 2.7rem;
+        .fleet-card {
+            display: grid;
+            grid-template-columns: .95fr 1.05fr;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--line);
+            overflow: hidden;
+            background: var(--surface);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+        }
+
+        .fleet-photo {
+            min-height: 170px;
+            background:
+                radial-gradient(7rem 7rem at 82% 22%, rgba(255, 255, 255, 0.9), transparent 70%),
+                linear-gradient(140deg, #0c4d9f, #7bc4ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: .8rem;
+        }
+
+        .fleet-photo img {
+            width: 92%;
+            max-height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .28));
+        }
+
+        .fleet-body { padding: .9rem; }
+        .fleet-price { color: var(--primary-2); font-weight: 800; }
+        .fleet-meta { color: var(--muted); font-size: .9rem; margin: .35rem 0 .7rem; }
+        .fleet-body .btn { width: 100%; }
+
+        .contact-card {
+            margin-top: 1rem;
+            background: linear-gradient(145deg, #eef6ff, #f7fbff);
+            border: 1px solid #cfdef1;
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .contact-lines div { margin-bottom: .8rem; color: #334155; }
+        .contact-lines strong { display: block; margin-bottom: .2rem; color: #0f172a; }
+
+        .map-art {
+            border-radius: 14px;
+            border: 1px solid #d5e4f5;
+            min-height: 180px;
+            background:
+                radial-gradient(7rem 7rem at 50% 35%, rgba(255, 255, 255, 0.8), transparent 65%),
+                linear-gradient(145deg, #d7edff, #a8d5ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0a3f8f;
+            font-weight: 700;
+            font-size: 1.12rem;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        footer {
+            margin-top: 2.6rem;
             border-top: 1px solid var(--line);
-            color: var(--muted);
-            font-size: 0.92rem;
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .footer-inner {
+            padding: 1.2rem 0 1.5rem;
+            color: #64748b;
+            font-size: .92rem;
+            display: flex;
+            justify-content: space-between;
+            gap: .8rem;
+            flex-wrap: wrap;
         }
 
         @media (max-width: 1024px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .feature-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-art { min-height: 340px; }
+            .availability-grid { grid-template-columns: 1fr 1fr; }
+            .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .fleet-grid { grid-template-columns: 1fr; }
+            .contact-card { grid-template-columns: 1fr; }
         }
 
-        @media (max-width: 640px) {
-            .topbar-inner {
-                padding: 0.8rem 0;
-            }
-
-            .hero {
-                padding-top: 2.2rem;
-            }
-
-            .trip-form, .stats-grid, .feature-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-                width: min(1150px, calc(100% - 1.4rem));
-            }
-        }
-
-        @keyframes rise {
-            from {
-                transform: translateY(10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        @media (max-width: 700px) {
+            .container { width: min(1180px, calc(100% - 1.2rem)); }
+            .topbar-inner { min-height: 66px; }
+            .brand-name { font-size: 1.6rem; }
+            .availability-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .fleet-card { grid-template-columns: 1fr; }
+            .hero-copy { padding: 1.25rem; }
+            .nav { gap: .2rem; }
+            .nav a { padding: .48rem .62rem; }
         }
     </style>
 </head>
 <body>
-    <div class="grain" aria-hidden="true"></div>
-
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
-                <span class="brand-mark"></span>
-                <span>Car Rentals</span>
+                <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals logo">
+                <span class="brand-name">R&A Auto Rentals</span>
             </a>
-            <nav class="top-links">
+            <nav class="nav">
                 @auth
                     @if(auth()->user()->canAccess('cars'))
                         <a href="{{ route('cars.index') }}">Cars</a>
@@ -407,10 +469,10 @@
                     @if(auth()->user()->canAccess('payments'))
                         <a href="{{ route('payments.index') }}">Payments</a>
                     @endif
-                    <a class="primary" href="{{ route('dashboard') }}">Open Dashboard</a>
+                    <a class="cta" href="{{ route('dashboard') }}">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}">Login</a>
-                    <a class="primary" href="{{ route('register') }}">Register</a>
+                    <a class="cta" href="{{ route('register') }}">Register</a>
                 @endauth
             </nav>
         </div>
@@ -418,209 +480,136 @@
 
     <main>
         <section class="hero">
-            <div class="container hero-grid">
-                <div>
-                    <span class="badge">Fleet Operations Platform</span>
-                    <h1>Run a premium rental business without operational chaos.</h1>
-                    <p>
-                        Manage cars, customers, agreements, expenses, and kilometer logs from one place.
-                        Built for teams that want cleaner workflows, faster collections, and better visibility.
-                    </p>
-                    <div class="cta-row">
-                        @auth
-                            <a class="btn btn-primary" href="{{ route('dashboard') }}">Go To Dashboard</a>
-                            <a class="btn btn-secondary" href="{{ route('gps-logs.index') }}">Open KM Logs</a>
-                        @else
-                            <a class="btn btn-primary" href="{{ route('register') }}">Create Account</a>
-                            <a class="btn btn-secondary" href="{{ route('login') }}">Login</a>
-                        @endauth
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-copy">
+                        <span class="kicker">Premium Rental Service</span>
+                        <h1>Drive your dreams with <span class="brand-highlight">R&A Auto Rentals</span>.</h1>
+                        <p>Manage cars, customers, payments, agreements, and mileage in one reliable platform built for <span class="brand-highlight">R&A Auto Rentals</span> daily work.</p>
+                        <div class="hero-actions">
+                            @auth
+                                <a class="btn btn-primary" href="{{ route('dashboard') }}">Open Dashboard</a>
+                                <a class="btn btn-secondary" href="{{ route('gps-logs.index') }}">Open KM Logs</a>
+                            @else
+                                <a class="btn btn-primary" href="{{ route('register') }}">Create Account</a>
+                                <a class="btn btn-secondary" href="{{ route('login') }}">Login</a>
+                            @endauth
+                        </div>
+                    </div>
+
+                    <div class="hero-art">
+                        <!-- <span class="chip">R&A Fleet Ready</span> -->
+                        <img src="{{ asset('images/hero car.jpg') }}" alt="R&A fleet visual" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';">
                     </div>
                 </div>
 
-                <aside class="hero-panel">
-                    <form class="trip-form">
-                        <div class="address-field">
-                            <label for="pickup">Pickup Location</label>
-                            <input id="pickup" type="text" placeholder="Search pickup address in Sri Lanka" autocomplete="off">
-                            <input id="pickup-lat" type="hidden">
-                            <input id="pickup-lng" type="hidden">
-                            <div id="pickup-suggestions" class="address-suggestions"></div>
+                <div class="availability">
+                    <h2 class="availability-title">Check Availability</h2>
+                    <form class="availability-grid">
+                        <div class="control">
+                            <label for="location">Pickup Location</label>
+                            <input id="location" type="text" placeholder="Colombo, Sri Lanka">
                         </div>
-                        <div class="address-field">
-                            <label for="dropoff">Drop-off Location</label>
-                            <input id="dropoff" type="text" placeholder="Search drop-off address in Sri Lanka" autocomplete="off">
-                            <input id="dropoff-lat" type="hidden">
-                            <input id="dropoff-lng" type="hidden">
-                            <div id="dropoff-suggestions" class="address-suggestions"></div>
+                        <div class="control">
+                            <label for="pickup">Pickup Date</label>
+                            <input id="pickup" type="date" value="{{ now()->toDateString() }}">
                         </div>
-                        <div>
-                            <label for="date-start">Pickup Date</label>
-                            <input id="date-start" type="date" value="{{ now()->toDateString() }}">
+                        <div class="control">
+                            <label for="return">Return Date</label>
+                            <input id="return" type="date" value="{{ now()->addDays(3)->toDateString() }}">
                         </div>
-                        <div>
-                            <label for="date-end">Drop-off Date</label>
-                            <input id="date-end" type="date" value="{{ now()->addDays(3)->toDateString() }}">
-                        </div>
-                        <div class="full">
-                            <button class="btn btn-primary" type="button">Start Reservation</button>
-                        </div>
-                        <div class="full" style="font-size:0.85rem;color:var(--muted);">
-                            Sri Lanka address search powered by OpenStreetMap (free).
+                        <div class="control">
+                            <button class="btn btn-primary" type="button">Search Cars</button>
                         </div>
                     </form>
-                </aside>
+                </div>
             </div>
         </section>
 
-        <section class="stats">
-            <div class="container stats-grid">
-                <article class="stat">
-                    <strong>99.2%</strong>
-                    <span>Fleet availability control</span>
-                </article>
-                <article class="stat">
-                    <strong>Daily</strong>
-                    <span>KM activity logging</span>
-                </article>
-                <article class="stat">
-                    <strong>3x</strong>
-                    <span>Faster payment follow-up</span>
-                </article>
-                <article class="stat">
-                    <strong>1 dashboard</strong>
-                    <span>Cars, customers, contracts, and finance</span>
-                </article>
+        <section class="section">
+            <div class="container">
+                <h2>Why R&A Auto Rentals?</h2>
+                <p class="head-note">A practical, fast, and team-friendly system to run rental operations without spreadsheet overload.</p>
+                <div class="feature-grid">
+                    <article class="feature">
+                        <span class="icon">🚗</span>
+                        <h3>Fleet Control</h3>
+                        <p>Track active cars, status, and vehicle info in a clear list with quick actions.</p>
+                    </article>
+                    <article class="feature">
+                        <span class="icon">📄</span>
+                        <h3>Smart Agreements</h3>
+                        <p>Create and maintain rental agreements with date control and customer assignment.</p>
+                    </article>
+                    <article class="feature">
+                        <span class="icon">💳</span>
+                        <h3>Payment Control</h3>
+                        <p>Monitor expected vs received payments and identify upcoming dues early.</p>
+                    </article>
+                </div>
             </div>
         </section>
 
-        <section class="container">
-            <h2 class="section-title">Everything your operations team needs</h2>
-            <p class="section-note">
-                This homepage is optimized to guide users into key modules quickly while keeping the visual style clean,
-                high-contrast, and conversion focused.
-            </p>
+        <section class="section">
+            <div class="container">
+                <h2>Explore Fleet</h2>
+                <p class="head-note">Quick highlight cards for your most rented vehicles.</p>
+                <div class="fleet-grid">
+                    <article class="fleet-card">
+                        <div class="fleet-photo">
+                            <img src="{{ asset('images/logo.png') }}" alt="R&A car">
+                        </div>
+                        <div class="fleet-body">
+                            <h3>Tesla Model S</h3>
+                            <div class="fleet-price">$120/day</div>
+                            <div class="fleet-meta">Electric · 5 seats · Auto · AC</div>
+                            <a class="btn btn-secondary" href="{{ route('cars.index') }}">View Cars</a>
+                        </div>
+                    </article>
+                    <article class="fleet-card">
+                        <div class="fleet-photo">
+                            <img src="{{ asset('images/logo.png') }}" alt="R&A SUV">
+                        </div>
+                        <div class="fleet-body">
+                            <h3>Range Rover Vogue</h3>
+                            <div class="fleet-price">$250/day</div>
+                            <div class="fleet-meta">Luxury SUV · 7 seats · Auto · Full option</div>
+                            <a class="btn btn-secondary" href="{{ route('cars.index') }}">View Cars</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
 
-            <div class="feature-grid">
-                <article class="feature">
-                    <h3>Fleet Management</h3>
-                    <p>Create, update, and monitor every vehicle profile with one-click access to status and details.</p>
-                </article>
-                <article class="feature">
-                    <h3>Customer Registry</h3>
-                    <p>Track customer records, rental history, and activity with fast search-ready structure.</p>
-                </article>
-                <article class="feature">
-                    <h3>Payment Control</h3>
-                    <p>View due payments, mark paid entries, and keep collection workflows visible for your team.</p>
-                </article>
-                <article class="feature">
-                    <h3>Smart Agreements</h3>
-                    <p>Manage rental contracts in one system and reduce manual errors across operations.</p>
-                </article>
-                <article class="feature">
-                    <h3>Expense Tracking</h3>
-                    <p>Log recurring and one-time expenses to keep profitability clear at all times.</p>
-                </article>
-                <article class="feature">
-                    <h3>DAGPS KM Logs</h3>
-                    <p>Record daily mileage and generate monthly per-car reports for operational control.</p>
-                </article>
+        <section class="section">
+            <div class="container">
+                <h2>Find Us</h2>
+                <div class="contact-card">
+                    <div class="contact-lines">
+                        <div>
+                            <strong>Main Office</strong>
+                            Galle, Sri Lanka
+                        </div>
+                        <div>
+                            <strong>Phone</strong>
+                            +94 77 717 3264
+                        </div>
+                        <div>
+                            <strong>Email</strong>
+                            info@rnautorentals.lk
+                        </div>
+                    </div>
+                    <div class="map-art">R&A Service Coverage Map</div>
+                </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            Car Rentals Platform | Laravel {{ Illuminate\Foundation\Application::VERSION }} | PHP {{ PHP_VERSION }}
+    <footer>
+        <div class="container footer-inner">
+            <div>© {{ now()->year }} R&A Auto Rentals. All rights reserved.</div>
+            <div>Laravel {{ Illuminate\Foundation\Application::VERSION }} · PHP {{ PHP_VERSION }}</div>
         </div>
     </footer>
-    <script>
-        (function () {
-            const debounce = (fn, delay = 350) => {
-                let timer;
-                return (...args) => {
-                    clearTimeout(timer);
-                    timer = setTimeout(() => fn(...args), delay);
-                };
-            };
-
-            const bindAddressSearch = (inputId, suggestionsId, latId, lngId) => {
-                const input = document.getElementById(inputId);
-                const suggestions = document.getElementById(suggestionsId);
-                const latInput = document.getElementById(latId);
-                const lngInput = document.getElementById(lngId);
-                if (!input || !suggestions) return;
-
-                const hideSuggestions = () => {
-                    suggestions.innerHTML = '';
-                    suggestions.style.display = 'none';
-                };
-
-                const renderSuggestions = (items) => {
-                    suggestions.innerHTML = '';
-                    if (!items.length) {
-                        hideSuggestions();
-                        return;
-                    }
-
-                    items.forEach((item) => {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = 'address-suggestion-item';
-                        btn.textContent = item.display_name;
-                        btn.addEventListener('click', () => {
-                            input.value = item.display_name;
-                            if (latInput) latInput.value = item.lat;
-                            if (lngInput) lngInput.value = item.lon;
-                            hideSuggestions();
-                        });
-                        suggestions.appendChild(btn);
-                    });
-
-                    suggestions.style.display = 'block';
-                };
-
-                const search = debounce(async () => {
-                    const q = input.value.trim();
-                    if (q.length < 3) {
-                        hideSuggestions();
-                        return;
-                    }
-
-                    try {
-                        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=lk&limit=5&q=${encodeURIComponent(q)}`;
-                        const response = await fetch(url, {
-                            headers: {
-                                'Accept': 'application/json',
-                            },
-                        });
-                        if (!response.ok) {
-                            hideSuggestions();
-                            return;
-                        }
-                        const data = await response.json();
-                        renderSuggestions(Array.isArray(data) ? data : []);
-                    } catch (e) {
-                        hideSuggestions();
-                    }
-                }, 400);
-
-                input.addEventListener('input', () => {
-                    if (latInput) latInput.value = '';
-                    if (lngInput) lngInput.value = '';
-                    search();
-                });
-
-                document.addEventListener('click', (event) => {
-                    if (!suggestions.contains(event.target) && event.target !== input) {
-                        hideSuggestions();
-                    }
-                });
-            };
-
-            bindAddressSearch('pickup', 'pickup-suggestions', 'pickup-lat', 'pickup-lng');
-            bindAddressSearch('dropoff', 'dropoff-suggestions', 'dropoff-lat', 'dropoff-lng');
-        })();
-    </script>
 </body>
 </html>

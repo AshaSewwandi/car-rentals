@@ -3,46 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@yield('title', 'Car Rental Manager')</title>
+  <title>@yield('title', 'R&A Auto Rentals')</title>
 
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4efe4;
-      --bg-soft: #f8f3e9;
-      --panel: rgba(255, 255, 255, 0.84);
+      --bg: #f3f5f9;
+      --bg-soft: #f8faff;
+      --panel: #ffffff;
       --panel-strong: #ffffff;
-      --text: #172332;
-      --muted: #5c6b7b;
-      --line: rgba(23, 35, 50, 0.15);
-      --primary: #e84a24;
-      --primary-deep: #be3614;
-      --teal: #136f7a;
-      --sidebar-width: 286px;
+      --text: #111827;
+      --muted: #64748b;
+      --line: rgba(15, 23, 42, 0.1);
+      --primary: #0a3f8f;
+      --primary-deep: #072d6b;
+      --accent: #0f66c3;
+      --teal: #0f66c3;
+      --sidebar-width: 274px;
+      --topbar-height: 76px;
     }
 
     body {
       font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(45rem 25rem at 8% -10%, rgba(232, 74, 36, 0.22), transparent 70%),
-        radial-gradient(34rem 18rem at 90% 3%, rgba(19, 111, 122, 0.24), transparent 70%),
-        linear-gradient(180deg, #f8f3e9 0%, #efe6d6 100%);
+      background: var(--bg);
     }
 
     .topbar {
-      backdrop-filter: blur(10px);
-      background: rgba(248, 243, 233, 0.82) !important;
+      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.92) !important;
       border-bottom: 1px solid var(--line);
+      padding: 0;
+      min-height: var(--topbar-height);
+    }
+
+    .topbar .container-fluid {
+      min-height: var(--topbar-height);
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .navbar-brand {
       font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+      font-weight: 800;
+      letter-spacing: -0.01em;
       color: var(--text) !important;
+      display: inline-flex;
+      align-items: center;
+      gap: .58rem;
+    }
+
+    .brand-name {
+      font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.03;
+      color: #0b1f3a;
+    }
+
+    .brand-logo {
+      width: 58px;
+      height: 34px;
+      object-fit: contain;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+      flex-shrink: 0;
+    }
+
+    .brand-fallback {
+      width: 58px;
+      height: 34px;
+      border-radius: .55rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .nav-link {
@@ -54,38 +97,103 @@
 
     .nav-link:hover {
       color: var(--text) !important;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(241, 245, 249, 0.95);
     }
 
     .shell-wrap {
-      min-height: calc(100vh - 66px);
+      min-height: calc(100vh - var(--topbar-height));
     }
 
     .sidebar {
       position: fixed;
-      top: 0;
+      top: var(--topbar-height);
       left: 0;
       width: var(--sidebar-width);
-      min-height: 100vh;
-      height: 100vh;
+      min-height: calc(100vh - var(--topbar-height));
+      height: calc(100vh - var(--topbar-height));
       overflow-y: auto;
-      background: transparent;
+      background: #fff;
       border-right: 1px solid var(--line) !important;
       z-index: 5;
-      padding: 84px .8rem 1rem .8rem !important;
+      padding: 0 !important;
     }
 
     .sidebar-card {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.74);
-      border-radius: 1rem;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 12px 24px rgba(23, 35, 50, 0.08);
-      padding: .8rem;
+      min-height: calc(100vh - var(--topbar-height));
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0 .75rem .7rem;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      padding: .55rem .65rem;
+      margin-bottom: .55rem;
+      border: 1px solid rgba(15, 102, 195, 0.22);
+      border-radius: .9rem;
+      background: #f8fbff;
+      box-shadow: 0 6px 16px rgba(10, 63, 143, 0.1);
+    }
+
+    .sidebar-brand-mark {
+      width: 3.45rem;
+      height: 2.15rem;
+      border-radius: .42rem;
+      border: 0;
+      background: transparent;
+      display: inline-block;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+      box-shadow: none;
+    }
+
+    .sidebar-brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .sidebar-brand-fallback {
+      position: absolute;
+      inset: 0;
+      border-radius: .42rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      display: none;
+    }
+
+    .sidebar-brand-title {
+      font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+      font-weight: 800;
+      font-size: 1.07rem;
+      letter-spacing: -0.01em;
+      color: #0b1f3a;
+      line-height: 1.02;
+    }
+
+    .sidebar-brand-sub {
+      color: #64748b;
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      line-height: 1.2;
     }
 
     .menu-section {
-      margin-bottom: .75rem;
+      margin-bottom: .45rem;
     }
 
     .menu-section:last-child {
@@ -97,22 +205,22 @@
       font-weight: 800;
       letter-spacing: .08em;
       text-transform: uppercase;
-      color: #6f7e8d;
-      padding: .4rem .65rem;
+      color: #94a3b8;
+      padding: .22rem .62rem;
     }
 
     .menu-link {
       display: flex;
       align-items: center;
       gap: .55rem;
-      border: 1px solid transparent;
+      border: 1px solid #eef2f7;
       border-radius: .75rem;
-      margin-bottom: .28rem;
-      color: var(--muted);
-      font-weight: 700;
+      margin-bottom: .2rem;
+      color: #334155;
+      font-weight: 600;
       text-decoration: none;
-      padding: .58rem .65rem;
-      transition: 150ms ease;
+      padding: .5rem .62rem;
+      transition: 180ms ease;
     }
 
     .menu-link:last-child {
@@ -120,34 +228,73 @@
     }
 
     .menu-link:hover {
-      background: rgba(255, 255, 255, 0.86);
-      border-color: rgba(23, 35, 50, 0.1);
-      color: var(--text);
+      background: #f8fbff;
+      border-color: #dbeafe;
+      color: #1e3a8a;
       transform: translateX(2px);
     }
 
     .menu-link.active {
-      background: linear-gradient(90deg, rgba(232, 74, 36, 0.16), rgba(232, 74, 36, 0.06));
-      border-color: rgba(232, 74, 36, 0.34);
-      color: #a73418;
-      box-shadow: inset 3px 0 0 #db4320;
+      background: linear-gradient(90deg, #e8efff, #f3f7ff);
+      border-color: #dbeafe;
+      color: var(--primary);
+      box-shadow: inset 3px 0 0 var(--accent);
     }
 
     .menu-dot {
-      width: .5rem;
-      height: .5rem;
-      border-radius: 50%;
-      background: rgba(23, 35, 50, 0.22);
+      width: .54rem;
+      height: .54rem;
+      border-radius: .18rem;
+      background: #cbd5e1;
       flex-shrink: 0;
     }
 
     .menu-link.active .menu-dot {
-      background: #d8411e;
+      background: var(--accent);
     }
 
     .app-main {
-      padding-top: 1.25rem !important;
+      padding-top: 1rem !important;
       padding-bottom: 2rem !important;
+    }
+
+    .page-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .7rem;
+      margin-bottom: 1rem !important;
+    }
+
+    .page-toolbar > div:first-child h4 {
+      margin-bottom: .2rem !important;
+      font-size: 1.72rem;
+      letter-spacing: -0.01em;
+    }
+
+    .page-toolbar .text-muted {
+      font-size: .94rem;
+    }
+
+    .list-card {
+      border-radius: .9rem;
+      border: 1px solid #dbe4ef !important;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04) !important;
+      overflow: hidden;
+    }
+
+    .record-card {
+      border: 1px solid #e3eaf3 !important;
+      border-radius: .8rem !important;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+      background: #fff;
+    }
+
+    .card-header .header-title {
+      font-size: 1.06rem;
+      font-weight: 700;
+      color: #0f172a;
     }
 
     .menu-icon-btn {
@@ -182,14 +329,14 @@
 
     .card {
       background: var(--panel);
-      border: 1px solid rgba(255, 255, 255, 0.7);
-      border-radius: 1rem;
-      box-shadow: 0 12px 30px rgba(23, 35, 50, 0.08) !important;
+      border: 1px solid #dbe4ef;
+      border-radius: .95rem;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05) !important;
       overflow: hidden;
     }
 
     .card-header {
-      background: rgba(255, 255, 255, 0.72);
+      background: #f8fbff;
       border-bottom: 1px solid var(--line);
       font-weight: 700;
       color: var(--text);
@@ -198,13 +345,13 @@
     .table {
       --bs-table-bg: transparent;
       --bs-table-color: var(--text);
-      --bs-table-striped-bg: rgba(255, 255, 255, 0.44);
-      --bs-table-hover-bg: rgba(232, 74, 36, 0.08);
+      --bs-table-striped-bg: #f8fbff;
+      --bs-table-hover-bg: #eff6ff;
       margin-bottom: 0;
     }
 
     .table thead th {
-      background: rgba(255, 255, 255, 0.68);
+      background: #f8fbff;
       color: var(--muted);
       font-weight: 700;
       border-bottom: 1px solid var(--line);
@@ -224,21 +371,22 @@
 
     .form-control:focus, .form-select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 .2rem rgba(232, 74, 36, 0.2);
+      box-shadow: 0 0 0 .2rem rgba(15, 118, 110, 0.18);
       background-color: #fff;
     }
 
     .btn-dark,
     .btn-outline-dark:hover {
-      background: linear-gradient(135deg, var(--primary), #f08f25) !important;
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
       border-color: transparent !important;
       color: #fff !important;
-      box-shadow: 0 10px 22px rgba(232, 74, 36, 0.25);
+      box-shadow: 0 8px 18px rgba(10, 63, 143, 0.28);
     }
 
     .btn-outline-dark {
-      border-color: rgba(23, 35, 50, 0.26);
-      color: var(--text);
+      border-color: #cbd5e1;
+      color: #334155;
+      background: #fff;
     }
 
     .btn-outline-danger {
@@ -275,7 +423,8 @@
     }
 
     .badge.bg-warning {
-      background: #ffd36b !important;
+      background: #dbeafe !important;
+      color: #1e3a8a !important;
     }
 
     .text-muted {
@@ -291,15 +440,36 @@
         min-height: auto;
         height: auto;
         overflow: visible;
-      }
-
-      .app-main {
-        padding-top: .8rem !important;
+        padding: 0 !important;
       }
 
       .app-main-col {
         margin-left: 0;
+        width: 100%;
       }
+
+      .page-toolbar > div:first-child h4 {
+        font-size: 1.42rem;
+      }
+    }
+
+    .sidebar-user {
+      margin-top: auto;
+      padding: .7rem .62rem .35rem;
+      border-top: 1px solid var(--line);
+      color: #475569;
+      font-size: .88rem;
+    }
+
+    .sidebar-user strong {
+      color: #0f172a;
+      display: block;
+      font-size: .94rem;
+    }
+
+    .sidebar-user a {
+      color: inherit;
+      display: block;
     }
   </style>
 </head>
@@ -312,7 +482,11 @@
         <span id="sidebarToggleIcon">&#9776;</span>
       </button>
     @endauth
-    <a class="navbar-brand" href="{{ url('/') }}">Car Rentals</a>
+    <a class="navbar-brand" href="{{ url('/') }}">
+      <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals logo" class="brand-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+      <span class="brand-fallback" style="display:none;">R&A</span>
+      <span class="brand-name">R&A Auto Rentals</span>
+    </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <span class="navbar-toggler-icon"></span>
@@ -333,6 +507,7 @@
         @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
           <li class="nav-item"><a class="nav-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}">Permissions</a></li>
         @endif
+          <li class="nav-item"><a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">Profile</a></li>
           <li class="nav-item"><span class="nav-link">{{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})</span></li>
           <li class="nav-item">
             <form method="post" action="{{ route('logout') }}">
@@ -387,6 +562,7 @@
 
         <div class="menu-section">
           <div class="menu-title">Administration</div>
+          <a class="menu-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}"><span class="menu-dot"></span>My Profile</a>
           @if(auth()->user()->canAccess('users_manage') && \Illuminate\Support\Facades\Route::has('users.index'))
             <a class="menu-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}"><span class="menu-dot"></span>Users & Roles</a>
           @endif
@@ -394,6 +570,15 @@
             <a class="menu-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}"><span class="menu-dot"></span>Permissions</a>
           @endif
         </div>
+
+        @auth
+          <div class="sidebar-user">
+            <a href="{{ route('profile.edit') }}" class="text-decoration-none">
+              <strong>{{ auth()->user()->name }}</strong>
+              <span>{{ auth()->user()->email }}</span>
+            </a>
+          </div>
+        @endauth
       </div>
     </aside>
 

@@ -2,7 +2,7 @@
 @section('title', 'Permission Management')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="page-toolbar">
   <div>
     <h4 class="mb-1">Permission Management</h4>
     <div class="text-muted">Set module access for each role to control what users can view and manage.</div>
@@ -12,9 +12,9 @@
 <div class="row g-3">
   @foreach($roles as $role)
     <div class="col-12 col-xl-6">
-      <div class="card shadow-sm">
+      <div class="card list-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>{{ ucfirst($role) }} Permissions</span>
+          <span class="header-title">{{ ucfirst($role) }} Permissions</span>
         </div>
         <form method="post" action="{{ route('permissions.update', $role) }}">
           @csrf

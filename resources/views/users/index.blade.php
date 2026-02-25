@@ -2,7 +2,7 @@
 @section('title', 'User Management')
 
 @section('content')
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+<div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">User Management</h4>
     <div class="text-muted">Create team accounts and control access by assigning user roles.</div>
@@ -20,8 +20,8 @@
   </div>
 @endif
 
-<div class="card shadow-sm">
-  <div class="card-header">Users</div>
+<div class="card list-card">
+  <div class="card-header"><span class="header-title">Users</span></div>
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-striped mb-0 align-middle">
