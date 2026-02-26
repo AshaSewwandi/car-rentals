@@ -12,34 +12,42 @@
       margin: 0;
       min-height: 100vh;
       font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
-      color: #172332;
+      color: #10223d;
       background:
-        radial-gradient(45rem 25rem at 8% -10%, rgba(15, 118, 110, 0.22), transparent 70%),
-        radial-gradient(34rem 18rem at 90% 3%, rgba(19, 111, 122, 0.24), transparent 70%),
-        linear-gradient(180deg, #f8f3e9 0%, #efe6d6 100%);
+        radial-gradient(45rem 25rem at 8% -10%, rgba(29, 78, 216, 0.24), transparent 70%),
+        radial-gradient(34rem 18rem at 90% 3%, rgba(14, 116, 144, 0.22), transparent 70%),
+        linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
       display: grid;
       place-items: center;
       padding: 1rem;
     }
     .auth-card {
       width: min(460px, 100%);
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.93);
+      border: 1px solid rgba(147, 197, 253, 0.7);
       border-radius: 1rem;
-      box-shadow: 0 12px 30px rgba(23, 35, 50, 0.08);
+      box-shadow: 0 18px 40px rgba(30, 64, 175, 0.14);
     }
     .auth-title {
       font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
       font-weight: 700;
+      color: #0f172a;
     }
     .form-control {
-      border-color: rgba(23, 35, 50, 0.2);
-      background-color: rgba(255, 255, 255, 0.9);
+      border-color: #bfdbfe;
+      background-color: #f8fbff;
       border-radius: .7rem;
     }
+    .form-control:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 .2rem rgba(37, 99, 235, 0.15);
+    }
     .btn-dark {
-      background: linear-gradient(135deg, #0f766e, #14b8a6) !important;
+      background: linear-gradient(135deg, #1d4ed8, #0369a1) !important;
       border-color: transparent !important;
+    }
+    .btn-dark:hover {
+      filter: brightness(1.04);
     }
   </style>
 </head>

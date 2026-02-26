@@ -24,8 +24,7 @@
             <th style="min-width:180px;">Vehicle</th>
             <th style="min-width:140px;">Start Date</th>
             <th style="min-width:140px;">End Date</th>
-            <th style="min-width:190px;">Start Location</th>
-            <th style="min-width:190px;">End Location</th>
+            <th style="min-width:190px;">Pickup Location</th>
             <th style="min-width:190px;">Availability Check</th>
             <th style="min-width:120px;">Status</th>
             <th style="min-width:240px;">Action</th>
@@ -52,9 +51,6 @@
               </td>
               <td>
                 {{ $requestItem->start_location ?: 'N/A' }}
-              </td>
-              <td>
-                {{ $requestItem->end_location ?: 'N/A' }}
               </td>
               <td>
                 @if(!$requestItem->is_checkable)
@@ -111,14 +107,14 @@
             </tr>
             @if($requestItem->message)
               <tr>
-                <td colspan="10">
+                <td colspan="9">
                   <strong>Message:</strong> {{ $requestItem->message }}
                 </td>
               </tr>
             @endif
           @empty
             <tr>
-              <td colspan="10" class="text-center p-4 text-muted">No rent requests yet.</td>
+              <td colspan="9" class="text-center p-4 text-muted">No rent requests yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -140,12 +136,12 @@
           @csrf
           @method('PUT')
           <div class="modal-header">
-            <h5 class="modal-title">Edit Dates & Locations</h5>
+            <h5 class="modal-title">Edit Dates & Pickup Location</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="alert alert-info mb-3">
-              Only start/end dates and start/end locations can be changed.
+              Only start/end dates and pickup location can be changed.
             </div>
 
             <div class="row g-3">
@@ -167,12 +163,8 @@
                 <input type="date" class="form-control" name="end_date" value="{{ $requestItem->end_date?->format('Y-m-d') }}">
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label">Start Location</label>
+                <label class="form-label">Pickup Location</label>
                 <input type="text" class="form-control" name="start_location" value="{{ $requestItem->start_location }}">
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">End Location</label>
-                <input type="text" class="form-control" name="end_location" value="{{ $requestItem->end_location }}">
               </div>
             </div>
           </div>

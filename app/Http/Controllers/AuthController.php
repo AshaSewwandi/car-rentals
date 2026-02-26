@@ -29,7 +29,10 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        $user = $request->user();
+        $targetRoute = $user && $user->isCustomer() ? 'customer.dashboard' : 'home';
+
+        return redirect()->intended(route($targetRoute));
     }
 
     public function showRegister()
@@ -41,12 +44,14 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
             'name' => $data['name'],
+            'phone' => $data['phone'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => 'customer',
@@ -55,7 +60,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('customer.dashboard');
     }
 
     public function logout(Request $request)

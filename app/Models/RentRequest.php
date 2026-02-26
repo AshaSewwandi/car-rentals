@@ -15,7 +15,6 @@ class RentRequest extends Model
         'phone',
         'email',
         'start_location',
-        'end_location',
         'start_date',
         'end_date',
         'message',
@@ -40,4 +39,3 @@ class RentRequest extends Model
         return $this->belongsTo(User::class, 'accepted_by');
     }
 }
-

@@ -55,7 +55,6 @@ class RentRequestController extends Controller
             'phone' => ['nullable', 'string', 'max:40', 'required_without:email'],
             'email' => ['nullable', 'email', 'max:180', 'required_without:phone'],
             'start_location' => ['nullable', 'string', 'max:255'],
-            'end_location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'message' => ['nullable', 'string', 'max:3000'],
@@ -95,7 +94,6 @@ class RentRequestController extends Controller
     {
         $validated = $request->validate([
             'start_location' => ['nullable', 'string', 'max:255'],
-            'end_location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
         ]);

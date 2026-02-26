@@ -135,11 +135,36 @@
         }
 
         .filter-grid {
+            --filter-control-height: 52px;
             margin-top: .9rem;
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: .65rem;
-            align-items: end;
+            align-items: start;
+        }
+
+        .filter-submit {
+            align-self: stretch;
+            margin-top: 0;
+            width: 100%;
+            height: var(--filter-control-height);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .filter-submit-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-submit-spacer {
+            display: block;
+            margin-bottom: .35rem;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            visibility: hidden;
         }
 
         .control label {
@@ -154,12 +179,32 @@
 
         .control input {
             width: 100%;
+            height: var(--filter-control-height);
             border: 1px solid #c8d7ea;
             background: #f8fbff;
             border-radius: 10px;
             padding: .65rem .7rem;
             color: #0f172a;
             font: inherit;
+        }
+
+        .control input.input-error {
+            border-color: #dc2626;
+            background: #fff7f7;
+        }
+
+        .field-error {
+            display: block;
+            min-height: 1.1rem;
+            visibility: hidden;
+            margin-top: .35rem;
+            color: #b91c1c;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .field-error.show {
+            visibility: visible;
         }
 
         .results-note {
@@ -413,7 +458,7 @@
         @media (max-width: 1050px) {
             .fleet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .filter-grid .filter-submit { grid-column: 1 / -1; }
+            .filter-grid .filter-submit-wrap { grid-column: 1 / -1; }
         }
 
         @media (max-width: 700px) {
@@ -451,34 +496,36 @@
         <section class="hero">
             <div class="hero-card">
                 <h1 class="hero-title">Full Fleet</h1>
-                <p class="hero-sub">Check vehicle availability for your selected date period and locations.</p>
+                <p class="hero-sub">Check vehicle availability for your selected date period and pickup location.</p>
                 <p class="hero-policy">Rental options: With driver or without driver. Daily package includes 150 km. Extra distance is charged at Rs 25 per km.</p>
-                <form class="filter-grid" method="get" action="{{ route('fleet.index') }}">
+                <form class="filter-grid" id="fleetFilterForm" method="get" action="{{ route('fleet.index') }}" novalidate>
                     <div class="control">
-                        <label for="start_location">Start Location</label>
-                        <input id="start_location" name="start_location" type="text" value="{{ $filters['start_location'] }}" placeholder="City, Airport, or Address">
-                    </div>
-                    <div class="control">
-                        <label for="dropoff_location">End Location</label>
-                        <input id="dropoff_location" name="dropoff_location" type="text" value="{{ $filters['dropoff_location'] }}" placeholder="City, Airport, or Address">
+                        <label for="start_location">Pickup Location</label>
+                        <input id="start_location" name="start_location" type="text" value="{{ $filters['start_location'] }}" placeholder="City, Airport, or Address" required aria-describedby="fleet_start_location_error">
+                        <small class="field-error" id="fleet_start_location_error"></small>
                     </div>
                     <div class="control">
                         <label for="start_date">Start Date</label>
-                        <input id="start_date" name="start_date" type="date" value="{{ $filters['start_date'] }}">
+                        <input id="start_date" name="start_date" type="date" value="{{ $filters['start_date'] }}" required aria-describedby="fleet_start_date_error">
+                        <small class="field-error" id="fleet_start_date_error"></small>
                     </div>
                     <div class="control">
                         <label for="end_date">End Date</label>
-                        <input id="end_date" name="end_date" type="date" value="{{ $filters['end_date'] }}">
+                        <input id="end_date" name="end_date" type="date" value="{{ $filters['end_date'] }}" required aria-describedby="fleet_end_date_error">
+                        <small class="field-error" id="fleet_end_date_error"></small>
                     </div>
-                    <button class="btn btn-primary filter-submit" type="submit">Find Available Cars</button>
+                    <div class="control filter-submit-wrap">
+                        <span class="filter-submit-spacer">Action</span>
+                        <button class="btn btn-primary filter-submit" type="submit">Find Available Cars</button>
+                    </div>
                 </form>
 
                 @if($filters['start_date'] && $filters['end_date'])
                     <div class="results-note">
                         System check completed for {{ $filters['start_date'] }} to {{ $filters['end_date'] }}.
                         Showing only available vehicles.
-                        @if($filters['start_location'] || $filters['dropoff_location'])
-                            | {{ $filters['start_location'] ?: 'Any start location' }} to {{ $filters['dropoff_location'] ?: 'Any end location' }}
+                        @if($filters['start_location'])
+                            | Pickup: {{ $filters['start_location'] }}
                         @endif
                         ({{ $cars->count() }} result{{ $cars->count() === 1 ? '' : 's' }})
                     </div>
@@ -534,6 +581,31 @@
                             </div>
                         @endif
                         <div class="fleet-actions">
+                            @if($filters['start_date'] && $filters['end_date'])
+                                <a
+                                    class="btn-request"
+                                    style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:.45rem;background:linear-gradient(135deg,#0a3f8f,#0f66c3);color:#fff;border-color:transparent;"
+                                    href="{{ route('booking.confirm', [
+                                        'car_id' => $car['id'],
+                                        'start_date' => $filters['start_date'],
+                                        'end_date' => $filters['end_date'],
+                                        'start_location' => $filters['start_location'],
+                                    ]) }}"
+                                >
+                                    Continue to Book
+                                </a>
+                            @else
+                                <button
+                                    type="button"
+                                    class="btn-request"
+                                    style="margin-bottom:.45rem;background:#dbe6f3;color:#475569;border-color:#c8d7ea;cursor:not-allowed;"
+                                    title="Select start date and end date first"
+                                    disabled
+                                >
+                                    Continue to Book
+                                </button>
+                                <div style="font-size:.78rem;color:#64748b;margin:-.2rem 0 .35rem;">Select start and end dates first.</div>
+                            @endif
                             <button
                                 type="button"
                                 class="btn-request js-request-btn"
@@ -543,7 +615,6 @@
                                 data-start-date="{{ $filters['start_date'] }}"
                                 data-end-date="{{ $filters['end_date'] }}"
                                 data-start-location="{{ $filters['start_location'] }}"
-                                data-end-location="{{ $filters['dropoff_location'] }}"
                             >
                                 Rent on Request
                             </button>
@@ -573,7 +644,6 @@
                 <input type="hidden" name="car_name" id="requestCarName">
                 <input type="hidden" name="plate_no" id="requestPlateNo">
                 <input type="hidden" name="start_location" id="requestStartLocation">
-                <input type="hidden" name="end_location" id="requestEndLocation">
                 <input type="hidden" name="start_date" id="requestStartDate">
                 <input type="hidden" name="end_date" id="requestEndDate">
                 <div class="request-grid">
@@ -613,7 +683,6 @@
             const carNameEl = document.getElementById('requestCarName');
             const plateNoEl = document.getElementById('requestPlateNo');
             const startLocationEl = document.getElementById('requestStartLocation');
-            const endLocationEl = document.getElementById('requestEndLocation');
             const startDateEl = document.getElementById('requestStartDate');
             const endDateEl = document.getElementById('requestEndDate');
 
@@ -630,13 +699,11 @@
                     const startDate = button.dataset.startDate || 'Not selected';
                     const endDate = button.dataset.endDate || 'Not selected';
                     const startLocation = button.dataset.startLocation || 'Not selected';
-                    const endLocation = button.dataset.endLocation || 'Not selected';
 
                     carIdEl.value = carId;
                     carNameEl.value = car;
                     plateNoEl.value = plate;
                     startLocationEl.value = startLocation === 'Not selected' ? '' : startLocation;
-                    endLocationEl.value = endLocation === 'Not selected' ? '' : endLocation;
                     startDateEl.value = startDate === 'Not selected' ? '' : startDate;
                     endDateEl.value = endDate === 'Not selected' ? '' : endDate;
 
@@ -644,8 +711,7 @@
                     messageEl.value =
 `Rental request:
 Vehicle: ${car} (${plate})
-Start location: ${startLocation}
-End location: ${endLocation}
+Pickup location: ${startLocation}
 Start date: ${startDate}
 End date: ${endDate}
 Please contact me with availability and final rent details.`;
@@ -661,6 +727,99 @@ Please contact me with availability and final rent details.`;
                     closeModal();
                 }
             });
+
+            const filterForm = document.getElementById('fleetFilterForm');
+            const filterPickupInput = document.getElementById('start_location');
+            const filterStartDateInput = document.getElementById('start_date');
+            const filterEndDateInput = document.getElementById('end_date');
+            const filterPickupError = document.getElementById('fleet_start_location_error');
+            const filterStartDateError = document.getElementById('fleet_start_date_error');
+            const filterEndDateError = document.getElementById('fleet_end_date_error');
+            let hasTriedFilterSubmit = false;
+
+            const showFilterError = (input, errorEl, message) => {
+                input.classList.add('input-error');
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            };
+
+            const clearFilterError = (input, errorEl) => {
+                input.classList.remove('input-error');
+                errorEl.textContent = '';
+                errorEl.classList.remove('show');
+            };
+
+            const syncFilterEndDateMin = () => {
+                if (!filterStartDateInput.value) {
+                    filterEndDateInput.min = '';
+                    return;
+                }
+
+                filterEndDateInput.min = filterStartDateInput.value;
+                if (filterEndDateInput.value && filterEndDateInput.value < filterStartDateInput.value) {
+                    filterEndDateInput.value = '';
+                }
+            };
+
+            const validateFilterForm = (focusFirstInvalid = true) => {
+                let isValid = true;
+                let firstInvalidInput = null;
+
+                clearFilterError(filterPickupInput, filterPickupError);
+                clearFilterError(filterStartDateInput, filterStartDateError);
+                clearFilterError(filterEndDateInput, filterEndDateError);
+
+                if (!filterPickupInput.value.trim()) {
+                    showFilterError(filterPickupInput, filterPickupError, 'Please enter pickup location.');
+                    firstInvalidInput = firstInvalidInput || filterPickupInput;
+                    isValid = false;
+                }
+
+                if (!filterStartDateInput.value) {
+                    showFilterError(filterStartDateInput, filterStartDateError, 'Please select a start date.');
+                    firstInvalidInput = firstInvalidInput || filterStartDateInput;
+                    isValid = false;
+                }
+
+                if (!filterEndDateInput.value) {
+                    showFilterError(filterEndDateInput, filterEndDateError, 'Please select an end date.');
+                    firstInvalidInput = firstInvalidInput || filterEndDateInput;
+                    isValid = false;
+                }
+
+                if (filterStartDateInput.value && filterEndDateInput.value && filterEndDateInput.value < filterStartDateInput.value) {
+                    showFilterError(filterEndDateInput, filterEndDateError, 'End date must be on or after start date.');
+                    firstInvalidInput = firstInvalidInput || filterEndDateInput;
+                    isValid = false;
+                }
+
+                if (!isValid && firstInvalidInput && focusFirstInvalid) {
+                    firstInvalidInput.focus();
+                }
+
+                return isValid;
+            };
+
+            filterForm.addEventListener('submit', (event) => {
+                hasTriedFilterSubmit = true;
+                if (!validateFilterForm()) {
+                    event.preventDefault();
+                }
+            });
+
+            [filterPickupInput, filterStartDateInput, filterEndDateInput].forEach((input) => {
+                input.addEventListener('input', () => {
+                    if (input === filterStartDateInput) {
+                        syncFilterEndDateMin();
+                    }
+                    if (!hasTriedFilterSubmit) {
+                        return;
+                    }
+                    validateFilterForm(false);
+                });
+            });
+
+            syncFilterEndDateMin();
         })();
     </script>
 </body>

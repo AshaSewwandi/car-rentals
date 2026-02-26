@@ -371,6 +371,23 @@
             color: var(--text);
         }
 
+        .control input.input-error {
+            border-color: #dc2626;
+            background: #fff7f7;
+        }
+
+        .field-error {
+            display: none;
+            margin-top: .35rem;
+            color: #b91c1c;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
         .control .btn {
             width: 100%;
             white-space: nowrap;
@@ -955,16 +972,23 @@
             <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" id="menuToggle">&#9776;</button>
             <nav class="nav">
                 @auth
-                    @if(auth()->user()->canAccess('cars'))
-                        <a href="{{ route('cars.index') }}">Cars</a>
+                    @if(!auth()->user()->isAdmin())
+                        <a class="cta" href="{{ route('customer.dashboard') }}">My Dashboard</a>
+                    @else
+                        @if(auth()->user()->canAccess('cars'))
+                            <a href="{{ route('cars.index') }}">Cars</a>
+                        @endif
+                        @if(auth()->user()->canAccess('customers'))
+                            <a href="{{ route('customers.index') }}">Customers</a>
+                        @endif
+                        @if(auth()->user()->canAccess('payments'))
+                            <a href="{{ route('payments.index') }}">Payments</a>
+                        @endif
+                        <a href="{{ route('profile.edit') }}">My Profile</a>
+                        @if(auth()->user()->canAccess('dashboard'))
+                            <a class="cta" href="{{ route('dashboard') }}">Dashboard</a>
+                        @endif
                     @endif
-                    @if(auth()->user()->canAccess('customers'))
-                        <a href="{{ route('customers.index') }}">Customers</a>
-                    @endif
-                    @if(auth()->user()->canAccess('payments'))
-                        <a href="{{ route('payments.index') }}">Payments</a>
-                    @endif
-                    <a class="cta" href="{{ route('dashboard') }}">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}">Login</a>
                     <a class="cta" href="{{ route('register') }}">Register</a>
@@ -1030,23 +1054,22 @@
 
                 <div class="availability-wrap">
                     <div class="availability">
-                        <h2 class="availability-title">Start & End</h2>
-                        <form class="availability-grid" action="{{ route('fleet.index') }}" method="get">
-                            <div class="control">
-                                <label for="start_location">Start Location</label>
-                                <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address">
-                            </div>
-                            <div class="control">
-                                <label for="dropoff-location">End Location</label>
-                                <input id="dropoff-location" name="dropoff_location" type="text" placeholder="City, Airport, or Address">
+                        <h2 class="availability-title">Pickup & Dates</h2>
+                        <form class="availability-grid" id="availabilityForm" action="{{ route('fleet.index') }}" method="get" novalidate>
+                            <div class="control full">
+                                <label for="start_location">Pickup Location</label>
+                                <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address" required aria-describedby="start_location_error">
+                                <small class="field-error" id="start_location_error"></small>
                             </div>
                             <div class="control">
                                 <label for="start_date">Start Date</label>
-                                <input id="start_date" name="start_date" type="date" value="{{ now()->toDateString() }}" required>
+                                <input id="start_date" name="start_date" type="date" required aria-describedby="start_date_error">
+                                <small class="field-error" id="start_date_error"></small>
                             </div>
                             <div class="control">
                                 <label for="end_date">End Date</label>
-                                <input id="end_date" name="end_date" type="date" value="{{ now()->addDays(3)->toDateString() }}" required>
+                                <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
+                                <small class="field-error" id="end_date_error"></small>
                             </div>
                             <div class="control full">
                                 <button class="btn btn-primary" type="submit">Find Available Cars</button>
@@ -1270,6 +1293,7 @@
                     <ul class="footer-links">
                         <li><a href="#home-section">Home</a></li>
                         <li><a href="#fleet-section">Fleet</a></li>
+                        <li><a href="{{ route('blogs') }}">Blogs</a></li>
                         <li><a href="#payments-section">Payments</a></li>
                         <li><a href="#contact-section">Contact</a></li>
                     </ul>
@@ -1278,8 +1302,8 @@
                     <p class="footer-title">Customer Care</p>
                     <ul class="footer-links">
                         <li><a href="#contact-section">Support Center</a></li>
-                        <li><a href="#contact-section">Terms of Service</a></li>
-                        <li><a href="#contact-section">Privacy Policy</a></li>
+                        <li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li>
+                        <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
                         <li><a href="#contact-section">FAQs</a></li>
                     </ul>
                 </div>
@@ -1313,6 +1337,103 @@
                     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
                 });
             }
+
+            const form = document.getElementById('availabilityForm');
+            if (!form) {
+                return;
+            }
+
+            const pickupInput = document.getElementById('start_location');
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            const pickupError = document.getElementById('start_location_error');
+            const startDateError = document.getElementById('start_date_error');
+            const endDateError = document.getElementById('end_date_error');
+            let hasTriedSubmit = false;
+
+            const showError = (input, errorEl, message) => {
+                input.classList.add('input-error');
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            };
+
+            const clearError = (input, errorEl) => {
+                input.classList.remove('input-error');
+                errorEl.textContent = '';
+                errorEl.classList.remove('show');
+            };
+
+            const syncEndDateMin = () => {
+                if (!startDateInput.value) {
+                    endDateInput.min = '';
+                    return;
+                }
+
+                endDateInput.min = startDateInput.value;
+                if (endDateInput.value && endDateInput.value < startDateInput.value) {
+                    endDateInput.value = '';
+                }
+            };
+
+            const validateAvailabilityForm = (focusFirstInvalid = true) => {
+                let isValid = true;
+                let firstInvalidInput = null;
+
+                clearError(pickupInput, pickupError);
+                clearError(startDateInput, startDateError);
+                clearError(endDateInput, endDateError);
+
+                if (!pickupInput.value.trim()) {
+                    showError(pickupInput, pickupError, 'Please enter pickup location.');
+                    firstInvalidInput = firstInvalidInput || pickupInput;
+                    isValid = false;
+                }
+
+                if (!startDateInput.value) {
+                    showError(startDateInput, startDateError, 'Please select a start date.');
+                    firstInvalidInput = firstInvalidInput || startDateInput;
+                    isValid = false;
+                }
+
+                if (!endDateInput.value) {
+                    showError(endDateInput, endDateError, 'Please select an end date.');
+                    firstInvalidInput = firstInvalidInput || endDateInput;
+                    isValid = false;
+                }
+
+                if (startDateInput.value && endDateInput.value && endDateInput.value < startDateInput.value) {
+                    showError(endDateInput, endDateError, 'End date must be on or after start date.');
+                    firstInvalidInput = firstInvalidInput || endDateInput;
+                    isValid = false;
+                }
+
+                if (!isValid && firstInvalidInput && focusFirstInvalid) {
+                    firstInvalidInput.focus();
+                }
+
+                return isValid;
+            };
+
+            form.addEventListener('submit', function (event) {
+                hasTriedSubmit = true;
+                if (!validateAvailabilityForm()) {
+                    event.preventDefault();
+                }
+            });
+
+            [pickupInput, startDateInput, endDateInput].forEach((input) => {
+                input.addEventListener('input', function () {
+                    if (input === startDateInput) {
+                        syncEndDateMin();
+                    }
+                    if (!hasTriedSubmit) {
+                        return;
+                    }
+                    validateAvailabilityForm(false);
+                });
+            });
+
+            syncEndDateMin();
         })();
     </script>
 </body>

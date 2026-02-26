@@ -47,4 +47,5 @@ class Car extends Model
     public function expenses(): HasMany { return $this->hasMany(Expense::class); }
     public function agreements(): HasMany { return $this->hasMany(Agreement::class); }
     public function gpsLogs(): HasMany { return $this->hasMany(GpsLog::class); }
+    public function bookings(): HasMany { return $this->hasMany(Booking::class); }
 }

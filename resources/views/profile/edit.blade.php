@@ -5,7 +5,7 @@
 <div class="page-toolbar">
   <div>
     <h4 class="mb-1">Edit Profile</h4>
-    <div class="text-muted">Update your account details and password.</div>
+    <div class="text-muted">Update your account details and manage active rental trips.</div>
   </div>
 </div>
 
@@ -38,6 +38,11 @@
           <label class="form-label">Email</label>
           <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
         </div>
+
+        <div class="col-12 col-lg-6">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone) }}" placeholder="+94 ...">
+        </div>
       </div>
 
       <hr class="my-4">
@@ -67,5 +72,60 @@
     </form>
   </div>
 </div>
-@endsection
 
+<div class="card list-card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="header-title">Active Rental Trips</span>
+    <span class="small text-muted">{{ $activeTrips->count() }} active</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0 align-middle">
+        <thead>
+          <tr>
+            <th style="min-width:110px;">Booking</th>
+            <th style="min-width:180px;">Vehicle</th>
+            <th style="min-width:170px;">Dates</th>
+            <th style="min-width:110px;">Status</th>
+            <th style="min-width:160px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($activeTrips as $trip)
+            <tr>
+              <td>#{{ $trip->id }}</td>
+              <td>
+                {{ $trip->car?->name ?: '-' }}<br>
+                <span class="text-muted">{{ $trip->car?->plate_no ?: '-' }}</span>
+              </td>
+              <td>
+                {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}<br>
+                <span class="text-muted">{{ $trip->rental_days }} day(s)</span>
+              </td>
+              <td>
+                <span class="badge text-bg-{{ $trip->status === 'confirmed' ? 'primary' : 'secondary' }}">
+                  {{ ucfirst($trip->status) }}
+                </span>
+              </td>
+              <td>
+                @if(!$trip->handover_at && $trip->start_mileage === null)
+                  <form method="post" action="{{ route('profile.bookings.cancel', $trip) }}" onsubmit="return confirm('Are you sure you want to cancel this trip? This action cannot be undone.');">
+                    @csrf
+                    <button class="btn btn-sm btn-outline-danger">Cancel Trip</button>
+                  </form>
+                @else
+                  <span class="text-muted small">Trip already started</span>
+                @endif
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center p-4 text-muted">No active rental trips.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+@endsection

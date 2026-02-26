@@ -12,7 +12,6 @@ class FleetController extends Controller
     {
         $validated = $request->validate([
             'start_location' => ['nullable', 'string', 'max:255'],
-            'dropoff_location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
         ]);
@@ -132,7 +131,6 @@ class FleetController extends Controller
 
         $filters = [
             'start_location' => $validated['start_location'] ?? '',
-            'dropoff_location' => $validated['dropoff_location'] ?? '',
             'start_date' => $startDate,
             'end_date' => $endDate,
         ];

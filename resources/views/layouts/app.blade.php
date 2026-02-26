@@ -782,6 +782,9 @@
           @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('availability-check.index'))
             <a class="menu-link {{ request()->routeIs('availability-check.*') ? 'active' : '' }}" href="{{ route('availability-check.index') }}"><span class="menu-dot"></span>Availability Check</a>
           @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
+            <a class="menu-link {{ request()->routeIs('rental-trips.*') ? 'active' : '' }}" href="{{ route('rental-trips.index') }}"><span class="menu-dot"></span>Rental Trips</a>
+          @endif
         </div>
 
         @auth

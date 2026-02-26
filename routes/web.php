@@ -3,24 +3,34 @@
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AvailabilityCheckController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FleetController;
 use App\Http\Controllers\GpsLogController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PermissionManagementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RentRequestController;
+use App\Http\Controllers\RentalTripController;
 use App\Http\Controllers\CustomerSupportRequestController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
-Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
-Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->name('support-requests.store');
-Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
+Route::view('/', 'welcome')->middleware('auth')->name('home');
+Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
+Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
+Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');
+Route::get('/fleet', [FleetController::class, 'index'])->middleware('auth')->name('fleet.index');
+Route::get('/booking/confirm', [BookingController::class, 'create'])->middleware('auth')->name('booking.confirm');
+Route::post('/booking/confirm', [BookingController::class, 'store'])->middleware('auth')->name('booking.store');
+Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->middleware('auth')->name('booking.success');
+Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->middleware('auth')->name('booking.cancel');
+Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->middleware('auth')->name('support-requests.store');
+Route::post('/rent-requests', [RentRequestController::class, 'store'])->middleware('auth')->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,9 +40,14 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/customer/dashboard', [HomeController::class, 'customerDashboard'])
+        ->middleware('role:customer')
+        ->name('customer.dashboard');
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/bookings/{booking}/cancel', [ProfileController::class, 'cancelBooking'])->name('profile.bookings.cancel');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
     Route::middleware('permission:cars')->group(function () {
@@ -100,5 +115,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/rent-requests/{rentRequest}/accept', [RentRequestController::class, 'accept'])->name('rent-requests.accept');
         Route::delete('/rent-requests/{rentRequest}', [RentRequestController::class, 'destroy'])->name('rent-requests.destroy');
         Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
+        Route::get('/rental-trips', [RentalTripController::class, 'index'])->name('rental-trips.index');
+        Route::post('/rental-trips/{booking}/handover', [RentalTripController::class, 'handover'])->name('rental-trips.handover');
+        Route::post('/rental-trips/{booking}/return', [RentalTripController::class, 'returnTrip'])->name('rental-trips.return');
     });
 });
