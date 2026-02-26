@@ -1,19 +1,26 @@
 <?php
 
 use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\AvailabilityCheckController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FleetController;
 use App\Http\Controllers\GpsLogController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PermissionManagementController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RentRequestController;
+use App\Http\Controllers\CustomerSupportRequestController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
+Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->name('support-requests.store');
+Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -84,5 +91,14 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:admin', 'permission:permissions_manage'])->group(function () {
         Route::get('/permissions', [PermissionManagementController::class, 'index'])->name('permissions.index');
         Route::put('/permissions/{role}', [PermissionManagementController::class, 'update'])->name('permissions.update');
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/support-requests', [CustomerSupportRequestController::class, 'index'])->name('support-requests.index');
+        Route::get('/rent-requests', [RentRequestController::class, 'index'])->name('rent-requests.index');
+        Route::put('/rent-requests/{rentRequest}', [RentRequestController::class, 'update'])->name('rent-requests.update');
+        Route::post('/rent-requests/{rentRequest}/accept', [RentRequestController::class, 'accept'])->name('rent-requests.accept');
+        Route::delete('/rent-requests/{rentRequest}', [RentRequestController::class, 'destroy'])->name('rent-requests.destroy');
+        Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
     });
 });

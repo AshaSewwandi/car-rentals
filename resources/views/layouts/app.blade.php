@@ -335,6 +335,10 @@
       overflow: hidden;
     }
 
+    .table-responsive {
+      -webkit-overflow-scrolling: touch;
+    }
+
     .card-header {
       background: #f8fbff;
       border-bottom: 1px solid var(--line);
@@ -451,6 +455,58 @@
       .page-toolbar > div:first-child h4 {
         font-size: 1.42rem;
       }
+
+      .navbar-brand {
+        max-width: calc(100vw - 110px);
+      }
+
+      .brand-logo {
+        width: 48px;
+        height: 30px;
+      }
+
+      .brand-name {
+        font-size: 1.04rem;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .app-main {
+        padding: .8rem .35rem 1.25rem !important;
+      }
+
+      .page-toolbar {
+        gap: .55rem;
+      }
+
+      .page-toolbar .d-flex {
+        width: 100%;
+        flex-wrap: wrap !important;
+      }
+
+      .page-toolbar .d-flex .form-control,
+      .page-toolbar .d-flex .form-select,
+      .page-toolbar .d-flex .btn {
+        flex: 1 1 100%;
+      }
+
+      .card-header {
+        padding: .78rem .9rem;
+      }
+
+      .card-body {
+        padding: .85rem;
+      }
+
+      .table td, .table th {
+        font-size: .9rem;
+      }
+
+      .table .btn {
+        margin-bottom: .3rem;
+      }
     }
 
     .sidebar-user {
@@ -470,6 +526,167 @@
     .sidebar-user a {
       color: inherit;
       display: block;
+    }
+
+    .app-footer {
+      margin-top: 1.2rem;
+      border-top: 1px solid #215fb2;
+      background: linear-gradient(135deg, #184f9f 0%, #1f66c2 100%);
+    }
+
+    .app-footer-inner {
+      padding: 1.25rem 0 1rem;
+    }
+
+    .app-footer-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+      gap: 1rem;
+      padding-bottom: .9rem;
+      border-bottom: 1px solid rgba(219, 232, 255, 0.28);
+    }
+
+    .app-footer-brand {
+      display: flex;
+      align-items: flex-start;
+      gap: .65rem;
+    }
+
+    .app-footer-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      border-radius: .6rem;
+      border: 1px solid #dbe6f3;
+      background: #f8fbff;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .app-footer-brand-title {
+      margin: 0 0 .3rem;
+      font-weight: 800;
+      color: #f8fbff;
+      font-size: .96rem;
+      letter-spacing: -.01em;
+    }
+
+    .app-footer-copy {
+      margin: 0;
+      color: #d9e8ff;
+      font-size: .82rem;
+      line-height: 1.55;
+    }
+
+    .app-footer-title {
+      margin: 0 0 .55rem;
+      color: #bfdbff;
+      font-weight: 800;
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .app-footer-links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: .4rem;
+    }
+
+    .app-footer-links a {
+      color: #e7f0ff;
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    .app-footer-links a:hover {
+      color: #ffffff;
+    }
+
+    .app-footer-note {
+      margin: 0 0 .45rem;
+      color: #d9e8ff;
+      font-size: .8rem;
+    }
+
+    .app-footer-newsletter {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .app-footer-newsletter input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #ffffff;
+      background: #ffffff;
+      border-radius: .5rem;
+      padding: .45rem .6rem;
+      color: #0f172a;
+      font-size: .84rem;
+    }
+
+    .app-footer-newsletter input::placeholder {
+      color: #64748b;
+    }
+
+    .app-footer-newsletter button {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: .5rem;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(10, 63, 143, 0.2);
+    }
+
+    .app-footer-bottom {
+      padding-top: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .6rem;
+      color: #d9e8ff;
+      font-size: .78rem;
+      flex-wrap: wrap;
+    }
+
+    .app-footer-social {
+      display: inline-flex;
+      gap: .8rem;
+    }
+
+    .app-footer-social a {
+      text-decoration: none;
+      color: #d9e8ff;
+      font-size: .74rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .app-footer-social a:hover {
+      color: var(--primary);
+    }
+
+    @media (max-width: 991.98px) {
+      .app-footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .app-footer-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -495,19 +712,6 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto">
         @auth
-        @if(\Illuminate\Support\Facades\Route::has('dashboard'))
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
-        @endif
-        @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('payments.index'))
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('payments.*') ? 'active' : '' }}" href="{{ route('payments.index') }}">Payments</a></li>
-        @endif
-        @if(auth()->user()->canAccess('users_manage') && \Illuminate\Support\Facades\Route::has('users.index'))
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">Users</a></li>
-        @endif
-        @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}">Permissions</a></li>
-        @endif
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">Profile</a></li>
           <li class="nav-item"><span class="nav-link">{{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})</span></li>
           <li class="nav-item">
             <form method="post" action="{{ route('logout') }}">
@@ -568,6 +772,15 @@
           @endif
           @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
             <a class="menu-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}"><span class="menu-dot"></span>Permissions</a>
+          @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('support-requests.index'))
+            <a class="menu-link {{ request()->routeIs('support-requests.*') ? 'active' : '' }}" href="{{ route('support-requests.index') }}"><span class="menu-dot"></span>Support Requests</a>
+          @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
+            <a class="menu-link {{ request()->routeIs('rent-requests.*') ? 'active' : '' }}" href="{{ route('rent-requests.index') }}"><span class="menu-dot"></span>Rent Requests</a>
+          @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('availability-check.index'))
+            <a class="menu-link {{ request()->routeIs('availability-check.*') ? 'active' : '' }}" href="{{ route('availability-check.index') }}"><span class="menu-dot"></span>Availability Check</a>
           @endif
         </div>
 
