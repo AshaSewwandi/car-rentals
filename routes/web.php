@@ -20,7 +20,7 @@ use App\Http\Controllers\CustomerSupportRequestController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->middleware('auth')->name('home');
+Route::view('/', 'welcome')->name('home');
 Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
 Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
 Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');

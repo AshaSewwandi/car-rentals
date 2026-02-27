@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
+use App\Models\Booking;
 use App\Models\Car;
-use App\Models\RentRequest;
 use App\Models\Rental;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -32,6 +32,12 @@ class AvailabilityCheckController extends Controller
 
         $carIds = $cars->pluck('id');
 
+        $confirmedBookings = Booking::query()
+            ->whereIn('car_id', $carIds)
+            ->where('status', 'confirmed')
+            ->get(['car_id', 'start_date', 'end_date'])
+            ->groupBy('car_id');
+
         $agreements = Agreement::query()
             ->whereIn('car_id', $carIds)
             ->where('status', 'active')
@@ -44,18 +50,10 @@ class AvailabilityCheckController extends Controller
             ->get(['car_id', 'start_date', 'end_date'])
             ->groupBy('car_id');
 
-        $acceptedRequests = RentRequest::query()
-            ->whereIn('car_id', $carIds)
-            ->where('status', 'accepted')
-            ->whereNotNull('start_date')
-            ->whereNotNull('end_date')
-            ->get(['car_id', 'start_date', 'end_date'])
-            ->groupBy('car_id');
-
         $timelineDates = collect(CarbonPeriod::create($startDate, $endDate))
             ->map(fn (Carbon $date) => $date->copy());
 
-        $rows = $cars->map(function (Car $car) use ($agreements, $rentals, $acceptedRequests, $startDate, $endDate, $timelineDates) {
+        $rows = $cars->map(function (Car $car) use ($confirmedBookings, $agreements, $rentals, $timelineDates) {
             $ranges = collect();
 
             foreach ($agreements->get($car->id, collect()) as $agreement) {
@@ -74,11 +72,11 @@ class AvailabilityCheckController extends Controller
                 ]);
             }
 
-            foreach ($acceptedRequests->get($car->id, collect()) as $acceptedRequest) {
+            foreach ($confirmedBookings->get($car->id, collect()) as $booking) {
                 $ranges->push([
-                    'start' => $acceptedRequest->start_date,
-                    'end' => $acceptedRequest->end_date,
-                    'source' => 'AcceptedRequest',
+                    'start' => $booking->start_date,
+                    'end' => $booking->end_date,
+                    'source' => 'Booking',
                 ]);
             }
 

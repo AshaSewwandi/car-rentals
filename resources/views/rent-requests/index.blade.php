@@ -62,7 +62,9 @@
                 @endif
               </td>
               <td>
-                @if($requestItem->status === 'accepted')
+                @if($requestItem->status === 'converted')
+                  <span class="badge text-bg-primary">Converted</span>
+                @elseif($requestItem->status === 'accepted')
                   <span class="badge text-bg-success">Accepted</span>
                 @else
                   <span class="badge text-bg-warning">Pending</span>
@@ -78,11 +80,11 @@
                   Edit
                 </button>
                 <br>
-                @if($requestItem->status !== 'accepted')
+                @if(!in_array($requestItem->status, ['accepted', 'converted']))
                   <form method="post" action="{{ route('rent-requests.accept', $requestItem) }}" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-dark" {{ $requestItem->is_checkable && !$requestItem->is_available_for_period ? 'disabled' : '' }}>
-                      Accept
+                      Accept & Convert
                     </button>
                   </form>
                   @if($requestItem->is_checkable && !$requestItem->is_available_for_period)
@@ -90,7 +92,7 @@
                   @endif
                 @else
                   <span class="text-muted small">
-                    Accepted by {{ $requestItem->acceptedBy?->name ?: 'Admin' }}<br>
+                    {{ $requestItem->status === 'converted' ? 'Converted' : 'Accepted' }} by {{ $requestItem->acceptedBy?->name ?: 'Admin' }}<br>
                     {{ $requestItem->accepted_at?->format('Y-m-d H:i') }}
                   </span>
                 @endif

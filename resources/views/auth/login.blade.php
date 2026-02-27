@@ -3,7 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login | R&A Auto Rentals</title>
+  @include('partials.seo-meta', [
+    'title' => 'Login | R&A Auto Rentals',
+    'description' => 'Sign in to manage your rental bookings, profile details, active trips, and payment status at R&A Auto Rentals.',
+    'keywords' => [
+      'rental login',
+      'customer sign in',
+      'booking dashboard login',
+      'rental account access',
+    ],
+    'robots' => 'noindex,follow',
+  ])
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

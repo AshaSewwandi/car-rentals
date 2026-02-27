@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
+use App\Models\Booking;
 use App\Models\Car;
 use App\Models\RentRequest;
 use App\Models\Rental;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -67,27 +69,66 @@ class RentRequestController extends Controller
 
     public function accept(RentRequest $rentRequest): RedirectResponse
     {
-        if ($rentRequest->car_id && $rentRequest->start_date && $rentRequest->end_date) {
-            $isAvailable = $this->isCarAvailable(
-                (int) $rentRequest->car_id,
-                $rentRequest->start_date->toDateString(),
-                $rentRequest->end_date->toDateString()
-            );
-
-            if (!$isAvailable) {
-                return back()->with('error', 'Selected vehicle is not available in requested dates.');
-            }
+        if (!$rentRequest->car_id || !$rentRequest->start_date || !$rentRequest->end_date) {
+            return back()->with('error', 'Vehicle, start date, and end date are required before accepting this request.');
         }
 
-        if ($rentRequest->status !== 'accepted') {
-            $rentRequest->update([
-                'status' => 'accepted',
-                'accepted_by' => auth()->id(),
-                'accepted_at' => now(),
-            ]);
+        $isAvailable = $this->isCarAvailable(
+            (int) $rentRequest->car_id,
+            $rentRequest->start_date->toDateString(),
+            $rentRequest->end_date->toDateString()
+        );
+
+        if (!$isAvailable) {
+            return back()->with('error', 'Selected vehicle is not available in requested dates.');
         }
 
-        return back()->with('success', 'Rent request accepted successfully.');
+        if ($rentRequest->status === 'converted') {
+            return back()->with('success', 'Request is already converted to a booking.');
+        }
+
+        $car = Car::findOrFail((int) $rentRequest->car_id);
+        $days = max(1, (int) $rentRequest->start_date->diffInDays($rentRequest->end_date) + 1);
+        $dailyRate = $this->resolveDailyRate($car);
+        $totalAmount = $dailyRate * $days;
+
+        $matchedUserId = null;
+        if ($rentRequest->email) {
+            $matchedUserId = User::query()
+                ->where('email', $rentRequest->email)
+                ->value('id');
+        }
+
+        Booking::create([
+            'user_id' => $matchedUserId,
+            'car_id' => $car->id,
+            'customer_name' => $rentRequest->name,
+            'customer_email' => $rentRequest->email,
+            'customer_phone' => $rentRequest->phone,
+            'pickup_location' => $rentRequest->start_location,
+            'start_date' => $rentRequest->start_date->toDateString(),
+            'end_date' => $rentRequest->end_date->toDateString(),
+            'rental_days' => $days,
+            'daily_rate' => $dailyRate,
+            'total_amount' => $totalAmount,
+            'final_total' => $totalAmount,
+            'included_km' => $days * 150,
+            'extra_km_rate' => 25,
+            'currency' => 'LKR',
+            'payment_method' => 'pay_later_bank',
+            'payment_provider' => null,
+            'payment_status' => 'pending',
+            'status' => 'confirmed',
+            'note' => $rentRequest->message,
+        ]);
+
+        $rentRequest->update([
+            'status' => 'converted',
+            'accepted_by' => auth()->id(),
+            'accepted_at' => now(),
+        ]);
+
+        return back()->with('success', 'Rent request converted to booking successfully.');
     }
 
     public function update(Request $request, RentRequest $rentRequest): RedirectResponse
@@ -112,7 +153,7 @@ class RentRequestController extends Controller
 
     private function isCarAvailable(int $carId, string $startDate, string $endDate): bool
     {
-        $hasAgreementOverlap = \App\Models\Agreement::query()
+        $hasAgreementOverlap = Agreement::query()
             ->where('car_id', $carId)
             ->where('status', 'active')
             ->whereDate('start_date', '<=', $endDate)
@@ -126,7 +167,7 @@ class RentRequestController extends Controller
             return false;
         }
 
-        $hasRentalOverlap = \App\Models\Rental::query()
+        $hasRentalOverlap = Rental::query()
             ->where('car_id', $carId)
             ->where('status', 'active')
             ->whereDate('start_date', '<=', $endDate)
@@ -140,15 +181,30 @@ class RentRequestController extends Controller
             return false;
         }
 
-        $hasAcceptedRequestOverlap = RentRequest::query()
+        $hasConfirmedBookingOverlap = Booking::query()
             ->where('car_id', $carId)
-            ->where('status', 'accepted')
-            ->whereNotNull('start_date')
-            ->whereNotNull('end_date')
+            ->where('status', 'confirmed')
             ->whereDate('start_date', '<=', $endDate)
             ->whereDate('end_date', '>=', $startDate)
             ->exists();
 
-        return !$hasAcceptedRequestOverlap;
+        return !$hasConfirmedBookingOverlap;
+    }
+
+    private function resolveDailyRate(Car $car): float
+    {
+        if ($car->note && preg_match('/(?:rs\\.?\\s*)?([\\d,]+(?:\\.\\d{1,2})?)/i', $car->note, $matches)) {
+            return (float) str_replace(',', '', $matches[1]);
+        }
+
+        $plateKey = strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', (string) $car->plate_no));
+        $knownRates = [
+            'CAK8043' => 4000,
+            'CAK9010' => 4000,
+            'CAK9792' => 4000,
+            '588233' => 8000,
+        ];
+
+        return (float) ($knownRates[$plateKey] ?? 4500);
     }
 }

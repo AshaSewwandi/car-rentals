@@ -3,7 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Booking Confirmation | R&A Auto Rentals</title>
+    @include('partials.seo-meta', [
+        'title' => 'Booking Confirmation | R&A Auto Rentals',
+        'description' => 'Confirm your rental booking details, review pricing, choose payment method, and finalize your trip with R&A Auto Rentals.',
+        'keywords' => [
+            'booking confirmation',
+            'rental payment method',
+            'online transfer rental',
+            'cash at pickup',
+            'trip confirmation',
+            'rental checkout',
+        ],
+        'robots' => 'noindex,follow',
+    ])
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>

@@ -38,15 +38,13 @@ class FleetController extends Controller
                 ->get(['car_id', 'start_date', 'end_date'])
                 ->groupBy('car_id');
 
-            $acceptedRequests = \App\Models\RentRequest::query()
+            $confirmedBookings = \App\Models\Booking::query()
                 ->whereIn('car_id', $carIds)
-                ->where('status', 'accepted')
-                ->whereNotNull('start_date')
-                ->whereNotNull('end_date')
+                ->where('status', 'confirmed')
                 ->get(['car_id', 'start_date', 'end_date'])
                 ->groupBy('car_id');
 
-            $availabilityRows = $allCars->map(function (Car $car) use ($agreements, $rentals, $acceptedRequests, $startDate, $endDate) {
+            $availabilityRows = $allCars->map(function (Car $car) use ($agreements, $rentals, $confirmedBookings, $startDate, $endDate) {
                 $bookingRanges = collect();
 
                 foreach ($agreements->get($car->id, collect()) as $agreement) {
@@ -65,11 +63,11 @@ class FleetController extends Controller
                     ]);
                 }
 
-                foreach ($acceptedRequests->get($car->id, collect()) as $request) {
+                foreach ($confirmedBookings->get($car->id, collect()) as $booking) {
                     $bookingRanges->push([
-                        'start' => $request->start_date,
-                        'end' => $request->end_date,
-                        'source' => 'Accepted Request',
+                        'start' => $booking->start_date,
+                        'end' => $booking->end_date,
+                        'source' => 'Booking',
                     ]);
                 }
 

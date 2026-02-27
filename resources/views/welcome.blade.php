@@ -3,7 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>R&A Auto Rentals | Premium Fleet</title>
+    @include('partials.seo-meta', [
+        'title' => 'R&A Auto Rentals | Premium Fleet',
+        'description' => 'Book daily and monthly rental vehicles in Sri Lanka. Check car availability, compare fleet options, and confirm your trip with R&A Auto Rentals.',
+        'keywords' => [
+            'premium car rental',
+            'fleet booking',
+            'daily vehicle rental',
+            'monthly vehicle rental',
+            'Sri Lanka rent a car',
+            'Galle rent a car',
+            'airport pickup rentals',
+        ],
+    ])
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>
@@ -103,6 +115,10 @@
             justify-content: flex-end;
         }
 
+        .nav form {
+            margin: 0;
+        }
+
         .menu-toggle {
             display: none;
             width: 42px;
@@ -128,7 +144,20 @@
             border-radius: 10px;
         }
 
-        .nav a:hover { background: var(--surface-soft); color: var(--text); }
+        .nav button {
+            border: 0;
+            background: transparent;
+            color: #475569;
+            font-weight: 600;
+            font-size: .95rem;
+            padding: .55rem .8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .nav a:hover,
+        .nav button:hover { background: var(--surface-soft); color: var(--text); }
 
         .nav .cta {
             color: #fff;
@@ -949,6 +978,12 @@
                 padding: .62rem .7rem;
             }
 
+            .nav button {
+                width: 100%;
+                text-align: left;
+                padding: .62rem .7rem;
+            }
+
             .nav .cta {
                 text-align: center;
             }
@@ -974,20 +1009,18 @@
                 @auth
                     @if(!auth()->user()->isAdmin())
                         <a class="cta" href="{{ route('customer.dashboard') }}">My Dashboard</a>
+                        <form method="post" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Log out</button>
+                        </form>
                     @else
-                        @if(auth()->user()->canAccess('cars'))
-                            <a href="{{ route('cars.index') }}">Cars</a>
-                        @endif
-                        @if(auth()->user()->canAccess('customers'))
-                            <a href="{{ route('customers.index') }}">Customers</a>
-                        @endif
-                        @if(auth()->user()->canAccess('payments'))
-                            <a href="{{ route('payments.index') }}">Payments</a>
-                        @endif
-                        <a href="{{ route('profile.edit') }}">My Profile</a>
                         @if(auth()->user()->canAccess('dashboard'))
                             <a class="cta" href="{{ route('dashboard') }}">Dashboard</a>
                         @endif
+                        <form method="post" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Log out</button>
+                        </form>
                     @endif
                 @else
                     <a href="{{ route('login') }}">Login</a>

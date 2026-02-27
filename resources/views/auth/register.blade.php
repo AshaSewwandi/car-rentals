@@ -3,7 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register | R&A Auto Rentals</title>
+  @include('partials.seo-meta', [
+    'title' => 'Register | R&A Auto Rentals',
+    'description' => 'Create your rental account to book vehicles online, track active trips, and manage profile details with R&A Auto Rentals.',
+    'keywords' => [
+      'rental registration',
+      'create account',
+      'book rental online',
+      'customer sign up',
+      'rental platform account',
+    ],
+    'robots' => 'noindex,follow',
+  ])
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

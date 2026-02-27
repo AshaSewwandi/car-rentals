@@ -3,7 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Full Fleet | R&A Auto Rentals</title>
+    @include('partials.seo-meta', [
+        'title' => 'Full Fleet | R&A Auto Rentals',
+        'description' => 'Browse the full R&A rental fleet, filter by pickup location and dates, and find available cars for your travel plan.',
+        'keywords' => [
+            'car fleet',
+            'available cars',
+            'fleet availability',
+            'vehicle booking',
+            'rental car list',
+            'pickup location booking',
+        ],
+    ])
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>

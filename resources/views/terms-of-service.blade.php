@@ -3,7 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Terms of Service | R&A Auto Rentals</title>
+    @include('partials.seo-meta', [
+        'title' => 'Terms of Service | R&A Auto Rentals',
+        'description' => 'Review R&A Auto Rentals terms for bookings, rental usage, payments, mileage limits, cancellations, and customer responsibilities.',
+        'keywords' => [
+            'rental terms',
+            'car rental conditions',
+            'booking terms',
+            'mileage policy',
+            'cancellation policy',
+            'rental agreement terms',
+        ],
+    ])
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>
@@ -150,6 +161,157 @@
             color: var(--muted);
         }
 
+        footer {
+            margin-top: 1.4rem;
+            border-top: 1px solid #d8e5f5;
+            background: linear-gradient(135deg, #184f9f 0%, #1f66c2 100%);
+        }
+
+        .footer-inner {
+            padding: 1.35rem 0 1rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+            gap: 1rem;
+            padding-bottom: .9rem;
+            border-bottom: 1px solid rgba(219, 232, 255, .28);
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: flex-start;
+            gap: .65rem;
+        }
+
+        .footer-logo {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            border-radius: .6rem;
+            border: 1px solid #dbe6f3;
+            background: #f8fbff;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .footer-brand-name {
+            margin: 0 0 .3rem;
+            font-weight: 800;
+            color: #f8fbff;
+            font-size: .96rem;
+            letter-spacing: -.01em;
+        }
+
+        .footer-copy {
+            margin: 0;
+            color: #d9e8ff;
+            font-size: .82rem;
+            line-height: 1.55;
+        }
+
+        .footer-title {
+            margin: 0 0 .55rem;
+            color: #bfdbff;
+            font-weight: 800;
+            font-size: .72rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .footer-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: .4rem;
+        }
+
+        .footer-links a {
+            color: #e7f0ff;
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .newsletter-note {
+            margin: 0 0 .45rem;
+            color: #d9e8ff;
+            font-size: .8rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #ffffff;
+            background: #ffffff;
+            border-radius: .5rem;
+            padding: .45rem .6rem;
+            color: #0f172a;
+            font-size: .84rem;
+        }
+
+        .newsletter-form button {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: .5rem;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary-2), var(--primary));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(10, 63, 143, 0.2);
+        }
+
+        .footer-bottom {
+            padding-top: .8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+            color: #d9e8ff;
+            font-size: .78rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-social {
+            display: inline-flex;
+            gap: .8rem;
+        }
+
+        .footer-social a {
+            text-decoration: none;
+            color: #d9e8ff;
+            font-size: .74rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .footer-social a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 920px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
         @media (max-width: 640px) {
             .container {
                 width: calc(100% - 1rem);
@@ -174,6 +336,10 @@
                 font-size: .9rem;
                 padding: .52rem .76rem;
                 border-radius: 9px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -239,5 +405,53 @@
             </section>
         </div>
     </main>
+    <footer>
+        <div class="container footer-inner">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
+                        <div>
+                            <p class="footer-brand-name">R&A Auto Rentals</p>
+                            <p class="footer-copy">Reliable daily and monthly rentals with trusted support for business, family, and long-distance travel.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="footer-title">Quick Links</p>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('home') }}">Home</a></li>
+                        <li><a href="{{ route('fleet.index') }}">Fleet</a></li>
+                        <li><a href="{{ route('blogs') }}">Blogs</a></li>
+                        <li><a href="{{ route('home') }}#contact-section">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer-title">Customer Care</p>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('home') }}#contact-section">Support Center</a></li>
+                        <li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li>
+                        <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="footer-title">Newsletter</p>
+                    <p class="newsletter-note">Get exclusive rental updates to your inbox.</p>
+                    <form class="newsletter-form" action="#" method="post">
+                        <input type="email" placeholder="Email">
+                        <button type="button" aria-label="Subscribe">&#10148;</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; {{ now()->year }} R&A Auto Rentals. All rights reserved.</div>
+                <div class="footer-social">
+                    <a href="#">Twitter</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Facebook</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

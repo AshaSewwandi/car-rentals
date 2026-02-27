@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Agreement;
 use App\Models\Booking;
 use App\Models\Car;
-use App\Models\RentRequest;
 use App\Models\Rental;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -206,22 +205,9 @@ class BookingController extends Controller
             return false;
         }
 
-        $acceptedRequestOverlap = RentRequest::query()
-            ->where('car_id', $carId)
-            ->where('status', 'accepted')
-            ->whereNotNull('start_date')
-            ->whereNotNull('end_date')
-            ->whereDate('start_date', '<=', $endDate)
-            ->whereDate('end_date', '>=', $startDate)
-            ->exists();
-
-        if ($acceptedRequestOverlap) {
-            return false;
-        }
-
         $bookingOverlap = Booking::query()
             ->where('car_id', $carId)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('status', 'confirmed')
             ->whereDate('start_date', '<=', $endDate)
             ->whereDate('end_date', '>=', $startDate)
             ->exists();
