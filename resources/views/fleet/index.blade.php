@@ -96,12 +96,45 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: .45rem;
             border: 1px solid transparent;
             text-decoration: none;
             font-weight: 700;
             padding: .58rem .95rem;
             border-radius: 10px;
             font-size: .9rem;
+        }
+
+        .btn .btn-spinner,
+        .btn-request .btn-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-top-color: #ffffff;
+            border-radius: 999px;
+            animation: btn-spin .7s linear infinite;
+            flex-shrink: 0;
+        }
+
+        .btn-light .btn-spinner,
+        .btn-request .btn-spinner {
+            border-color: rgba(15, 23, 42, 0.22);
+            border-top-color: #0f66c3;
+        }
+
+        .btn.is-loading .btn-spinner,
+        .btn-request.is-loading .btn-spinner {
+            display: inline-block;
+        }
+
+        .btn.is-loading,
+        .btn-request.is-loading {
+            pointer-events: none;
+        }
+
+        @keyframes btn-spin {
+            to { transform: rotate(360deg); }
         }
 
         .btn-primary {
@@ -396,13 +429,46 @@
 
         .request-panel {
             width: min(620px, 100%);
-            max-height: calc(100vh - 2rem);
-            overflow: auto;
+            overflow: hidden;
             background: #fff;
             border: 1px solid #dbe6f3;
             border-radius: 14px;
-            padding: 1rem;
             box-shadow: 0 24px 54px rgba(15, 23, 42, 0.25);
+        }
+
+        .request-panel-body {
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: #94a3b8 #e2e8f0;
+        }
+
+        .request-panel-body::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .request-panel-body::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 999px;
+        }
+
+        .request-panel-body::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 999px;
+            border: 2px solid #e2e8f0;
+            background-clip: padding-box;
+        }
+
+        .request-panel-body::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .request-panel-body::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         .request-title {
@@ -453,6 +519,73 @@
             grid-column: 1 / -1;
         }
 
+        .request-field input.input-error,
+        .request-field textarea.input-error,
+        .request-summary.input-error {
+            border-color: #dc2626 !important;
+            background: #fff7f7 !important;
+        }
+
+        .request-error {
+            display: none;
+            margin-top: .35rem;
+            color: #b91c1c;
+            font-size: .8rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .request-error.show {
+            display: block;
+        }
+
+        .request-summary {
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            background: #f8fbff;
+            padding: .7rem .8rem;
+        }
+
+        .request-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .55rem .8rem;
+        }
+
+        .request-summary-item {
+            padding: .45rem .55rem;
+            border-radius: 10px;
+            border: 1px solid #dbe6f3;
+            background: #fff;
+        }
+
+        .request-summary-item strong {
+            display: block;
+            font-size: .7rem;
+            color: #64748b;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            margin-bottom: .2rem;
+        }
+
+        .request-summary-item span {
+            color: #0f172a;
+            font-weight: 600;
+            font-size: .9rem;
+            line-height: 1.35;
+        }
+
+        .request-summary-item input {
+            width: 100%;
+            border: 1px solid #c8d7ea;
+            background: #f8fbff;
+            border-radius: 8px;
+            padding: .46rem .5rem;
+            color: #0f172a;
+            font: inherit;
+            font-size: .9rem;
+        }
+
         .request-actions {
             margin-top: .85rem;
             display: flex;
@@ -482,6 +615,7 @@
             .fleet-photo { height: 190px; }
             .top-actions .btn { padding: .5rem .72rem; font-size: .82rem; }
             .request-grid { grid-template-columns: 1fr; }
+            .request-summary-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -527,7 +661,10 @@
                     </div>
                     <div class="control filter-submit-wrap">
                         <span class="filter-submit-spacer">Action</span>
-                        <button class="btn btn-primary filter-submit" type="submit">Find Available Cars</button>
+                        <button class="btn btn-primary filter-submit js-loading-submit" type="submit" data-loading-text="Checking Availability...">
+                            <span class="btn-spinner" aria-hidden="true"></span>
+                            <span class="btn-label">Find Available Cars</span>
+                        </button>
                     </div>
                 </form>
 
@@ -595,6 +732,8 @@
                             @if($filters['start_date'] && $filters['end_date'])
                                 <a
                                     class="btn-request"
+                                    data-loading-link="true"
+                                    data-loading-text="Opening..."
                                     style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:.45rem;background:linear-gradient(135deg,#0a3f8f,#0f66c3);color:#fff;border-color:transparent;"
                                     href="{{ route('booking.confirm', [
                                         'car_id' => $car['id'],
@@ -603,7 +742,8 @@
                                         'start_location' => $filters['start_location'],
                                     ]) }}"
                                 >
-                                    Continue to Book
+                                    <span class="btn-spinner" aria-hidden="true"></span>
+                                    <span class="btn-label">Continue to Book</span>
                                 </a>
                             @else
                                 <button
@@ -627,7 +767,8 @@
                                 data-end-date="{{ $filters['end_date'] }}"
                                 data-start-location="{{ $filters['start_location'] }}"
                             >
-                                Rent on Request
+                                <span class="btn-spinner" aria-hidden="true"></span>
+                                <span class="btn-label">Rent on Request</span>
                             </button>
                         </div>
                     </div>
@@ -646,45 +787,102 @@
 
     <div class="request-modal" id="requestModal" aria-hidden="true">
         <div class="request-panel" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
-            <h2 class="request-title" id="requestTitle">Rent on Request</h2>
-            <p class="request-sub" id="requestSub">Submit your request and our team will contact you.</p>
+            <div class="request-panel-body">
+                <h2 class="request-title" id="requestTitle">Rent on Request</h2>
+                <p class="request-sub" id="requestSub">Submit your request and our team will contact you.</p>
+                @php
+                    $currentUser = auth()->user();
+                @endphp
 
-            <form method="post" action="{{ route('rent-requests.store') }}">
-                @csrf
-                <input type="hidden" name="car_id" id="requestCarId">
-                <input type="hidden" name="car_name" id="requestCarName">
-                <input type="hidden" name="plate_no" id="requestPlateNo">
-                <input type="hidden" name="start_location" id="requestStartLocation">
-                <input type="hidden" name="start_date" id="requestStartDate">
-                <input type="hidden" name="end_date" id="requestEndDate">
-                <div class="request-grid">
-                    <div class="request-field">
-                        <label for="requestName">Name</label>
-                        <input id="requestName" name="name" type="text" required>
+                <form id="requestForm" method="post" action="{{ route('rent-requests.store') }}" novalidate>
+                    @csrf
+                    <input type="hidden" name="car_id" id="requestCarId">
+                    <input type="hidden" name="car_name" id="requestCarName">
+                    <input type="hidden" name="plate_no" id="requestPlateNo">
+                    <div class="request-grid">
+                        <div class="request-field">
+                            <label for="requestName">Name</label>
+                            <input id="requestName" name="name" type="text" value="{{ old('name', $currentUser?->name) }}" required>
+                            <small class="request-error" id="requestNameError"></small>
+                        </div>
+                        <div class="request-field">
+                            <label for="requestPhone">Phone</label>
+                            <input id="requestPhone" name="phone" type="text" value="{{ old('phone', $currentUser?->phone) }}" placeholder="+94 ...">
+                            <small class="request-error" id="requestPhoneError"></small>
+                        </div>
+                        <div class="request-field full">
+                            <label for="requestEmail">Email</label>
+                            <input id="requestEmail" name="email" type="email" value="{{ old('email', $currentUser?->email) }}" placeholder="you@example.com">
+                            <small class="request-error" id="requestEmailError"></small>
+                        </div>
+                        <div class="request-field full">
+                            <label>Rental Details</label>
+                            <div class="request-summary" id="requestSummaryBlock">
+                                <div class="request-summary-grid">
+                                    <div class="request-summary-item">
+                                        <strong>Vehicle</strong>
+                                        <span id="requestSummaryVehicle">-</span>
+                                    </div>
+                                    <div class="request-summary-item">
+                                        <strong>Pickup</strong>
+                                        <input type="text" id="requestStartLocation" name="start_location" placeholder="City, Airport, or Address">
+                                    </div>
+                                    <div class="request-summary-item">
+                                        <strong>Start Date</strong>
+                                        <input type="date" id="requestStartDate" name="start_date">
+                                    </div>
+                                    <div class="request-summary-item">
+                                        <strong>End Date</strong>
+                                        <input type="date" id="requestEndDate" name="end_date">
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="request-error" id="requestDetailsError"></small>
+                        </div>
+                        <div class="request-field full">
+                            <label for="requestMessage">Additional Note (Optional)</label>
+                            <textarea id="requestMessage" name="message" placeholder="Any special request, pickup time, child seat, driver, etc."></textarea>
+                        </div>
                     </div>
-                    <div class="request-field">
-                        <label for="requestPhone">Phone</label>
-                        <input id="requestPhone" name="phone" type="text" placeholder="+94 ...">
+                    <div class="request-actions">
+                        <button type="button" class="btn btn-cancel" id="requestCancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary js-loading-submit" data-loading-text="Sending Request...">
+                            <span class="btn-spinner" aria-hidden="true"></span>
+                            <span class="btn-label">Send Request</span>
+                        </button>
                     </div>
-                    <div class="request-field full">
-                        <label for="requestEmail">Email</label>
-                        <input id="requestEmail" name="email" type="email" placeholder="you@example.com">
-                    </div>
-                    <div class="request-field full">
-                        <label for="requestMessage">Request Details</label>
-                        <textarea id="requestMessage" name="message" required></textarea>
-                    </div>
-                </div>
-                <div class="request-actions">
-                    <button type="button" class="btn btn-cancel" id="requestCancel">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send Request</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         (function () {
+            const setButtonLoading = (button, loadingText) => {
+                if (!button || button.classList.contains('is-loading')) return;
+                const label = button.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = loadingText || button.dataset.loadingText || 'Loading...';
+                }
+                button.classList.add('is-loading');
+                if (button.tagName === 'BUTTON') {
+                    button.disabled = true;
+                }
+            };
+
+            const clearButtonLoading = (button) => {
+                if (!button) return;
+                const label = button.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                button.classList.remove('is-loading');
+                if (button.tagName === 'BUTTON') {
+                    button.disabled = false;
+                }
+            };
+
             const modal = document.getElementById('requestModal');
             const cancelBtn = document.getElementById('requestCancel');
             const messageEl = document.getElementById('requestMessage');
@@ -696,6 +894,94 @@
             const startLocationEl = document.getElementById('requestStartLocation');
             const startDateEl = document.getElementById('requestStartDate');
             const endDateEl = document.getElementById('requestEndDate');
+            const requestNameEl = document.getElementById('requestName');
+            const requestPhoneEl = document.getElementById('requestPhone');
+            const requestEmailEl = document.getElementById('requestEmail');
+            const requestForm = document.getElementById('requestForm');
+            const requestSummaryBlockEl = document.getElementById('requestSummaryBlock');
+            const requestSummaryVehicleEl = document.getElementById('requestSummaryVehicle');
+            const requestNameErrorEl = document.getElementById('requestNameError');
+            const requestPhoneErrorEl = document.getElementById('requestPhoneError');
+            const requestEmailErrorEl = document.getElementById('requestEmailError');
+            const requestDetailsErrorEl = document.getElementById('requestDetailsError');
+            const requestSubmitBtn = requestForm ? requestForm.querySelector('.js-loading-submit') : null;
+            const defaultRequestName = @json(old('name', $currentUser?->name ?? ''));
+            const defaultRequestPhone = @json(old('phone', $currentUser?->phone ?? ''));
+            const defaultRequestEmail = @json(old('email', $currentUser?->email ?? ''));
+
+            const showRequestError = (inputEl, errorEl, message) => {
+                if (inputEl) inputEl.classList.add('input-error');
+                if (errorEl) {
+                    errorEl.textContent = message;
+                    errorEl.classList.add('show');
+                }
+            };
+
+            const clearRequestError = (inputEl, errorEl) => {
+                if (inputEl) inputEl.classList.remove('input-error');
+                if (errorEl) {
+                    errorEl.textContent = '';
+                    errorEl.classList.remove('show');
+                }
+            };
+
+            const validateRequestForm = () => {
+                let valid = true;
+
+                clearRequestError(requestNameEl, requestNameErrorEl);
+                clearRequestError(requestPhoneEl, requestPhoneErrorEl);
+                clearRequestError(requestEmailEl, requestEmailErrorEl);
+                clearRequestError(requestSummaryBlockEl, requestDetailsErrorEl);
+
+                if (!requestNameEl.value.trim()) {
+                    showRequestError(requestNameEl, requestNameErrorEl, 'Please enter your name.');
+                    valid = false;
+                }
+
+                const phoneValue = (requestPhoneEl.value || '').trim();
+                const emailValue = (requestEmailEl.value || '').trim();
+                const phoneDigits = phoneValue.replace(/\D/g, '');
+                const hasPhone = phoneValue.length > 0;
+                const hasEmail = emailValue.length > 0;
+
+                if (!hasPhone) {
+                    showRequestError(requestPhoneEl, requestPhoneErrorEl, 'Please enter phone number.');
+                    valid = false;
+                } else if (phoneDigits.length < 9 || phoneDigits.length > 15) {
+                    showRequestError(requestPhoneEl, requestPhoneErrorEl, 'Please enter a valid phone number.');
+                    valid = false;
+                }
+
+                if (!hasEmail) {
+                    showRequestError(requestEmailEl, requestEmailErrorEl, 'Please enter email.');
+                    valid = false;
+                } else {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(emailValue)) {
+                        showRequestError(requestEmailEl, requestEmailErrorEl, 'Please enter a valid email address.');
+                        valid = false;
+                    }
+                }
+
+                if (!startLocationEl.value.trim() || !startDateEl.value || !endDateEl.value) {
+                    showRequestError(requestSummaryBlockEl, requestDetailsErrorEl, 'Please select pickup location, start date, and end date first.');
+                    valid = false;
+                }
+
+                if (startDateEl.value && endDateEl.value && endDateEl.value < startDateEl.value) {
+                    showRequestError(requestSummaryBlockEl, requestDetailsErrorEl, 'End date must be on or after start date.');
+                    valid = false;
+                }
+
+                return valid;
+            };
+
+            const syncRequestEndDateMin = () => {
+                endDateEl.min = startDateEl.value || '';
+                if (startDateEl.value && endDateEl.value && endDateEl.value < startDateEl.value) {
+                    endDateEl.value = '';
+                }
+            };
 
             const closeModal = () => {
                 modal.classList.remove('open');
@@ -704,6 +990,7 @@
 
             openButtons.forEach((button) => {
                 button.addEventListener('click', () => {
+                    setButtonLoading(button, 'Opening...');
                     const carId = button.dataset.carId || '';
                     const car = button.dataset.car || '-';
                     const plate = button.dataset.plate || '-';
@@ -717,18 +1004,22 @@
                     startLocationEl.value = startLocation === 'Not selected' ? '' : startLocation;
                     startDateEl.value = startDate === 'Not selected' ? '' : startDate;
                     endDateEl.value = endDate === 'Not selected' ? '' : endDate;
+                    syncRequestEndDateMin();
+                    if (requestNameEl) requestNameEl.value = defaultRequestName;
+                    if (requestPhoneEl) requestPhoneEl.value = defaultRequestPhone;
+                    if (requestEmailEl) requestEmailEl.value = defaultRequestEmail;
+                    clearRequestError(requestNameEl, requestNameErrorEl);
+                    clearRequestError(requestPhoneEl, requestPhoneErrorEl);
+                    clearRequestError(requestEmailEl, requestEmailErrorEl);
+                    clearRequestError(requestSummaryBlockEl, requestDetailsErrorEl);
+                    if (requestSummaryVehicleEl) requestSummaryVehicleEl.textContent = `${car} (${plate})`;
 
                     subEl.textContent = `Vehicle: ${car} (${plate})`;
-                    messageEl.value =
-`Rental request:
-Vehicle: ${car} (${plate})
-Pickup location: ${startLocation}
-Start date: ${startDate}
-End date: ${endDate}
-Please contact me with availability and final rent details.`;
+                    messageEl.value = 'Please contact me with availability and final rent details.';
 
                     modal.classList.add('open');
                     modal.setAttribute('aria-hidden', 'false');
+                    setTimeout(() => clearButtonLoading(button), 250);
                 });
             });
 
@@ -739,6 +1030,34 @@ Please contact me with availability and final rent details.`;
                 }
             });
 
+            if (requestForm) {
+                requestForm.addEventListener('submit', (event) => {
+                    if (!validateRequestForm()) {
+                        event.preventDefault();
+                        clearButtonLoading(requestSubmitBtn);
+                        return;
+                    }
+                    setButtonLoading(requestSubmitBtn, 'Sending Request...');
+                });
+            }
+
+            [requestNameEl, requestPhoneEl, requestEmailEl].forEach((el) => {
+                if (!el) return;
+                el.addEventListener('input', () => {
+                    validateRequestForm();
+                });
+            });
+
+            [startLocationEl, startDateEl, endDateEl].forEach((el) => {
+                if (!el) return;
+                el.addEventListener('input', () => {
+                    if (el === startDateEl) {
+                        syncRequestEndDateMin();
+                    }
+                    validateRequestForm();
+                });
+            });
+
             const filterForm = document.getElementById('fleetFilterForm');
             const filterPickupInput = document.getElementById('start_location');
             const filterStartDateInput = document.getElementById('start_date');
@@ -746,6 +1065,7 @@ Please contact me with availability and final rent details.`;
             const filterPickupError = document.getElementById('fleet_start_location_error');
             const filterStartDateError = document.getElementById('fleet_start_date_error');
             const filterEndDateError = document.getElementById('fleet_end_date_error');
+            const filterSubmitBtn = filterForm ? filterForm.querySelector('.js-loading-submit') : null;
             let hasTriedFilterSubmit = false;
 
             const showFilterError = (input, errorEl, message) => {
@@ -815,7 +1135,16 @@ Please contact me with availability and final rent details.`;
                 hasTriedFilterSubmit = true;
                 if (!validateFilterForm()) {
                     event.preventDefault();
+                    clearButtonLoading(filterSubmitBtn);
+                    return;
                 }
+                setButtonLoading(filterSubmitBtn, 'Checking Availability...');
+            });
+
+            document.querySelectorAll('[data-loading-link="true"]').forEach((link) => {
+                link.addEventListener('click', () => {
+                    setButtonLoading(link, link.dataset.loadingText || 'Opening...');
+                });
             });
 
             [filterPickupInput, filterStartDateInput, filterEndDateInput].forEach((input) => {

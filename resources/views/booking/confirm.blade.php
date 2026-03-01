@@ -57,9 +57,32 @@
         .brand img { width: 44px; height: 30px; object-fit: contain; }
         .btn {
             display: inline-flex; align-items: center; justify-content: center;
+            gap: .45rem;
             text-decoration: none; border: 1px solid transparent;
             border-radius: 10px; font-weight: 700;
             padding: .62rem 1rem;
+        }
+        .btn .btn-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-top-color: #ffffff;
+            border-radius: 999px;
+            animation: btn-spin .7s linear infinite;
+        }
+        .btn-light .btn-spinner {
+            border-color: rgba(15, 23, 42, 0.22);
+            border-top-color: #0f66c3;
+        }
+        .btn.is-loading .btn-spinner {
+            display: inline-block;
+        }
+        .btn.is-loading {
+            pointer-events: none;
+        }
+        @keyframes btn-spin {
+            to { transform: rotate(360deg); }
         }
         .btn-light { background: #f8fbff; color: #334155; border-color: #c9d9ef; }
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; }
@@ -288,24 +311,29 @@
                             <div class="card-header">Customer details</div>
                             <div class="card-body">
                                 <div style="display:flex;align-items:center;gap:.65rem;padding:.55rem .65rem;border:1px solid #dbe6f3;border-radius:10px;background:#f8fbff;margin-bottom:.8rem;">
-                                    <img src="{{ $avatarUrl }}" alt="{{ $currentUser->name }}" style="width:42px;height:42px;border-radius:999px;object-fit:cover;border:1px solid #c8d7ea;">
+                                    <img src="{{ $avatarUrl }}" alt="{{ $currentUser?->name ?: 'Guest user' }}" style="width:42px;height:42px;border-radius:999px;object-fit:cover;border:1px solid #c8d7ea;">
                                     <div style="line-height:1.2;">
-                                        <div style="font-weight:700;color:#0f172a;">{{ $currentUser->name }}</div>
-                                        <div style="font-size:.82rem;color:#64748b;">{{ $currentUser->phone ?: 'Phone not set' }}</div>
+                                        <div style="font-weight:700;color:#0f172a;">{{ $currentUser?->name ?: 'Guest booking' }}</div>
+                                        <div style="font-size:.82rem;color:#64748b;">{{ $currentUser?->phone ?: 'Phone not set' }}</div>
                                     </div>
                                 </div>
+                                @guest
+                                    <div class="help" style="margin:-.2rem 0 .65rem;">
+                                        Continue as guest: we will create your customer account automatically and send a temporary password to your email.
+                                    </div>
+                                @endguest
                                 <div class="grid">
                                     <div class="field">
                                         <label>Name</label>
-                                        <input type="text" name="customer_name" value="{{ old('customer_name', $currentUser->name) }}" required>
+                                        <input type="text" name="customer_name" value="{{ old('customer_name', $currentUser?->name) }}" required>
                                     </div>
                                     <div class="field">
                                         <label>Phone</label>
-                                        <input type="text" name="customer_phone" value="{{ old('customer_phone', $currentUser->phone) }}" placeholder="+94 ...">
+                                        <input type="text" name="customer_phone" value="{{ old('customer_phone', $currentUser?->phone) }}" placeholder="+94 ..." required>
                                     </div>
                                     <div class="field full">
                                         <label>Email</label>
-                                        <input type="email" name="customer_email" value="{{ old('customer_email', $currentUser->email) }}" placeholder="you@example.com">
+                                        <input type="email" name="customer_email" value="{{ old('customer_email', $currentUser?->email) }}" placeholder="you@example.com" required>
                                     </div>
                                     <div class="field full">
                                         <label>Payment method</label>
@@ -356,7 +384,10 @@
                             </div>
                             <div class="actions">
                                 <a class="btn btn-light" href="{{ route('fleet.index', $filters) }}">Edit selection</a>
-                                <button class="btn btn-primary" type="submit">Confirm booking</button>
+                                <button class="btn btn-primary js-loading-submit" type="submit" data-loading-text="Confirming...">
+                                    <span class="btn-spinner" aria-hidden="true"></span>
+                                    <span class="btn-label">Confirm booking</span>
+                                </button>
                             </div>
                         </div>
                     </aside>
@@ -368,6 +399,8 @@
         (function () {
             const paymentMethodEl = document.getElementById('paymentMethod');
             const bankDetailsEl = document.getElementById('bankTransferDetails');
+            const bookingForm = document.querySelector('form[action="{{ route('booking.store') }}"]');
+            const bookingSubmitBtn = bookingForm ? bookingForm.querySelector('.js-loading-submit') : null;
 
             if (!paymentMethodEl || !bankDetailsEl) {
                 return;
@@ -379,6 +412,18 @@
 
             paymentMethodEl.addEventListener('change', syncBankDetails);
             syncBankDetails();
+
+            if (bookingForm && bookingSubmitBtn) {
+                bookingForm.addEventListener('submit', () => {
+                    const label = bookingSubmitBtn.querySelector('.btn-label');
+                    if (label) {
+                        label.dataset.originalText = label.textContent;
+                        label.textContent = bookingSubmitBtn.dataset.loadingText || 'Confirming...';
+                    }
+                    bookingSubmitBtn.classList.add('is-loading');
+                    bookingSubmitBtn.disabled = true;
+                });
+            }
         })();
     </script>
 </body>

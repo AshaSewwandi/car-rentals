@@ -20,6 +20,7 @@ class UserManagementController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'role' => ['required', Rule::in(['admin', 'customer'])],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -27,6 +28,7 @@ class UserManagementController extends Controller
 
         User::create([
             'name' => $data['name'],
+            'phone' => $data['phone'],
             'email' => $data['email'],
             'role' => $data['role'],
             'password' => Hash::make($data['password']),
@@ -39,6 +41,7 @@ class UserManagementController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'role' => ['required', Rule::in(['admin', 'customer'])],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
@@ -50,6 +53,7 @@ class UserManagementController extends Controller
 
         $update = [
             'name' => $data['name'],
+            'phone' => $data['phone'],
             'email' => $data['email'],
             'role' => $data['role'],
         ];

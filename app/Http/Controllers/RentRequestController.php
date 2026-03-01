@@ -50,16 +50,25 @@ class RentRequestController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'car_id' => ['nullable', 'exists:cars,id'],
+            'car_id' => ['required', 'exists:cars,id'],
             'car_name' => ['nullable', 'string', 'max:180'],
             'plate_no' => ['nullable', 'string', 'max:100'],
             'name' => ['required', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40', 'required_without:email'],
             'email' => ['nullable', 'email', 'max:180', 'required_without:phone'],
-            'start_location' => ['nullable', 'string', 'max:255'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'start_location' => ['required', 'string', 'max:255'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'message' => ['nullable', 'string', 'max:3000'],
+        ], [
+            'name.required' => 'Please enter your name.',
+            'phone.required_without' => 'Please enter phone or email.',
+            'email.required_without' => 'Please enter email or phone.',
+            'email.email' => 'Please enter a valid email address.',
+            'start_location.required' => 'Please select pickup location before sending request.',
+            'start_date.required' => 'Please select a start date before sending request.',
+            'end_date.required' => 'Please select an end date before sending request.',
+            'end_date.after_or_equal' => 'End date must be the same as or after start date.',
         ]);
 
         RentRequest::create($validated + ['status' => 'pending']);

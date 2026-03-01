@@ -18,19 +18,20 @@ use App\Http\Controllers\RentRequestController;
 use App\Http\Controllers\RentalTripController;
 use App\Http\Controllers\CustomerSupportRequestController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
 Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
 Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');
-Route::get('/fleet', [FleetController::class, 'index'])->middleware('auth')->name('fleet.index');
-Route::get('/booking/confirm', [BookingController::class, 'create'])->middleware('auth')->name('booking.confirm');
-Route::post('/booking/confirm', [BookingController::class, 'store'])->middleware('auth')->name('booking.store');
-Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->middleware('auth')->name('booking.success');
-Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->middleware('auth')->name('booking.cancel');
+Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
+Route::get('/booking/confirm', [BookingController::class, 'create'])->name('booking.confirm');
+Route::post('/booking/confirm', [BookingController::class, 'store'])->name('booking.store');
+Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->name('booking.success');
+Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->middleware('auth')->name('support-requests.store');
-Route::post('/rent-requests', [RentRequestController::class, 'store'])->middleware('auth')->name('rent-requests.store');
+Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -48,12 +49,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/bookings/{booking}/cancel', [ProfileController::class, 'cancelBooking'])->name('profile.bookings.cancel');
+    Route::get('/profile/bookings/{booking}/invoice/pdf', [ProfileController::class, 'invoicePdf'])->name('profile.bookings.invoice-pdf');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
     Route::middleware('permission:cars')->group(function () {
         Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
         Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
         Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
+        Route::patch('/cars/{car}/renewal', [CarController::class, 'updateRenewal'])->name('cars.renewal.update');
         Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
     });
 
@@ -77,6 +80,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    });
+
+    Route::middleware('permission:vehicle_maintenance')->group(function () {
+        Route::get('/vehicle-maintenance', [VehicleMaintenanceController::class, 'index'])->name('vehicle-maintenance.index');
+        Route::get('/vehicle-maintenance/export/pdf', [VehicleMaintenanceController::class, 'exportPdf'])->name('vehicle-maintenance.export-pdf');
+        Route::post('/vehicle-maintenance', [VehicleMaintenanceController::class, 'store'])->name('vehicle-maintenance.store');
+        Route::put('/vehicle-maintenance/{vehicleMaintenance}', [VehicleMaintenanceController::class, 'update'])->name('vehicle-maintenance.update');
+        Route::delete('/vehicle-maintenance/{vehicleMaintenance}', [VehicleMaintenanceController::class, 'destroy'])->name('vehicle-maintenance.destroy');
     });
 
     Route::middleware('permission:agreements')->group(function () {
@@ -116,7 +127,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/rent-requests/{rentRequest}', [RentRequestController::class, 'destroy'])->name('rent-requests.destroy');
         Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
         Route::get('/rental-trips', [RentalTripController::class, 'index'])->name('rental-trips.index');
+        Route::get('/rental-trips/export/pdf', [RentalTripController::class, 'exportPdf'])->name('rental-trips.export-pdf');
+        Route::get('/rental-trips/{booking}/invoice/pdf', [RentalTripController::class, 'invoicePdf'])->name('rental-trips.invoice-pdf');
+        Route::post('/rental-trips/{booking}/cancel', [RentalTripController::class, 'cancel'])->name('rental-trips.cancel');
         Route::post('/rental-trips/{booking}/handover', [RentalTripController::class, 'handover'])->name('rental-trips.handover');
         Route::post('/rental-trips/{booking}/return', [RentalTripController::class, 'returnTrip'])->name('rental-trips.return');
+        Route::post('/rental-trips/{booking}/payment/base/paid', [RentalTripController::class, 'markBasePaymentPaid'])->name('rental-trips.payment.base.paid');
+        Route::post('/rental-trips/{booking}/payment/additional/paid', [RentalTripController::class, 'markAdditionalPaymentPaid'])->name('rental-trips.payment.additional.paid');
     });
 });

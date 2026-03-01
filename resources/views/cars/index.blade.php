@@ -49,6 +49,20 @@
               @if($car->note)
                 <div class="small text-muted mt-2">Note: {{ $car->note }}</div>
               @endif
+              @if($car->maintenance_last_service_date || $car->maintenance_next_service_date || $car->tracker_maintenance_mileage)
+                <div class="small text-muted mt-2">
+                  Maintenance:
+                  @if($car->maintenance_last_service_date)
+                    Last service {{ $car->maintenance_last_service_date->format('Y-m-d') }}
+                  @endif
+                  @if($car->maintenance_next_service_date)
+                    | Next service {{ $car->maintenance_next_service_date->format('Y-m-d') }}
+                  @endif
+                  @if($car->tracker_maintenance_mileage)
+                    | Interval {{ number_format($car->tracker_maintenance_mileage) }} km
+                  @endif
+                </div>
+              @endif
             </div>
 
             <div class="d-flex gap-2">
@@ -166,8 +180,34 @@
                   <input type="date" name="tracker_insurance_expires" class="form-control form-control-sm" value="{{ optional($car->tracker_insurance_expires)->format('Y-m-d') }}">
                 </div>
                 <div class="col-12 col-lg-4">
-                  <label class="form-label small mb-1">Maintenance Mileage (KM)</label>
+                  <label class="form-label small mb-1">License Expires</label>
+                  <input type="date" name="tracker_license_expires" class="form-control form-control-sm" value="{{ optional($car->tracker_license_expires)->format('Y-m-d') }}">
+                </div>
+              </div>
+
+              <hr class="my-3">
+              <div class="small text-muted mb-2">Maintenance details</div>
+
+              <div class="row g-2">
+                <div class="col-12 col-lg-4">
+                  <label class="form-label small mb-1">Service Interval (KM)</label>
                   <input type="number" min="0" name="tracker_maintenance_mileage" class="form-control form-control-sm" value="{{ $car->tracker_maintenance_mileage }}">
+                </div>
+                <div class="col-12 col-lg-4">
+                  <label class="form-label small mb-1">Last Service Date</label>
+                  <input type="date" name="maintenance_last_service_date" class="form-control form-control-sm" value="{{ optional($car->maintenance_last_service_date)->format('Y-m-d') }}">
+                </div>
+                <div class="col-12 col-lg-4">
+                  <label class="form-label small mb-1">Last Service Mileage</label>
+                  <input type="number" min="0" name="maintenance_last_service_mileage" class="form-control form-control-sm" value="{{ $car->maintenance_last_service_mileage }}">
+                </div>
+                <div class="col-12 col-lg-4">
+                  <label class="form-label small mb-1">Next Service Date</label>
+                  <input type="date" name="maintenance_next_service_date" class="form-control form-control-sm" value="{{ optional($car->maintenance_next_service_date)->format('Y-m-d') }}">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small mb-1">Maintenance Notes</label>
+                  <textarea name="maintenance_note" class="form-control form-control-sm" rows="2">{{ $car->maintenance_note }}</textarea>
                 </div>
               </div>
 
@@ -285,10 +325,36 @@
               <label class="form-label">Insurance Expires</label>
               <input type="date" name="tracker_insurance_expires" class="form-control" value="{{ old('tracker_insurance_expires') }}">
             </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">License Expires</label>
+              <input type="date" name="tracker_license_expires" class="form-control" value="{{ old('tracker_license_expires') }}">
+            </div>
+          </div>
+          <hr class="my-3">
+          <div class="small text-muted mb-2">Maintenance details</div>
+          <div class="row g-2 mt-0">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Service Interval (KM)</label>
+              <input type="number" min="0" name="tracker_maintenance_mileage" class="form-control" value="{{ old('tracker_maintenance_mileage') }}">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Last Service Date</label>
+              <input type="date" name="maintenance_last_service_date" class="form-control" value="{{ old('maintenance_last_service_date') }}">
+            </div>
+          </div>
+          <div class="row g-2 mt-0">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Last Service Mileage</label>
+              <input type="number" min="0" name="maintenance_last_service_mileage" class="form-control" value="{{ old('maintenance_last_service_mileage') }}">
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Next Service Date</label>
+              <input type="date" name="maintenance_next_service_date" class="form-control" value="{{ old('maintenance_next_service_date') }}">
+            </div>
           </div>
           <div class="mb-2 mt-2">
-            <label class="form-label">Maintenance Mileage (KM)</label>
-            <input type="number" min="0" name="tracker_maintenance_mileage" class="form-control" value="{{ old('tracker_maintenance_mileage') }}">
+            <label class="form-label">Maintenance Notes</label>
+            <textarea name="maintenance_note" class="form-control" rows="3">{{ old('maintenance_note') }}</textarea>
           </div>
           <div class="mb-2">
             <label class="form-label">Status</label>

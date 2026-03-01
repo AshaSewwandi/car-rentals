@@ -280,6 +280,7 @@
                               data-service-date="{{ $row['date'] }}"
                               data-service-type="{{ $row['service_type'] }}"
                               data-service-cost="{{ $row['service_cost'] }}"
+                              data-service-mileage="{{ $row['service_mileage'] }}"
                               data-service-note="{{ $row['service_note'] }}"
                             >
                               {{ $row['is_service'] ? 'Edit' : 'Mark' }}
@@ -332,6 +333,10 @@
             <input type="number" step="0.01" min="0" class="form-control" name="service_cost" id="service_cost" placeholder="Optional">
           </div>
           <div class="mb-2">
+            <label class="form-label">Mileage at Service</label>
+            <input type="number" min="0" step="1" class="form-control" name="service_mileage" id="service_mileage" placeholder="Optional">
+          </div>
+          <div class="mb-2">
             <label class="form-label">Note</label>
             <input type="text" class="form-control" name="service_note" id="service_note" placeholder="Optional details">
           </div>
@@ -358,6 +363,7 @@
       const originalDateInput = modal.querySelector('#original_service_date');
       const typeInput = modal.querySelector('#service_type');
       const costInput = modal.querySelector('#service_cost');
+      const mileageInput = modal.querySelector('#service_mileage');
       const noteInput = modal.querySelector('#service_note');
 
       const selectedDate = button.getAttribute('data-service-date') || '';
@@ -365,6 +371,7 @@
       if (originalDateInput) originalDateInput.value = selectedDate;
       if (typeInput) typeInput.value = button.getAttribute('data-service-type') || '';
       if (costInput) costInput.value = button.getAttribute('data-service-cost') || '';
+      if (mileageInput) mileageInput.value = button.getAttribute('data-service-mileage') || '';
       if (noteInput) noteInput.value = button.getAttribute('data-service-note') || '';
     });
   });

@@ -83,6 +83,7 @@ class GpsLogController extends Controller
                     $service = $this->extractServiceFromNote((string) ($log?->note ?? ''));
                     $row['service_type'] = $service['type'];
                     $row['service_cost'] = $service['cost'];
+                    $row['service_mileage'] = $service['mileage'];
                     $row['service_note'] = $service['note'];
                 }
             }
@@ -303,6 +304,7 @@ class GpsLogController extends Controller
             'original_service_date' => ['nullable', 'date'],
             'service_type' => ['required', 'string', 'max:100'],
             'service_cost' => ['nullable', 'numeric', 'min:0'],
+            'service_mileage' => ['nullable', 'integer', 'min:0'],
             'service_note' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -313,6 +315,7 @@ class GpsLogController extends Controller
         $serviceNote = $this->buildServiceNote(
             $data['service_type'],
             isset($data['service_cost']) ? (float) $data['service_cost'] : null,
+            isset($data['service_mileage']) ? (int) $data['service_mileage'] : null,
             $data['service_note'] ?? null
         );
 
@@ -549,11 +552,14 @@ class GpsLogController extends Controller
         return max(1, $count);
     }
 
-    private function buildServiceNote(string $type, ?float $cost = null, ?string $note = null): string
+    private function buildServiceNote(string $type, ?float $cost = null, ?int $mileage = null, ?string $note = null): string
     {
         $parts = ['Service: '.trim($type)];
         if ($cost !== null) {
             $parts[] = 'Cost: '.number_format($cost, 2, '.', '');
+        }
+        if ($mileage !== null) {
+            $parts[] = 'Mileage: '.$mileage;
         }
         if ($note !== null && trim($note) !== '') {
             $parts[] = 'Note: '.trim($note);
@@ -567,6 +573,7 @@ class GpsLogController extends Controller
         $result = [
             'type' => null,
             'cost' => null,
+            'mileage' => null,
             'note' => null,
         ];
 
@@ -580,6 +587,9 @@ class GpsLogController extends Controller
         if (preg_match('/Cost:\s*([0-9]+(?:\.[0-9]+)?)/i', $note, $m)) {
             $result['cost'] = trim($m[1]);
         }
+        if (preg_match('/Mileage:\s*([0-9]+)/i', $note, $m)) {
+            $result['mileage'] = trim($m[1]);
+        }
         if (preg_match('/Note:\s*(.+)$/i', $note, $m)) {
             $result['note'] = trim($m[1]);
         }
@@ -589,7 +599,7 @@ class GpsLogController extends Controller
 
     private function removeServiceFromNote(string $note): ?string
     {
-        $cleaned = preg_replace('/\bService:\s*[^|]+(?:\|\s*Cost:\s*[0-9]+(?:\.[0-9]+)?)?(?:\|\s*Note:\s*[^|]+)?/i', '', $note);
+        $cleaned = preg_replace('/\bService:\s*[^|]+(?:\|\s*Cost:\s*[0-9]+(?:\.[0-9]+)?)?(?:\|\s*Mileage:\s*[0-9]+)?(?:\|\s*Note:\s*[^|]+)?/i', '', $note);
         $cleaned = trim((string) $cleaned, " \t\n\r\0\x0B|");
 
         return $cleaned === '' ? null : $cleaned;

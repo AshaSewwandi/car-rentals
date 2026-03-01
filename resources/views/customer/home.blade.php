@@ -261,6 +261,7 @@
       </div>
       <ul class="side-links">
         <li><a href="#" data-section-toggle="active" class="active">Active orders <span>&rsaquo;</span></a></li>
+        <li><a href="#" data-section-toggle="completed">Completed orders <span>&rsaquo;</span></a></li>
         <li><a href="#" data-section-toggle="canceled">Canceled orders <span>&rsaquo;</span></a></li>
         <li><a href="{{ route('profile.edit') }}">Account settings <span>&rsaquo;</span></a></li>
       </ul>
@@ -284,15 +285,42 @@
                   | {{ $trip->car?->plate_no ?: '-' }}
                   | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
                 </div>
-                <div style="margin-top:.6rem;">
+                <div style="margin-top:.6rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                  <a class="btn btn-light" href="{{ route('profile.bookings.invoice-pdf', $trip) }}">Invoice</a>
                   @if(!$trip->handover_at && $trip->start_mileage === null)
-                    <form method="post" action="{{ route('profile.bookings.cancel', $trip) }}" onsubmit="return confirm('Are you sure you want to cancel this trip? This action cannot be undone.');">
+                    <form style="margin:0;" method="post" action="{{ route('profile.bookings.cancel', $trip) }}" onsubmit="return confirm('Are you sure you want to cancel this trip? This action cannot be undone.');">
                       @csrf
                       <button class="btn btn-danger" type="submit">Cancel Trip</button>
                     </form>
                   @else
                     <span class="muted">Trip already started. Cancellation unavailable.</span>
                   @endif
+                </div>
+              </article>
+            @endforeach
+          </div>
+        @endif
+      </section>
+
+      <section id="completed-orders-section" data-orders-section="completed" style="display:none;">
+        <h2 id="completed-orders" style="margin-top:0;">Completed orders</h2>
+        @if($completedTrips->isEmpty())
+          <p class="muted">You have no completed orders yet.</p>
+        @else
+          <div class="orders">
+            @foreach($completedTrips as $trip)
+              <article class="order">
+                <div class="order-head">
+                  <strong>#{{ $trip->id }} - {{ $trip->car?->name ?: 'Vehicle' }}</strong>
+                  <span class="pill" style="color:#166534;background:#ecfdf3;border-color:#bbf7d0;">Completed</span>
+                </div>
+                <div class="muted">
+                  {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}
+                  | {{ $trip->car?->plate_no ?: '-' }}
+                  | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
+                </div>
+                <div style="margin-top:.6rem;">
+                  <a class="btn btn-light" href="{{ route('profile.bookings.invoice-pdf', $trip) }}">Invoice</a>
                 </div>
               </article>
             @endforeach
@@ -316,6 +344,9 @@
                   {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}
                   | {{ $trip->car?->plate_no ?: '-' }}
                   | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
+                </div>
+                <div style="margin-top:.6rem;">
+                  <a class="btn btn-light" href="{{ route('profile.bookings.invoice-pdf', $trip) }}">Invoice</a>
                 </div>
               </article>
             @endforeach

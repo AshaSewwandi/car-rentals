@@ -29,6 +29,7 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
             <th>Role</th>
             <th>Created</th>
             <th>Action</th>
@@ -39,6 +40,7 @@
             <tr>
               <td>{{ $user->name }}</td>
               <td>{{ $user->email }}</td>
+              <td>{{ $user->phone ?: '-' }}</td>
               <td><span class="badge {{ $user->role === 'admin' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($user->role) }}</span></td>
               <td>{{ $user->created_at?->format('Y-m-d') }}</td>
               <td class="text-nowrap">
@@ -58,7 +60,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="5" class="text-center p-4 text-muted">No users found.</td></tr>
+            <tr><td colspan="6" class="text-center p-4 text-muted">No users found.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -83,6 +85,10 @@
           <div class="mb-2">
             <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
           </div>
           <div class="mb-2">
             <label class="form-label">Role</label>
@@ -128,6 +134,10 @@
             <div class="mb-2">
               <label class="form-label">Email</label>
               <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Phone</label>
+              <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" required>
             </div>
             <div class="mb-2">
               <label class="form-label">Role</label>

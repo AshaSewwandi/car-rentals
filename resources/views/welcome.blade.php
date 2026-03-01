@@ -280,6 +280,32 @@
             font-size: .95rem;
         }
 
+        .btn .btn-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-top-color: #ffffff;
+            border-radius: 999px;
+            animation: btn-spin .7s linear infinite;
+        }
+
+        .btn.is-loading .btn-spinner {
+            display: inline-block;
+        }
+
+        .btn.is-loading .btn-label {
+            opacity: .95;
+        }
+
+        .btn.is-loading {
+            pointer-events: none;
+        }
+
+        @keyframes btn-spin {
+            to { transform: rotate(360deg); }
+        }
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: #fff;
@@ -1105,7 +1131,10 @@
                                 <small class="field-error" id="end_date_error"></small>
                             </div>
                             <div class="control full">
-                                <button class="btn btn-primary" type="submit">Find Available Cars</button>
+                                <button class="btn btn-primary" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking Availability...">
+                                    <span class="btn-spinner" aria-hidden="true"></span>
+                                    <span class="btn-label">Find Available Cars</span>
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -1379,10 +1408,33 @@
             const pickupInput = document.getElementById('start_location');
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
+            const availabilitySubmitBtn = document.getElementById('availabilitySubmitBtn');
             const pickupError = document.getElementById('start_location_error');
             const startDateError = document.getElementById('start_date_error');
             const endDateError = document.getElementById('end_date_error');
             let hasTriedSubmit = false;
+
+            const setLoadingState = (button) => {
+                if (!button) return;
+                const label = button.querySelector('.btn-label');
+                const loadingText = button.dataset.loadingText || 'Loading...';
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = loadingText;
+                }
+                button.classList.add('is-loading');
+                button.disabled = true;
+            };
+
+            const clearLoadingState = (button) => {
+                if (!button) return;
+                const label = button.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                button.classList.remove('is-loading');
+                button.disabled = false;
+            };
 
             const showError = (input, errorEl, message) => {
                 input.classList.add('input-error');
@@ -1451,7 +1503,10 @@
                 hasTriedSubmit = true;
                 if (!validateAvailabilityForm()) {
                     event.preventDefault();
+                    clearLoadingState(availabilitySubmitBtn);
+                    return;
                 }
+                setLoadingState(availabilitySubmitBtn);
             });
 
             [pickupInput, startDateInput, endDateInput].forEach((input) => {

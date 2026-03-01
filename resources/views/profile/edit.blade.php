@@ -109,12 +109,18 @@
               </td>
               <td>
                 @if(!$trip->handover_at && $trip->start_mileage === null)
-                  <form method="post" action="{{ route('profile.bookings.cancel', $trip) }}" onsubmit="return confirm('Are you sure you want to cancel this trip? This action cannot be undone.');">
-                    @csrf
-                    <button class="btn btn-sm btn-outline-danger">Cancel Trip</button>
-                  </form>
+                  <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('profile.bookings.invoice-pdf', $trip) }}" class="btn btn-sm btn-outline-dark">Invoice</a>
+                    <form method="post" action="{{ route('profile.bookings.cancel', $trip) }}" onsubmit="return confirm('Are you sure you want to cancel this trip? This action cannot be undone.');">
+                      @csrf
+                      <button class="btn btn-sm btn-outline-danger">Cancel Trip</button>
+                    </form>
+                  </div>
                 @else
-                  <span class="text-muted small">Trip already started</span>
+                  <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a href="{{ route('profile.bookings.invoice-pdf', $trip) }}" class="btn btn-sm btn-outline-dark">Invoice</a>
+                    <span class="text-muted small">Trip already started</span>
+                  </div>
                 @endif
               </td>
             </tr>

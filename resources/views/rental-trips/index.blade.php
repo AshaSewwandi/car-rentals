@@ -7,7 +7,73 @@
     <h4 class="mb-1">Rental Trips</h4>
     <div class="text-muted">Record start and end mileage, then auto-calculate extra km and final amount.</div>
   </div>
+  <form method="get" action="{{ route('rental-trips.index') }}" class="d-flex flex-wrap align-items-end gap-2">
+    <div>
+      <label for="trip_car_id" class="form-label mb-1">Vehicle</label>
+      <select id="trip_car_id" name="car_id" class="form-select form-select-sm" style="min-width: 220px;">
+        <option value="">All Vehicles</option>
+        @foreach($cars as $car)
+          <option value="{{ $car->id }}" @selected((string)($filters['car_id'] ?? '') === (string)$car->id)>
+            {{ $car->name }} ({{ $car->plate_no }})
+          </option>
+        @endforeach
+      </select>
+    </div>
+    <div>
+      <label for="trip_date_from" class="form-label mb-1">From</label>
+      <input id="trip_date_from" type="date" name="date_from" class="form-control form-control-sm" value="{{ $filters['date_from'] ?? '' }}">
+    </div>
+    <div>
+      <label for="trip_date_to" class="form-label mb-1">To</label>
+      <input id="trip_date_to" type="date" name="date_to" class="form-control form-control-sm" value="{{ $filters['date_to'] ?? '' }}" min="{{ $filters['date_from'] ?? '' }}">
+    </div>
+    <div>
+      <label for="trip_status" class="form-label mb-1">Status</label>
+      <select id="trip_status" name="status" class="form-select form-select-sm" style="min-width: 140px;">
+        <option value="">All Statuses</option>
+        <option value="pending" @selected(($filters['status'] ?? '') === 'pending')>Pending</option>
+        <option value="confirmed" @selected(($filters['status'] ?? '') === 'confirmed')>Confirmed</option>
+        <option value="completed" @selected(($filters['status'] ?? '') === 'completed')>Completed</option>
+        <option value="cancelled" @selected(($filters['status'] ?? '') === 'cancelled')>Cancelled</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-sm btn-dark">Filter</button>
+    <a href="{{ route('rental-trips.index') }}" class="btn btn-sm btn-outline-dark">Reset</a>
+    <a href="{{ route('rental-trips.export-pdf', array_filter([
+      'car_id' => $filters['car_id'] ?? null,
+      'date_from' => $filters['date_from'] ?? null,
+      'date_to' => $filters['date_to'] ?? null,
+      'status' => $filters['status'] ?? null,
+    ], fn($value) => $value !== null && $value !== '')) }}" class="btn btn-sm btn-outline-dark">
+      Export PDF
+    </a>
+  </form>
 </div>
+
+<script>
+  (function () {
+    const navEntry = performance.getEntriesByType('navigation')[0];
+    const isReload = navEntry ? navEntry.type === 'reload' : performance.navigation.type === 1;
+    if (isReload && window.location.search) {
+      window.location.replace(window.location.pathname);
+      return;
+    }
+
+    const fromInput = document.getElementById('trip_date_from');
+    const toInput = document.getElementById('trip_date_to');
+    if (!fromInput || !toInput) return;
+
+    const syncToDateMin = () => {
+      toInput.min = fromInput.value || '';
+      if (fromInput.value && toInput.value && toInput.value < fromInput.value) {
+        toInput.value = '';
+      }
+    };
+
+    fromInput.addEventListener('input', syncToDateMin);
+    syncToDateMin();
+  })();
+</script>
 
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
@@ -25,7 +91,9 @@
             <th>Base</th>
             <th>Mileage</th>
             <th>Usage Billing</th>
-            <th>Status</th>
+            <th>Trip Status</th>
+            <th>Base Details</th>
+            <th>Additional Details</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -60,35 +128,74 @@
                 <div class="mt-1">Final: <strong>LKR {{ number_format((float)($booking->final_total ?? $booking->total_amount), 2) }}</strong></div>
               </td>
               <td>
-                <span class="badge text-bg-{{ $booking->status === 'completed' ? 'success' : ($booking->status === 'confirmed' ? 'primary' : 'secondary') }}">
+                @php
+                  $statusClass = match ($booking->status) {
+                    'completed' => 'success',
+                    'confirmed' => 'warning',
+                    'cancelled' => 'danger',
+                    default => 'secondary',
+                  };
+                @endphp
+                <span class="badge text-bg-{{ $statusClass }}">
                   {{ ucfirst($booking->status) }}
                 </span>
-                <br>
-                <span class="badge text-bg-{{ $booking->payment_status === 'paid' ? 'success' : 'warning' }} mt-1">
-                  Payment: {{ ucfirst($booking->payment_status) }}
-                </span>
+              </td>
+              <td>
+                <div>{{ ucfirst((string) $booking->payment_status) }}</div>
+                <div class="text-muted small">LKR {{ number_format((float) $booking->total_amount, 2) }}</div>
+              </td>
+              <td>
+                <div>{{ $booking->additional_payment_status === 'not_required' ? 'Not Yet' : ucfirst((string) $booking->additional_payment_status) }}</div>
+                <div class="text-muted small">LKR {{ number_format((float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0), 2) }}</div>
               </td>
               <td style="min-width: 240px;">
-                @if($booking->start_mileage === null)
+                @if($booking->status === 'cancelled')
+                  <span class="text-muted small">Trip cancelled</span>
+                @elseif($booking->start_mileage === null)
                   <form method="post" action="{{ route('rental-trips.handover', $booking) }}" class="d-flex gap-2">
                     @csrf
-                    <input type="number" step="0.01" min="0" name="start_mileage" class="form-control form-control-sm" placeholder="Start KM" required>
+                    <input type="text" inputmode="decimal" name="start_mileage" class="form-control form-control-sm" placeholder="Start KM" required>
                     <button type="submit" class="btn btn-sm btn-dark">Start</button>
                   </form>
                 @elseif($booking->status !== 'completed')
                   <form method="post" action="{{ route('rental-trips.return', $booking) }}" class="d-flex gap-2">
                     @csrf
-                    <input type="number" step="0.01" min="{{ (float)$booking->start_mileage }}" name="end_mileage" class="form-control form-control-sm" placeholder="End KM" required>
+                    <input type="text" inputmode="decimal" name="end_mileage" class="form-control form-control-sm" placeholder="End KM" required>
                     <button type="submit" class="btn btn-sm btn-dark">Return</button>
                   </form>
                 @else
                   <span class="text-muted small">Completed by {{ $booking->returnedBy?->name ?: 'Admin' }}<br>{{ $booking->returned_at?->format('Y-m-d H:i') }}</span>
                 @endif
+
+                @if($booking->status !== 'cancelled' && $booking->payment_status !== 'paid')
+                  <form method="post" action="{{ route('rental-trips.payment.base.paid', $booking) }}" class="mt-2">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Base Paid</button>
+                  </form>
+                @endif
+
+                @if($booking->status !== 'cancelled' && $booking->additional_payment_status === 'pending')
+                  <form method="post" action="{{ route('rental-trips.payment.additional.paid', $booking) }}" class="mt-2">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Additional Paid</button>
+                  </form>
+                @endif
+
+                @if(in_array($booking->status, ['pending', 'confirmed'], true) && !$booking->handover_at && $booking->start_mileage === null)
+                  <form method="post" action="{{ route('rental-trips.cancel', $booking) }}" class="mt-2" onsubmit="return confirm('Cancel this rental trip?');">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Cancel Trip</button>
+                  </form>
+                @endif
+
+                <a href="{{ route('rental-trips.invoice-pdf', $booking) }}" class="btn btn-sm btn-outline-dark w-100 mt-2">
+                  Invoice PDF
+                </a>
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="8" class="text-center p-4 text-muted">No bookings found yet.</td>
+              <td colspan="10" class="text-center p-4 text-muted">No bookings found yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -102,4 +209,3 @@
   @endif
 </div>
 @endsection
-

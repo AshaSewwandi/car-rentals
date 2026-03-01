@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -111,6 +113,35 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('success', 'Rental trip canceled successfully.');
+    }
+
+    public function invoicePdf(Request $request, Booking $booking): Response
+    {
+        $user = $request->user();
+        $belongsToUser = ($booking->user_id && $booking->user_id === $user->id)
+            || (!$booking->user_id && $booking->customer_email && strcasecmp((string) $booking->customer_email, (string) $user->email) === 0)
+            || (!$booking->user_id && $booking->customer_phone && $user->phone && (string) $booking->customer_phone === (string) $user->phone)
+            || (!$booking->user_id && $booking->customer_name && (string) $booking->customer_name === (string) $user->name);
+
+        if (!$belongsToUser && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $booking->load(['car', 'returnedBy', 'user']);
+
+        $baseAmount = (float) $booking->total_amount;
+        $additionalAmount = (float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0);
+        $finalAmount = (float) ($booking->final_total ?? $booking->total_amount);
+
+        $pdf = Pdf::loadView('rental-trips.invoice-pdf', [
+            'booking' => $booking,
+            'generatedAt' => now(),
+            'baseAmount' => $baseAmount,
+            'additionalAmount' => $additionalAmount,
+            'finalAmount' => $finalAmount,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download('rental-trip-invoice-' . $booking->id . '.pdf');
     }
 
     private function customerBookingsQuery($user)

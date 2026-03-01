@@ -235,10 +235,70 @@
 </div>
 
 <div class="row g-3">
+  <div class="col-12">
+    <div class="card panel-card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Renewals From {{ $renewalWindowStart->format('Y-m-d') }} To {{ $renewalWindowEnd->format('Y-m-d') }}</span>
+        @if(auth()->user()->canAccess('cars'))
+          <a class="panel-link" href="{{ route('cars.index') }}">Manage Vehicles</a>
+        @endif
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped mb-0 align-middle">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Renewal Type</th>
+                <th>Renewal Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($renewalAlerts as $alert)
+                <tr>
+                  <td>{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}</td>
+                  <td>{{ $alert['type'] }}</td>
+                  <td>{{ $alert['date']->format('Y-m-d') }}</td>
+                  <td>
+                    @if($alert['days_left'] <= 7)
+                      <span class="badge text-bg-danger">Due in {{ max($alert['days_left'], 0) }} day{{ max($alert['days_left'], 0) === 1 ? '' : 's' }}</span>
+                    @else
+                      <span class="badge text-bg-warning">Due in {{ $alert['days_left'] }} days</span>
+                    @endif
+                  </td>
+                  <td>
+                    @if(auth()->user()->canAccess('cars'))
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-dark"
+                        data-bs-toggle="modal"
+                        data-bs-target="#renewalUpdateModal"
+                        data-renewal-url="{{ route('cars.renewal.update', $alert['car']) }}"
+                        data-renewal-car="{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}"
+                        data-renewal-type="{{ strtolower($alert['type']) }}"
+                        data-renewal-date="{{ $alert['date']->format('Y-m-d') }}"
+                      >
+                        Renew
+                      </button>
+                    @endif
+                  </td>
+                </tr>
+              @empty
+                <tr><td colspan="5" class="text-center p-4 text-muted">No insurance or license renewals in the selected 30-day window.</td></tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="col-12 col-xl-7">
     <div class="card panel-card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Upcoming Payments</span>
+        <span>Payments For {{ $month }}</span>
         @if(auth()->user()->canAccess('payments'))
           <a class="panel-link" href="{{ route('payments.index') }}">View All</a>
         @endif
@@ -265,7 +325,7 @@
                   <td class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
                 </tr>
               @empty
-                <tr><td colspan="5" class="text-center p-4 text-muted">No upcoming pending payments.</td></tr>
+                <tr><td colspan="5" class="text-center p-4 text-muted">No pending payments for {{ $month }}.</td></tr>
               @endforelse
             </tbody>
           </table>
@@ -277,7 +337,7 @@
   <div class="col-12 col-xl-5">
     <div class="card panel-card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Upcoming Expenses</span>
+        <span>Expenses For {{ $month }}</span>
         @if(auth()->user()->canAccess('expenses'))
           <a class="panel-link" href="{{ route('expenses.index') }}">View All</a>
         @endif
@@ -302,7 +362,7 @@
                   <td class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
                 </tr>
               @empty
-                <tr><td colspan="4" class="text-center p-4 text-muted">No upcoming expenses.</td></tr>
+                <tr><td colspan="4" class="text-center p-4 text-muted">No expenses for {{ $month }}.</td></tr>
               @endforelse
             </tbody>
           </table>
@@ -311,6 +371,69 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="renewalUpdateModal" tabindex="-1" aria-labelledby="renewalUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="renewalUpdateModalLabel">Update Renewal Date</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="renewalUpdateForm">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="renewal_type" id="renewal_type">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Vehicle</label>
+            <input type="text" class="form-control" id="renewal_car_name" readonly>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Renewal Type</label>
+            <input type="text" class="form-control" id="renewal_type_label" readonly>
+          </div>
+          <div class="mb-1">
+            <label class="form-label">New Renewal Date</label>
+            <input type="date" class="form-control" name="renewal_date" id="renewal_date" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-dark">Save Renewal Date</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const renewalModal = document.getElementById('renewalUpdateModal');
+    const renewalForm = document.getElementById('renewalUpdateForm');
+    const renewalCarName = document.getElementById('renewal_car_name');
+    const renewalType = document.getElementById('renewal_type');
+    const renewalTypeLabel = document.getElementById('renewal_type_label');
+    const renewalDate = document.getElementById('renewal_date');
+
+    if (!renewalModal || !renewalForm || !renewalCarName || !renewalType || !renewalTypeLabel || !renewalDate) {
+      return;
+    }
+
+    renewalModal.addEventListener('show.bs.modal', function (event) {
+      const trigger = event.relatedTarget;
+      const formAction = trigger?.getAttribute('data-renewal-url') || '';
+      const carName = trigger?.getAttribute('data-renewal-car') || '';
+      const type = trigger?.getAttribute('data-renewal-type') || '';
+      const date = trigger?.getAttribute('data-renewal-date') || '';
+
+      renewalForm.setAttribute('action', formAction);
+      renewalCarName.value = carName;
+      renewalType.value = type;
+      renewalTypeLabel.value = type ? type.charAt(0).toUpperCase() + type.slice(1) : '';
+      renewalDate.value = date;
+    });
+  });
+</script>
 
 </div>
 @endsection

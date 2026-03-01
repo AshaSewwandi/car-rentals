@@ -45,6 +45,40 @@
 
         .container { width: min(900px, calc(100% - 2rem)); margin: 0 auto; }
         .page { padding: 1.25rem 0 2rem; }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(8px);
+        }
+        .topbar-inner {
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+        }
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: .65rem;
+            text-decoration: none;
+            color: inherit;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-weight: 700;
+            font-size: 1.16rem;
+        }
+        .brand img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border: 1px solid #dbe6f3;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 4px;
+        }
 
         .card {
             background: var(--panel);
@@ -197,16 +231,62 @@
 
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; }
         .btn-light { background: #f8fbff; color: #334155; border-color: #c9d9ef; }
+        .footer {
+            border-top: 1px solid var(--line);
+            background: #fff;
+            margin-top: 1.3rem;
+        }
+        .footer-inner {
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+            color: #64748b;
+            font-size: .9rem;
+        }
+        .footer-links {
+            display: inline-flex;
+            gap: .8rem;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            color: #0f66c3;
+        }
 
         @media (max-width: 680px) {
             .container { width: calc(100% - 1rem); }
             .bank-grid { grid-template-columns: 1fr; }
             .row { flex-direction: column; gap: .25rem; }
             .row strong { text-align: left; }
+            .topbar-inner { min-height: 64px; }
+            .brand { font-size: 1rem; }
+            .footer-inner {
+                min-height: 86px;
+                padding: .6rem 0;
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+            }
+            .footer-links { justify-content: center; }
         }
     </style>
 </head>
 <body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="{{ route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
+                <span>R&A Auto Rentals</span>
+            </a>
+            <a class="btn btn-light" href="{{ route('fleet.index') }}">Back to Fleet</a>
+        </div>
+    </header>
+
     <main class="page">
         <div class="container">
             <section class="card">
@@ -215,6 +295,10 @@
                     <h1>Booking Confirmed</h1>
                 </div>
                 <p class="subtitle">Your trip request is saved successfully. We have included all details below so you can review quickly.</p>
+
+                @if(session('success'))
+                    <div class="status ok">{{ session('success') }}</div>
+                @endif
 
                 <div class="status {{ $booking->payment_status === 'paid' ? 'ok' : 'warn' }}">
                     @if($booking->payment_status === 'paid')
@@ -280,5 +364,16 @@
             </section>
         </div>
     </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div>&copy; {{ now()->year }} R&A Auto Rentals</div>
+            <div class="footer-links">
+                <a href="{{ route('home') }}">Home</a>
+                <a href="{{ route('privacy-policy') }}">Privacy Policy</a>
+                <a href="{{ route('terms-of-service') }}">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

@@ -142,11 +142,11 @@
     <form method="get" action="{{ route('availability-check.index') }}" class="row g-2 align-items-end mb-3">
       <div class="col-12 col-md-3">
         <label class="form-label mb-1">Start Date</label>
-        <input type="date" class="form-control" name="start_date" value="{{ $filters['start_date'] ?? '' }}">
+        <input type="date" class="form-control" id="availabilityStartDate" name="start_date" value="{{ $filters['start_date'] ?? '' }}">
       </div>
       <div class="col-12 col-md-3">
         <label class="form-label mb-1">End Date</label>
-        <input type="date" class="form-control" name="end_date" value="{{ $filters['end_date'] ?? '' }}">
+        <input type="date" class="form-control" id="availabilityEndDate" name="end_date" value="{{ $filters['end_date'] ?? '' }}" min="{{ $filters['start_date'] ?? '' }}">
       </div>
       <div class="col-12 col-md-4">
         <label class="form-label mb-1">Vehicle</label>
@@ -176,7 +176,7 @@
 
     <div class="availability-grid">
       <div class="card p-3">
-        <div class="fw-semibold mb-2">Partner Inventory</div>
+        <div class="fw-semibold mb-2">Inventory availability for selected date range</div>
         @forelse($rows as $row)
           <div class="inventory-item">
             <div class="fw-semibold">{{ $row['name'] }}</div>
@@ -236,4 +236,29 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    const navEntry = performance.getEntriesByType('navigation')[0];
+    const isReload = navEntry ? navEntry.type === 'reload' : performance.navigation.type === 1;
+    if (isReload && window.location.search) {
+      window.location.replace(window.location.pathname);
+      return;
+    }
+
+    const startInput = document.getElementById('availabilityStartDate');
+    const endInput = document.getElementById('availabilityEndDate');
+    if (!startInput || !endInput) return;
+
+    const syncEndDateMin = () => {
+      endInput.min = startInput.value || '';
+      if (startInput.value && endInput.value && endInput.value < startInput.value) {
+        endInput.value = '';
+      }
+    };
+
+    startInput.addEventListener('input', syncEndDateMin);
+    syncEndDateMin();
+  })();
+</script>
 @endsection

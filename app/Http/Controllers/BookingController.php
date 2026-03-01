@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GuestAccountCreatedMail;
+use App\Mail\BookingInvoiceStatusMail;
 use App\Models\Agreement;
 use App\Models\Booking;
 use App\Models\Car;
 use App\Models\Rental;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Throwable;
 
 class BookingController extends Controller
 {
@@ -54,8 +61,8 @@ class BookingController extends Controller
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'pickup_location' => ['nullable', 'string', 'max:255'],
             'customer_name' => ['required', 'string', 'max:120'],
-            'customer_email' => ['nullable', 'email', 'max:180', 'required_without:customer_phone'],
-            'customer_phone' => ['nullable', 'string', 'max:40', 'required_without:customer_email'],
+            'customer_email' => ['required', 'email', 'max:180'],
+            'customer_phone' => ['required', 'string', 'max:40'],
             'payment_method' => ['required', 'in:pay_later_bank,pay_at_pickup_cash'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
@@ -69,9 +76,10 @@ class BookingController extends Controller
         $days = max(1, (int) Carbon::parse($validated['start_date'])->diffInDays(Carbon::parse($validated['end_date'])) + 1);
         $dailyRate = $this->resolveDailyRate($car);
         $totalAmount = $dailyRate * $days;
+        [$bookingUser, $guestAccountCreated, $guestAccountMailSent] = $this->resolveBookingUser($request, $validated);
 
         $booking = Booking::create([
-            'user_id' => $request->user()->id,
+            'user_id' => $bookingUser?->id,
             'car_id' => $car->id,
             'customer_name' => $validated['customer_name'],
             'customer_email' => $validated['customer_email'] ?? null,
@@ -93,7 +101,21 @@ class BookingController extends Controller
             'note' => $validated['note'] ?? null,
         ]);
 
-        return redirect()->route('booking.success', $booking)->with('success', 'Booking confirmed. Payment is pending.');
+        $this->rememberGuestBooking($request, $booking->id);
+        if (!$request->user() && $bookingUser) {
+            Auth::login($bookingUser);
+            $request->session()->regenerate();
+        }
+        $this->sendBookingInvoiceEmail($booking, 'confirmed');
+
+        $successMessage = 'Booking confirmed. Payment is pending.';
+        if ($guestAccountCreated && $guestAccountMailSent) {
+            $successMessage .= ' Customer account created and temporary password sent to your email.';
+        } elseif ($guestAccountCreated) {
+            $successMessage .= ' Customer account created. Temporary password email could not be sent right now.';
+        }
+
+        return redirect()->route('booking.success', $booking)->with('success', $successMessage);
     }
 
     public function success(Request $request, Booking $booking): View
@@ -219,7 +241,8 @@ class BookingController extends Controller
     {
         $user = $request->user();
         if (!$user) {
-            return false;
+            $guestBookingIds = (array) $request->session()->get('guest_booking_ids', []);
+            return in_array($booking->id, $guestBookingIds, true);
         }
 
         if ($user->isAdmin()) {
@@ -232,6 +255,16 @@ class BookingController extends Controller
 
         return !empty($booking->customer_email) && !empty($user->email)
             && strcasecmp((string) $booking->customer_email, (string) $user->email) === 0;
+    }
+
+    private function rememberGuestBooking(Request $request, int $bookingId): void
+    {
+        $guestBookingIds = (array) $request->session()->get('guest_booking_ids', []);
+        if (!in_array($bookingId, $guestBookingIds, true)) {
+            $guestBookingIds[] = $bookingId;
+        }
+
+        $request->session()->put('guest_booking_ids', array_values(array_unique($guestBookingIds)));
     }
 
     private function resolveDailyRate(Car $car): float
@@ -263,5 +296,77 @@ class BookingController extends Controller
         }
 
         return null;
+    }
+
+    private function sendBookingInvoiceEmail(Booking $booking, string $stage): void
+    {
+        $email = (string) ($booking->customer_email ?: $booking->user?->email ?: '');
+        if ($email === '') {
+            return;
+        }
+
+        try {
+            $booking->loadMissing('car');
+            Mail::to($email)->send(new BookingInvoiceStatusMail($booking, $stage));
+        } catch (Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * @return array{0: User|null, 1: bool, 2: bool}
+     */
+    private function resolveBookingUser(Request $request, array $validated): array
+    {
+        $loggedInUser = $request->user();
+        if ($loggedInUser) {
+            return [$loggedInUser, false, false];
+        }
+
+        $email = strtolower(trim((string) ($validated['customer_email'] ?? '')));
+        $phone = trim((string) ($validated['customer_phone'] ?? ''));
+        $name = trim((string) ($validated['customer_name'] ?? ''));
+
+        if ($email === '') {
+            return [null, false, false];
+        }
+
+        $existingUser = User::query()->whereRaw('LOWER(email) = ?', [$email])->first();
+        if ($existingUser) {
+            $updates = [];
+            if (empty($existingUser->phone) && $phone !== '') {
+                $updates['phone'] = $phone;
+            }
+            if (empty($existingUser->name) && $name !== '') {
+                $updates['name'] = $name;
+            }
+            if (($existingUser->role ?? '') !== 'admin' && empty($existingUser->role)) {
+                $updates['role'] = 'customer';
+            }
+            if (!empty($updates)) {
+                $existingUser->update($updates);
+            }
+
+            return [$existingUser, false, false];
+        }
+
+        $temporaryPassword = Str::upper(Str::random(4)) . random_int(1000, 9999) . Str::lower(Str::random(2));
+        $newUser = User::create([
+            'name' => $name,
+            'phone' => $phone,
+            'email' => $email,
+            'password' => Hash::make($temporaryPassword),
+            'role' => 'customer',
+        ]);
+
+        $mailSent = false;
+        try {
+            Mail::to($newUser->email)->send(new GuestAccountCreatedMail($newUser, $temporaryPassword));
+            $mailSent = true;
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        return [$newUser, true, $mailSent];
     }
 }

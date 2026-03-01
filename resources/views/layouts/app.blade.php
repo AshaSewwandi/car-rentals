@@ -797,6 +797,9 @@
           @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
             <a class="menu-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><span class="menu-dot"></span>Expenses</a>
           @endif
+          @if(auth()->user()->canAccess('vehicle_maintenance') && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
+            <a class="menu-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}" href="{{ route('vehicle-maintenance.index') }}"><span class="menu-dot"></span>Maintenance</a>
+          @endif
         </div>
 
         <div class="menu-section">

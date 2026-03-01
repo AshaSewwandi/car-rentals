@@ -31,6 +31,24 @@ class CarController extends Controller
         return back()->with('success', 'Car updated successfully.');
     }
 
+    public function updateRenewal(Request $request, Car $car)
+    {
+        $data = $request->validate([
+            'renewal_type' => ['required', 'in:insurance,license'],
+            'renewal_date' => ['required', 'date'],
+        ]);
+
+        $field = $data['renewal_type'] === 'insurance'
+            ? 'tracker_insurance_expires'
+            : 'tracker_license_expires';
+
+        $car->update([
+            $field => $data['renewal_date'],
+        ]);
+
+        return back()->with('success', ucfirst($data['renewal_type']).' renewal date updated successfully.');
+    }
+
     public function destroy(Car $car)
     {
         $car->delete();
@@ -59,7 +77,12 @@ class CarController extends Controller
             'tracker_activation_date' => ['nullable', 'date'],
             'tracker_expiry_time' => ['nullable', 'string', 'max:100'],
             'tracker_insurance_expires' => ['nullable', 'date'],
+            'tracker_license_expires' => ['nullable', 'date'],
             'tracker_maintenance_mileage' => ['nullable', 'integer', 'min:0'],
+            'maintenance_last_service_date' => ['nullable', 'date'],
+            'maintenance_last_service_mileage' => ['nullable', 'integer', 'min:0'],
+            'maintenance_next_service_date' => ['nullable', 'date'],
+            'maintenance_note' => ['nullable', 'string', 'max:1000'],
             'plate_no' => ['required', 'string', 'max:100', Rule::unique('cars', 'plate_no')->ignore($carId)],
             'status' => ['required', 'in:available,rented'],
             'note' => ['nullable', 'string', 'max:255'],

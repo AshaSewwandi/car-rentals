@@ -26,7 +26,12 @@ class Car extends Model
         'tracker_activation_date',
         'tracker_expiry_time',
         'tracker_insurance_expires',
+        'tracker_license_expires',
         'tracker_maintenance_mileage',
+        'maintenance_last_service_date',
+        'maintenance_last_service_mileage',
+        'maintenance_next_service_date',
+        'maintenance_note',
         'latest_latitude',
         'latest_longitude',
         'latest_speed',
@@ -40,11 +45,15 @@ class Car extends Model
     protected $casts = [
         'tracker_activation_date' => 'datetime',
         'tracker_insurance_expires' => 'date',
+        'tracker_license_expires' => 'date',
+        'maintenance_last_service_date' => 'date',
+        'maintenance_next_service_date' => 'date',
         'tracker_last_seen_at' => 'datetime',
     ];
 
     public function rentals(): HasMany { return $this->hasMany(Rental::class); }
     public function expenses(): HasMany { return $this->hasMany(Expense::class); }
+    public function maintenanceRecords(): HasMany { return $this->hasMany(VehicleMaintenance::class); }
     public function agreements(): HasMany { return $this->hasMany(Agreement::class); }
     public function gpsLogs(): HasMany { return $this->hasMany(GpsLog::class); }
     public function bookings(): HasMany { return $this->hasMany(Booking::class); }

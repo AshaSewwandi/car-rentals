@@ -78,6 +78,36 @@ class HomeController extends Controller
             ->orderByDesc('updated_at')
             ->get();
 
+        $completedTrips = Booking::query()
+            ->with('car')
+            ->where('status', 'completed')
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+
+                if (!empty($user->email)) {
+                    $query->orWhere(function ($fallback) use ($user) {
+                        $fallback->whereNull('user_id')
+                            ->whereNotNull('customer_email')
+                            ->where('customer_email', $user->email);
+                    });
+                }
+
+                if (!empty($user->phone)) {
+                    $query->orWhere(function ($fallback) use ($user) {
+                        $fallback->whereNull('user_id')
+                            ->whereNotNull('customer_phone')
+                            ->where('customer_phone', $user->phone);
+                    });
+                }
+
+                $query->orWhere(function ($fallback) use ($user) {
+                    $fallback->whereNull('user_id')
+                        ->where('customer_name', $user->name);
+                });
+            })
+            ->orderByDesc('updated_at')
+            ->get();
+
         $recommendedCars = Car::query()
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -93,7 +123,7 @@ class HomeController extends Controller
                 ];
             });
 
-        return view('customer.home', compact('user', 'activeTrips', 'canceledTrips', 'recommendedCars'));
+        return view('customer.home', compact('user', 'activeTrips', 'canceledTrips', 'completedTrips', 'recommendedCars'));
     }
 
     private function extractRate(?string $note): ?float
