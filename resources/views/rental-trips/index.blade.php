@@ -5,7 +5,9 @@
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Rental Trips</h4>
-    <div class="text-muted">Record start and end mileage, then auto-calculate extra km and final amount.</div>
+    <div class="text-muted">
+      {{ auth()->user()->isAdmin() ? 'Record start and end mileage, then auto-calculate extra km and final amount.' : 'View only the rental trips linked to your partner account.' }}
+    </div>
   </div>
   <form method="get" action="{{ route('rental-trips.index') }}" class="d-flex flex-wrap align-items-end gap-2">
     <div>
@@ -149,39 +151,43 @@
                 <div class="text-muted small">LKR {{ number_format((float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0), 2) }}</div>
               </td>
               <td style="min-width: 240px;">
-                @if($booking->status === 'cancelled')
-                  <span class="text-muted small">Trip cancelled</span>
-                @elseif($booking->start_mileage === null)
-                  <form method="post" action="{{ route('rental-trips.handover', $booking) }}" class="d-flex gap-2">
-                    @csrf
-                    <input type="text" inputmode="decimal" name="start_mileage" class="form-control form-control-sm" placeholder="Start KM" required>
-                    <button type="submit" class="btn btn-sm btn-dark">Start</button>
-                  </form>
-                @elseif($booking->status !== 'completed')
-                  <form method="post" action="{{ route('rental-trips.return', $booking) }}" class="d-flex gap-2">
-                    @csrf
-                    <input type="text" inputmode="decimal" name="end_mileage" class="form-control form-control-sm" placeholder="End KM" required>
-                    <button type="submit" class="btn btn-sm btn-dark">Return</button>
-                  </form>
+                @if(auth()->user()->isAdmin())
+                  @if($booking->status === 'cancelled')
+                    <span class="text-muted small">Trip cancelled</span>
+                  @elseif($booking->start_mileage === null)
+                    <form method="post" action="{{ route('rental-trips.handover', $booking) }}" class="d-flex gap-2">
+                      @csrf
+                      <input type="text" inputmode="decimal" name="start_mileage" class="form-control form-control-sm" placeholder="Start KM" required>
+                      <button type="submit" class="btn btn-sm btn-dark">Start</button>
+                    </form>
+                  @elseif($booking->status !== 'completed')
+                    <form method="post" action="{{ route('rental-trips.return', $booking) }}" class="d-flex gap-2">
+                      @csrf
+                      <input type="text" inputmode="decimal" name="end_mileage" class="form-control form-control-sm" placeholder="End KM" required>
+                      <button type="submit" class="btn btn-sm btn-dark">Return</button>
+                    </form>
+                  @else
+                    <span class="text-muted small">Completed by {{ $booking->returnedBy?->name ?: 'Admin' }}<br>{{ $booking->returned_at?->format('Y-m-d H:i') }}</span>
+                  @endif
                 @else
-                  <span class="text-muted small">Completed by {{ $booking->returnedBy?->name ?: 'Admin' }}<br>{{ $booking->returned_at?->format('Y-m-d H:i') }}</span>
+                  <span class="text-muted small">Read only</span>
                 @endif
 
-                @if($booking->status !== 'cancelled' && $booking->payment_status !== 'paid')
+                @if(auth()->user()->isAdmin() && $booking->status !== 'cancelled' && $booking->payment_status !== 'paid')
                   <form method="post" action="{{ route('rental-trips.payment.base.paid', $booking) }}" class="mt-2">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Base Paid</button>
                   </form>
                 @endif
 
-                @if($booking->status !== 'cancelled' && $booking->additional_payment_status === 'pending')
+                @if(auth()->user()->isAdmin() && $booking->status !== 'cancelled' && $booking->additional_payment_status === 'pending')
                   <form method="post" action="{{ route('rental-trips.payment.additional.paid', $booking) }}" class="mt-2">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Additional Paid</button>
                   </form>
                 @endif
 
-                @if(in_array($booking->status, ['pending', 'confirmed'], true) && !$booking->handover_at && $booking->start_mileage === null)
+                @if(auth()->user()->isAdmin() && in_array($booking->status, ['pending', 'confirmed'], true) && !$booking->handover_at && $booking->start_mileage === null)
                   <form method="post" action="{{ route('rental-trips.cancel', $booking) }}" class="mt-2" onsubmit="return confirm('Cancel this rental trip?');">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-outline-danger w-100">Cancel Trip</button>

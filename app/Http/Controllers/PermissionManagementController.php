@@ -10,7 +10,7 @@ class PermissionManagementController extends Controller
 {
     public function index()
     {
-        $roles = ['admin', 'customer'];
+        $roles = ['admin', 'partner', 'customer'];
         $modules = config('permissions.modules', []);
 
         $matrix = [];
@@ -25,7 +25,7 @@ class PermissionManagementController extends Controller
 
     public function update(Request $request, string $role)
     {
-        $allowedRoles = ['admin', 'customer'];
+        $allowedRoles = ['admin', 'partner', 'customer'];
         abort_unless(in_array($role, $allowedRoles, true), 404);
 
         $modules = array_keys(config('permissions.modules', []));

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Car extends Model
@@ -19,6 +20,7 @@ class Car extends Model
         'tracker_device_name',
         'tracker_device_type',
         'tracker_imei',
+        'partner_user_id',
         'tracker_sim',
         'tracker_iccid',
         'tracker_contact_name',
@@ -57,4 +59,5 @@ class Car extends Model
     public function agreements(): HasMany { return $this->hasMany(Agreement::class); }
     public function gpsLogs(): HasMany { return $this->hasMany(GpsLog::class); }
     public function bookings(): HasMany { return $this->hasMany(Booking::class); }
+    public function partner(): BelongsTo { return $this->belongsTo(User::class, 'partner_user_id'); }
 }

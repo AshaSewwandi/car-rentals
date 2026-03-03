@@ -4,10 +4,11 @@ namespace App\Mail;
 
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class BookingInvoiceStatusMail extends Mailable
+class BookingInvoiceStatusMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -31,4 +32,3 @@ class BookingInvoiceStatusMail extends Mailable
             ->view('emails.booking-invoice-status');
     }
 }
-

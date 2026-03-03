@@ -119,6 +119,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/permissions/{role}', [PermissionManagementController::class, 'update'])->name('permissions.update');
     });
 
+    Route::middleware(['role:admin,partner', 'permission:rental_trips'])->group(function () {
+        Route::get('/rental-trips', [RentalTripController::class, 'index'])->name('rental-trips.index');
+        Route::get('/rental-trips/export/pdf', [RentalTripController::class, 'exportPdf'])->name('rental-trips.export-pdf');
+        Route::get('/rental-trips/{booking}/invoice/pdf', [RentalTripController::class, 'invoicePdf'])->name('rental-trips.invoice-pdf');
+    });
+
     Route::middleware('role:admin')->group(function () {
         Route::get('/support-requests', [CustomerSupportRequestController::class, 'index'])->name('support-requests.index');
         Route::get('/rent-requests', [RentRequestController::class, 'index'])->name('rent-requests.index');
@@ -126,9 +132,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/rent-requests/{rentRequest}/accept', [RentRequestController::class, 'accept'])->name('rent-requests.accept');
         Route::delete('/rent-requests/{rentRequest}', [RentRequestController::class, 'destroy'])->name('rent-requests.destroy');
         Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
-        Route::get('/rental-trips', [RentalTripController::class, 'index'])->name('rental-trips.index');
-        Route::get('/rental-trips/export/pdf', [RentalTripController::class, 'exportPdf'])->name('rental-trips.export-pdf');
-        Route::get('/rental-trips/{booking}/invoice/pdf', [RentalTripController::class, 'invoicePdf'])->name('rental-trips.invoice-pdf');
         Route::post('/rental-trips/{booking}/cancel', [RentalTripController::class, 'cancel'])->name('rental-trips.cancel');
         Route::post('/rental-trips/{booking}/handover', [RentalTripController::class, 'handover'])->name('rental-trips.handover');
         Route::post('/rental-trips/{booking}/return', [RentalTripController::class, 'returnTrip'])->name('rental-trips.return');

@@ -3,6 +3,7 @@
 return [
     'modules' => [
         'dashboard' => 'Dashboard',
+        'rental_trips' => 'Rental Trips',
         'cars' => 'Cars',
         'customers' => 'Customers',
         'payments' => 'Payments',
@@ -17,6 +18,7 @@ return [
     'defaults' => [
         'admin' => [
             'dashboard' => true,
+            'rental_trips' => true,
             'cars' => true,
             'customers' => true,
             'payments' => true,
@@ -29,6 +31,20 @@ return [
         ],
         'customer' => [
             'dashboard' => true,
+            'rental_trips' => false,
+            'cars' => false,
+            'customers' => false,
+            'payments' => false,
+            'expenses' => false,
+            'vehicle_maintenance' => false,
+            'agreements' => false,
+            'gps_logs' => false,
+            'users_manage' => false,
+            'permissions_manage' => false,
+        ],
+        'partner' => [
+            'dashboard' => false,
+            'rental_trips' => true,
             'cars' => false,
             'customers' => false,
             'payments' => false,

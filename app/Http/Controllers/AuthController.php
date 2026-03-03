@@ -30,7 +30,15 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
-        $targetRoute = $user && $user->isCustomer() ? 'customer.dashboard' : 'home';
+        $targetRoute = 'home';
+
+        if ($user?->isCustomer()) {
+            $targetRoute = 'customer.dashboard';
+        } elseif ($user?->isPartner()) {
+            $targetRoute = 'rental-trips.index';
+        } elseif ($user?->canAccess('dashboard')) {
+            $targetRoute = 'dashboard';
+        }
 
         return redirect()->intended(route($targetRoute));
     }

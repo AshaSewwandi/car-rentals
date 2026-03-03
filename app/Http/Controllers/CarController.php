@@ -3,20 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CarController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cars = Car::query()->latest()->get();
+        $cars = Car::query()
+            ->with('partner')
+            ->when($request->user()?->isPartner(), function ($query) use ($request) {
+                $query->where('partner_user_id', $request->user()->id);
+            })
+            ->latest()
+            ->get();
+        $partners = User::query()
+            ->where('role', 'partner')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
 
-        return view('cars.index', compact('cars'));
+        return view('cars.index', compact('cars', 'partners'));
     }
 
     public function store(Request $request)
     {
+        abort_unless($request->user()?->isAdmin(), 403);
+
         $data = $this->validateCar($request);
         Car::create($data);
 
@@ -25,6 +38,8 @@ class CarController extends Controller
 
     public function update(Request $request, Car $car)
     {
+        abort_unless($request->user()?->isAdmin(), 403);
+
         $data = $this->validateCar($request, $car->id);
         $car->update($data);
 
@@ -33,6 +48,8 @@ class CarController extends Controller
 
     public function updateRenewal(Request $request, Car $car)
     {
+        abort_unless($request->user()?->isAdmin(), 403);
+
         $data = $request->validate([
             'renewal_type' => ['required', 'in:insurance,license'],
             'renewal_date' => ['required', 'date'],
@@ -49,8 +66,10 @@ class CarController extends Controller
         return back()->with('success', ucfirst($data['renewal_type']).' renewal date updated successfully.');
     }
 
-    public function destroy(Car $car)
+    public function destroy(Request $request, Car $car)
     {
+        abort_unless($request->user()?->isAdmin(), 403);
+
         $car->delete();
 
         return back()->with('success', 'Car deleted successfully.');
@@ -60,6 +79,7 @@ class CarController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'partner_user_id' => ['nullable', 'exists:users,id', Rule::exists('users', 'id')->where('role', 'partner')],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'year' => ['nullable', 'integer', 'min:1990', 'max:' . ((int) now()->format('Y') + 1)],

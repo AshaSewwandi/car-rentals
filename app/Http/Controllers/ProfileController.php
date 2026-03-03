@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingCancelledMail;
 use App\Models\Booking;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -111,6 +115,7 @@ class ProfileController extends Controller
         $booking->update([
             'status' => 'cancelled',
         ]);
+        $this->sendCancellationEmails($booking, $user->name ?: ucfirst($user->role), $user->isAdmin() ? 'admin' : 'customer');
 
         return back()->with('success', 'Rental trip canceled successfully.');
     }
@@ -170,5 +175,38 @@ class ProfileController extends Controller
                     ->where('customer_name', $user->name);
             });
         });
+    }
+
+    private function sendCancellationEmails(Booking $booking, string $cancelledBy, string $cancelledRole): void
+    {
+        $booking->loadMissing('car.partner');
+
+        $recipients = collect();
+
+        if (!empty($booking->customer_email)) {
+            $recipients->push((string) $booking->customer_email);
+        }
+
+        if (!empty($booking->car?->partner?->email)) {
+            $recipients->push((string) $booking->car->partner->email);
+        }
+
+        User::query()
+            ->where('role', 'admin')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->each(fn ($email) => $recipients->push((string) $email));
+
+        $recipients
+            ->filter()
+            ->map(fn ($email) => strtolower(trim((string) $email)))
+            ->unique()
+            ->each(function (string $email) use ($booking, $cancelledBy, $cancelledRole) {
+                try {
+                    Mail::to($email)->queue(new BookingCancelledMail($booking, $cancelledBy, $cancelledRole));
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            });
     }
 }

@@ -754,7 +754,7 @@
       <div class="sidebar-card">
         <div class="menu-section">
           <div class="menu-title">Core</div>
-          @if(\Illuminate\Support\Facades\Route::has('dashboard'))
+          @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
             <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="menu-dot"></span>Dashboard</a>
           @endif
           @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
@@ -762,16 +762,16 @@
           @endif
         </div>
 
-        @if(auth()->user()->role === 'admin')
+        @if(auth()->user()->isAdmin() || auth()->user()->canAccess('rental_trips'))
           <div class="menu-section">
             <div class="menu-title">Trips</div>
-            @if(\Illuminate\Support\Facades\Route::has('rent-requests.index'))
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
               <a class="menu-link {{ request()->routeIs('rent-requests.*') ? 'active' : '' }}" href="{{ route('rent-requests.index') }}"><span class="menu-dot"></span>Rent Requests</a>
             @endif
-            @if(\Illuminate\Support\Facades\Route::has('availability-check.index'))
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
               <a class="menu-link {{ request()->routeIs('availability-check.*') ? 'active' : '' }}" href="{{ route('availability-check.index') }}"><span class="menu-dot"></span>Availability Check</a>
             @endif
-            @if(\Illuminate\Support\Facades\Route::has('rental-trips.index'))
+            @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
               <a class="menu-link {{ request()->routeIs('rental-trips.*') ? 'active' : '' }}" href="{{ route('rental-trips.index') }}"><span class="menu-dot"></span>Rental Trips</a>
             @endif
           </div>

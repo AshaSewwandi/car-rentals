@@ -106,13 +106,11 @@ class BookingController extends Controller
             Auth::login($bookingUser);
             $request->session()->regenerate();
         }
-        $this->sendBookingInvoiceEmail($booking, 'confirmed');
+        $this->sendBookingInvoiceEmailAfterResponse($booking->id, 'confirmed');
 
         $successMessage = 'Booking confirmed. Payment is pending.';
-        if ($guestAccountCreated && $guestAccountMailSent) {
-            $successMessage .= ' Customer account created and temporary password sent to your email.';
-        } elseif ($guestAccountCreated) {
-            $successMessage .= ' Customer account created. Temporary password email could not be sent right now.';
+        if ($guestAccountCreated) {
+            $successMessage .= ' Customer account created and temporary password email will be sent to your email.';
         }
 
         return redirect()->route('booking.success', $booking)->with('success', $successMessage);
@@ -298,19 +296,44 @@ class BookingController extends Controller
         return null;
     }
 
-    private function sendBookingInvoiceEmail(Booking $booking, string $stage): void
+    private function sendBookingInvoiceEmailAfterResponse(int $bookingId, string $stage): void
     {
-        $email = (string) ($booking->customer_email ?: $booking->user?->email ?: '');
-        if ($email === '') {
-            return;
-        }
+        dispatch(function () use ($bookingId, $stage) {
+            $booking = Booking::query()->with(['car.partner', 'user'])->find($bookingId);
+            if (!$booking) {
+                return;
+            }
 
-        try {
-            $booking->loadMissing('car');
-            Mail::to($email)->send(new BookingInvoiceStatusMail($booking, $stage));
-        } catch (Throwable $e) {
-            report($e);
-        }
+            $recipients = collect();
+
+            $customerEmail = (string) ($booking->customer_email ?: $booking->user?->email ?: '');
+            if ($customerEmail !== '') {
+                $recipients->push($customerEmail);
+            }
+
+            $partnerEmail = (string) ($booking->car?->partner?->email ?: '');
+            if ($partnerEmail !== '') {
+                $recipients->push($partnerEmail);
+            }
+
+            User::query()
+                ->where('role', 'admin')
+                ->whereNotNull('email')
+                ->pluck('email')
+                ->each(fn ($email) => $recipients->push((string) $email));
+
+            $recipients
+                ->filter()
+                ->map(fn ($email) => strtolower(trim((string) $email)))
+                ->unique()
+                ->each(function (string $email) use ($booking, $stage) {
+                    try {
+                        Mail::to($email)->queue(new BookingInvoiceStatusMail($booking, $stage));
+                    } catch (Throwable $e) {
+                        report($e);
+                    }
+                });
+        })->afterResponse();
     }
 
     /**
@@ -359,14 +382,24 @@ class BookingController extends Controller
             'role' => 'customer',
         ]);
 
-        $mailSent = false;
-        try {
-            Mail::to($newUser->email)->send(new GuestAccountCreatedMail($newUser, $temporaryPassword));
-            $mailSent = true;
-        } catch (Throwable $e) {
-            report($e);
-        }
+        $this->sendGuestAccountCreatedEmailAfterResponse($newUser->id, $temporaryPassword);
 
-        return [$newUser, true, $mailSent];
+        return [$newUser, true, true];
+    }
+
+    private function sendGuestAccountCreatedEmailAfterResponse(int $userId, string $temporaryPassword): void
+    {
+        dispatch(function () use ($userId, $temporaryPassword) {
+            $user = User::query()->find($userId);
+            if (!$user || empty($user->email)) {
+                return;
+            }
+
+            try {
+                Mail::to($user->email)->queue(new GuestAccountCreatedMail($user, $temporaryPassword));
+            } catch (Throwable $e) {
+                report($e);
+            }
+        })->afterResponse();
     }
 }

@@ -41,7 +41,11 @@
               <td>{{ $user->name }}</td>
               <td>{{ $user->email }}</td>
               <td>{{ $user->phone ?: '-' }}</td>
-              <td><span class="badge {{ $user->role === 'admin' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($user->role) }}</span></td>
+              <td>
+                <span class="badge {{ $user->role === 'admin' ? 'bg-success' : ($user->role === 'partner' ? 'bg-primary' : 'bg-secondary') }}">
+                  {{ ucfirst($user->role) }}
+                </span>
+              </td>
               <td>{{ $user->created_at?->format('Y-m-d') }}</td>
               <td class="text-nowrap">
                 <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
@@ -94,6 +98,7 @@
             <label class="form-label">Role</label>
             <select name="role" class="form-select" required>
               <option value="customer" @selected(old('role') === 'customer')>Customer</option>
+              <option value="partner" @selected(old('role') === 'partner')>Partner</option>
               <option value="admin" @selected(old('role') === 'admin')>Admin</option>
             </select>
           </div>
@@ -143,6 +148,7 @@
               <label class="form-label">Role</label>
               <select name="role" class="form-select" required>
                 <option value="customer" @selected($user->role === 'customer')>Customer</option>
+                <option value="partner" @selected($user->role === 'partner')>Partner</option>
                 <option value="admin" @selected($user->role === 'admin')>Admin</option>
               </select>
               @if(auth()->id() === $user->id)

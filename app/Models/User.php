@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->role === 'customer';
     }
 
+    public function isPartner(): bool
+    {
+        return $this->role === 'partner';
+    }
+
     public function canAccess(string $permission): bool
     {
         return RolePermission::allowed($this->role, $permission);

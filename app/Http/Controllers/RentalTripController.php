@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingCancelledMail;
 use App\Mail\BookingInvoiceStatusMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking;
 use App\Models\Car;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -18,7 +20,7 @@ class RentalTripController extends Controller
     public function index(Request $request): View
     {
         $filters = $this->validatedFilters($request);
-        $bookingsQuery = $this->buildFilteredBookingsQuery($filters);
+        $bookingsQuery = $this->buildFilteredBookingsQuery($filters, $request->user());
 
         $bookings = $bookingsQuery->paginate(20)->withQueryString();
 
@@ -37,7 +39,7 @@ class RentalTripController extends Controller
     public function exportPdf(Request $request): Response
     {
         $filters = $this->validatedFilters($request);
-        $bookings = $this->buildFilteredBookingsQuery($filters)
+        $bookings = $this->buildFilteredBookingsQuery($filters, $request->user())
             ->with('returnedBy')
             ->get();
 
@@ -56,8 +58,10 @@ class RentalTripController extends Controller
         return $pdf->download('rental-trips-' . now()->format('Ymd-His') . '.pdf');
     }
 
-    public function invoicePdf(Booking $booking): Response
+    public function invoicePdf(Request $request, Booking $booking): Response
     {
+        abort_unless($this->canAccessBooking($request->user(), $booking), 403);
+
         $booking->load(['car', 'returnedBy', 'user']);
 
         $baseAmount = (float) $booking->total_amount;
@@ -145,7 +149,7 @@ class RentalTripController extends Controller
             'returned_by' => auth()->id(),
             'status' => 'completed',
         ]);
-        $this->sendBookingInvoiceEmail($booking, 'completed');
+        $this->sendBookingInvoiceEmailAfterResponse($booking->id, 'completed');
 
         return back()->with('success', 'Trip return recorded and final amount calculated.');
     }
@@ -163,6 +167,7 @@ class RentalTripController extends Controller
         $booking->update([
             'status' => 'cancelled',
         ]);
+        $this->sendCancellationEmails($booking, auth()->user()?->name ?: 'Admin', 'admin');
 
         return back()->with('success', 'Rental trip canceled successfully.');
     }
@@ -219,11 +224,17 @@ class RentalTripController extends Controller
         ]);
     }
 
-    private function buildFilteredBookingsQuery(array $filters)
+    private function buildFilteredBookingsQuery(array $filters, ?User $user)
     {
         $query = Booking::query()
-            ->with('car')
+            ->with('car.partner')
             ->orderByDesc('id');
+
+        if ($user && !$user->isAdmin()) {
+            $query->whereHas('car', function ($carQuery) use ($user) {
+                $carQuery->where('partner_user_id', $user->id);
+            });
+        }
 
         if (!empty($filters['car_id'])) {
             $query->where('car_id', (int) $filters['car_id']);
@@ -249,6 +260,21 @@ class RentalTripController extends Controller
         return $query;
     }
 
+    private function canAccessBooking(?User $user, Booking $booking): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        $booking->loadMissing('car');
+
+        return (int) ($booking->car?->partner_user_id ?? 0) === (int) $user->id;
+    }
+
     private function parseMileageInput(string $value): ?float
     {
         $normalized = trim(str_replace([',', ' '], '', $value));
@@ -259,18 +285,76 @@ class RentalTripController extends Controller
         return (float) $normalized;
     }
 
-    private function sendBookingInvoiceEmail(Booking $booking, string $stage): void
+    private function sendBookingInvoiceEmailAfterResponse(int $bookingId, string $stage): void
     {
-        $email = (string) ($booking->customer_email ?: $booking->user?->email ?: '');
-        if ($email === '') {
-            return;
+        dispatch(function () use ($bookingId, $stage) {
+            $booking = Booking::query()->with(['car.partner', 'user'])->find($bookingId);
+            if (!$booking) {
+                return;
+            }
+
+            $recipients = collect();
+
+            $customerEmail = (string) ($booking->customer_email ?: $booking->user?->email ?: '');
+            if ($customerEmail !== '') {
+                $recipients->push($customerEmail);
+            }
+
+            $partnerEmail = (string) ($booking->car?->partner?->email ?: '');
+            if ($partnerEmail !== '') {
+                $recipients->push($partnerEmail);
+            }
+
+            User::query()
+                ->where('role', 'admin')
+                ->whereNotNull('email')
+                ->pluck('email')
+                ->each(fn ($email) => $recipients->push((string) $email));
+
+            $recipients
+                ->filter()
+                ->map(fn ($email) => strtolower(trim((string) $email)))
+                ->unique()
+                ->each(function (string $email) use ($booking, $stage) {
+                    try {
+                        Mail::to($email)->queue(new BookingInvoiceStatusMail($booking, $stage));
+                    } catch (Throwable $e) {
+                        report($e);
+                    }
+                });
+        })->afterResponse();
+    }
+
+    private function sendCancellationEmails(Booking $booking, string $cancelledBy, string $cancelledRole): void
+    {
+        $booking->loadMissing('car.partner');
+
+        $recipients = collect();
+
+        if (!empty($booking->customer_email)) {
+            $recipients->push((string) $booking->customer_email);
         }
 
-        try {
-            $booking->loadMissing('car');
-            Mail::to($email)->send(new BookingInvoiceStatusMail($booking, $stage));
-        } catch (Throwable $e) {
-            report($e);
+        if (!empty($booking->car?->partner?->email)) {
+            $recipients->push((string) $booking->car->partner->email);
         }
+
+        User::query()
+            ->where('role', 'admin')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->each(fn ($email) => $recipients->push((string) $email));
+
+        $recipients
+            ->filter()
+            ->map(fn ($email) => strtolower(trim((string) $email)))
+            ->unique()
+            ->each(function (string $email) use ($booking, $cancelledBy, $cancelledRole) {
+                try {
+                    Mail::to($email)->queue(new BookingCancelledMail($booking, $cancelledBy, $cancelledRole));
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            });
     }
 }

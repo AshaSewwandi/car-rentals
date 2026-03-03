@@ -22,7 +22,7 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', Rule::in(['admin', 'customer'])],
+            'role' => ['required', Rule::in(['admin', 'customer', 'partner'])],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -43,11 +43,11 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:40'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role' => ['required', Rule::in(['admin', 'customer'])],
+            'role' => ['required', Rule::in(['admin', 'customer', 'partner'])],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
 
-        if ($request->user()->id === $user->id && $data['role'] !== 'admin') {
+        if ($request->user()->id === $user->id && $user->role === 'admin' && $data['role'] !== 'admin') {
             return back()->withErrors(['role' => 'You cannot remove your own admin role.']);
         }
 

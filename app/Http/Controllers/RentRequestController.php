@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingInvoiceStatusMail;
 use App\Models\Agreement;
 use App\Models\Booking;
 use App\Models\Car;
@@ -10,7 +11,9 @@ use App\Models\Rental;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Throwable;
 
 class RentRequestController extends Controller
 {
@@ -108,7 +111,7 @@ class RentRequestController extends Controller
                 ->value('id');
         }
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => $matchedUserId,
             'car_id' => $car->id,
             'customer_name' => $rentRequest->name,
@@ -136,6 +139,8 @@ class RentRequestController extends Controller
             'accepted_by' => auth()->id(),
             'accepted_at' => now(),
         ]);
+
+        $this->sendConvertedBookingEmailsAfterResponse($booking->id);
 
         return back()->with('success', 'Rent request converted to booking successfully.');
     }
@@ -215,5 +220,43 @@ class RentRequestController extends Controller
         ];
 
         return (float) ($knownRates[$plateKey] ?? 4500);
+    }
+
+    private function sendConvertedBookingEmailsAfterResponse(int $bookingId): void
+    {
+        dispatch(function () use ($bookingId) {
+            $booking = Booking::query()->with(['car.partner', 'user'])->find($bookingId);
+            if (!$booking) {
+                return;
+            }
+
+            $recipients = collect();
+
+            if (!empty($booking->customer_email)) {
+                $recipients->push((string) $booking->customer_email);
+            }
+
+            if (!empty($booking->car?->partner?->email)) {
+                $recipients->push((string) $booking->car->partner->email);
+            }
+
+            User::query()
+                ->where('role', 'admin')
+                ->whereNotNull('email')
+                ->pluck('email')
+                ->each(fn ($email) => $recipients->push((string) $email));
+
+            $recipients
+                ->filter()
+                ->map(fn ($email) => strtolower(trim((string) $email)))
+                ->unique()
+                ->each(function (string $email) use ($booking) {
+                    try {
+                        Mail::to($email)->queue(new BookingInvoiceStatusMail($booking, 'confirmed'));
+                    } catch (Throwable $e) {
+                        report($e);
+                    }
+                });
+        })->afterResponse();
     }
 }
