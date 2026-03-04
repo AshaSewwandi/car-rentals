@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -111,6 +112,8 @@ class FleetController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function (Car $car) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+
                 return [
                     'id' => $car->id,
                     'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
@@ -122,7 +125,10 @@ class FleetController extends Controller
                     'color' => $car->color,
                     'fuel_type' => $car->fuel_type,
                     'transmission' => $car->transmission,
-                    'rate' => $this->resolveDailyRate($car),
+                    'driver_mode' => $car->driver_mode ?: 'both',
+                    'per_day_km' => $pricing['per_day_km'],
+                    'extra_km_rate' => $pricing['extra_km_rate'],
+                    'rate' => number_format((float) $pricing['daily_rate'], 0),
                     'image' => $this->resolveImagePath($car),
                 ];
             });
@@ -134,38 +140,6 @@ class FleetController extends Controller
         ];
 
         return view('fleet.index', compact('cars', 'filters', 'availabilityRows'));
-    }
-
-    private function extractRate(?string $note): ?string
-    {
-        if (!$note) {
-            return null;
-        }
-
-        if (preg_match('/(?:rs\\.?\\s*)?([\\d,]+(?:\\.\\d{1,2})?)/i', $note, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
-    }
-
-    private function resolveDailyRate(Car $car): ?string
-    {
-        $noteRate = $this->extractRate($car->note);
-        if ($noteRate) {
-            return $noteRate;
-        }
-
-        $plateKey = strtoupper((string) Str::of((string) $car->plate_no)->replaceMatches('/[^A-Za-z0-9]/', ''));
-
-        $knownRates = [
-            'CAK8043' => '4,000',
-            'CAK9010' => '4,000',
-            'CAK9792' => '4,000',
-            '588233' => '8,000',
-        ];
-
-        return $knownRates[$plateKey] ?? null;
     }
 
     private function resolveImagePath(Car $car): string

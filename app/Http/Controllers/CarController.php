@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Models\User;
+use App\Models\VehiclePricing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,8 +23,24 @@ class CarController extends Controller
             ->where('role', 'partner')
             ->orderBy('name')
             ->get(['id', 'name', 'email']);
+        $vehiclePricings = VehiclePricing::query()
+            ->orderBy('make')
+            ->orderBy('model')
+            ->get();
 
-        return view('cars.index', compact('cars', 'partners'));
+        return view('cars.index', compact('cars', 'partners', 'vehiclePricings'));
+    }
+
+    public function pricingIndex(Request $request)
+    {
+        abort_unless($request->user()?->canAccess('cars'), 403);
+
+        $vehiclePricings = VehiclePricing::query()
+            ->orderBy('make')
+            ->orderBy('model')
+            ->get();
+
+        return view('vehicle-pricings.index', compact('vehiclePricings'));
     }
 
     public function store(Request $request)
@@ -75,6 +92,35 @@ class CarController extends Controller
         return back()->with('success', 'Car deleted successfully.');
     }
 
+    public function storePricing(Request $request)
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        $data = $this->validateVehiclePricing($request);
+        VehiclePricing::create($data);
+
+        return back()->with('success', 'Vehicle pricing added successfully.');
+    }
+
+    public function updatePricing(Request $request, VehiclePricing $vehiclePricing)
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        $data = $this->validateVehiclePricing($request, $vehiclePricing->id);
+        $vehiclePricing->update($data);
+
+        return back()->with('success', 'Vehicle pricing updated successfully.');
+    }
+
+    public function destroyPricing(Request $request, VehiclePricing $vehiclePricing)
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        $vehiclePricing->delete();
+
+        return back()->with('success', 'Vehicle pricing deleted successfully.');
+    }
+
     private function validateCar(Request $request, ?int $carId = null): array
     {
         return $request->validate([
@@ -86,6 +132,7 @@ class CarController extends Controller
             'color' => ['nullable', 'string', 'max:50'],
             'fuel_type' => ['nullable', 'string', 'max:50'],
             'transmission' => ['nullable', 'string', 'max:50'],
+            'driver_mode' => ['required', 'in:both,with_driver_only,without_driver_only'],
             'dagps_device_id' => ['nullable', 'string', 'max:100'],
             'tracker_device_name' => ['nullable', 'string', 'max:100'],
             'tracker_device_type' => ['nullable', 'string', 'max:100'],
@@ -105,6 +152,26 @@ class CarController extends Controller
             'maintenance_note' => ['nullable', 'string', 'max:1000'],
             'plate_no' => ['required', 'string', 'max:100', Rule::unique('cars', 'plate_no')->ignore($carId)],
             'status' => ['required', 'in:available,rented'],
+            'note' => ['nullable', 'string', 'max:255'],
+        ]);
+    }
+
+    private function validateVehiclePricing(Request $request, ?int $pricingId = null): array
+    {
+        return $request->validate([
+            'make' => ['nullable', 'string', 'max:100'],
+            'model' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('vehicle_pricings', 'model')->ignore($pricingId)->where(function ($query) use ($request) {
+                    return $query->where('make', $request->input('make'));
+                }),
+            ],
+            'per_day_km' => ['required', 'integer', 'min:1'],
+            'per_day_amount' => ['required', 'numeric', 'min:0'],
+            'extra_km_rate' => ['required', 'numeric', 'min:0'],
+            'driver_cost_per_day' => ['required', 'numeric', 'min:0'],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
     }

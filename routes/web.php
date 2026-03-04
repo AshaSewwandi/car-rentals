@@ -26,11 +26,17 @@ Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
 Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
 Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');
 Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
+Route::get('/airport-hires', [HomeController::class, 'airportHires'])->name('airport-hires.index');
+Route::get('/short-term-rentals', [HomeController::class, 'shortTermRentals'])->name('short-term-rentals.index');
+Route::get('/medical-transport', [HomeController::class, 'medicalTransport'])->name('medical-transport.index');
+Route::get('/group-packages', [HomeController::class, 'groupPackages'])->name('group-packages.index');
+Route::get('/pricing', [HomeController::class, 'pricingIndex'])->name('pricing.index');
 Route::get('/booking/confirm', [BookingController::class, 'create'])->name('booking.confirm');
 Route::post('/booking/confirm', [BookingController::class, 'store'])->name('booking.store');
 Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->name('booking.success');
 Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->middleware('auth')->name('support-requests.store');
+Route::post('/airport-hires/support', [CustomerSupportRequestController::class, 'store'])->name('airport-hires.support.store');
 Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {
@@ -54,10 +60,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
     Route::middleware('permission:cars')->group(function () {
         Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
+        Route::get('/vehicle-pricings', [CarController::class, 'pricingIndex'])->name('vehicle-pricings.index');
         Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
         Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
         Route::patch('/cars/{car}/renewal', [CarController::class, 'updateRenewal'])->name('cars.renewal.update');
         Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
+        Route::post('/vehicle-pricings', [CarController::class, 'storePricing'])->name('vehicle-pricings.store');
+        Route::put('/vehicle-pricings/{vehiclePricing}', [CarController::class, 'updatePricing'])->name('vehicle-pricings.update');
+        Route::delete('/vehicle-pricings/{vehiclePricing}', [CarController::class, 'destroyPricing'])->name('vehicle-pricings.destroy');
     });
 
     Route::middleware('permission:payments')->group(function () {

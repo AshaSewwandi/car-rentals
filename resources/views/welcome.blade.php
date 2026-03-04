@@ -1032,6 +1032,11 @@
             </a>
             <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" id="menuToggle">&#9776;</button>
             <nav class="nav">
+                <a href="{{ route('group-packages.index') }}">Group Packages</a>
+                <a href="{{ route('medical-transport.index') }}">Medical Transport</a>
+                <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
+                <a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a>
+                <a href="{{ route('pricing.index') }}">Rates</a>
                 @auth
                     @if(!auth()->user()->isAdmin())
                         <a class="cta" href="{{ route('customer.dashboard') }}">My Dashboard</a>
@@ -1355,6 +1360,11 @@
                     <ul class="footer-links">
                         <li><a href="#home-section">Home</a></li>
                         <li><a href="#fleet-section">Fleet</a></li>
+                        <li><a href="{{ route('group-packages.index') }}">Group Packages</a></li>
+                        <li><a href="{{ route('medical-transport.index') }}">Medical Transport</a></li>
+                        <li><a href="{{ route('airport-hires.index') }}">Airport Hires</a></li>
+                        <li><a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a></li>
+                        <li><a href="{{ route('pricing.index') }}">Pricing</a></li>
                         <li><a href="{{ route('blogs') }}">Blogs</a></li>
                         <li><a href="#payments-section">Payments</a></li>
                         <li><a href="#contact-section">Contact</a></li>

@@ -642,7 +642,7 @@
             <div class="hero-card">
                 <h1 class="hero-title">Full Fleet</h1>
                 <p class="hero-sub">Check vehicle availability for your selected date period and pickup location.</p>
-                <p class="hero-policy">Rental options: With driver or without driver. Daily package includes 150 km. Extra distance is charged at Rs 25 per km.</p>
+                <p class="hero-policy">Rental options vary by vehicle. Check each vehicle card for driver availability, included daily KM, and extra KM charge.</p>
                 <form class="filter-grid" id="fleetFilterForm" method="get" action="{{ route('fleet.index') }}" novalidate>
                     <div class="control">
                         <label for="start_location">Pickup Location</label>
@@ -712,7 +712,17 @@
                             @endif
                         </div>
                         <div class="fleet-sub">{{ $car['plate_no'] }}</div>
-                        <div class="fleet-policy">With driver / Without driver Â· 150 km/day included Â· Rs 25 per extra km</div>
+                        <div class="fleet-policy">
+                            @if(($car['driver_mode'] ?? 'both') === 'with_driver_only')
+                                With driver only
+                            @elseif(($car['driver_mode'] ?? 'both') === 'without_driver_only')
+                                Without driver only
+                            @else
+                                With driver / Without driver
+                            @endif
+                            · {{ number_format((float) ($car['per_day_km'] ?? 150), 0) }} km/day included
+                            · Rs {{ number_format((float) ($car['extra_km_rate'] ?? 25), 0) }} per extra km
+                        </div>
                         <div class="fleet-meta">
                             @if($car['year']) <span>{{ $car['year'] }}</span> @endif
                             @if($car['make']) <span>{{ $car['make'] }}</span> @endif
@@ -1164,3 +1174,5 @@
     </script>
 </body>
 </html>
+
+

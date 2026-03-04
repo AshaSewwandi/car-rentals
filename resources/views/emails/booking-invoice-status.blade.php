@@ -28,6 +28,8 @@
         $statusColor = $isCompleted ? '#166534' : '#0f66c3';
         $statusBg = $isCompleted ? '#ecfdf3' : '#eff6ff';
         $baseAmount = (float) ($booking->total_amount ?? 0);
+        $driverAmount = (float) ($booking->driver_total ?? 0);
+        $rentalAmountOnly = max($baseAmount - $driverAmount, 0);
         $additionalAmount = (float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0);
         $finalAmount = (float) ($booking->final_total ?? $booking->total_amount ?? 0);
         $vehicleYear = $booking->car?->year ?? $booking->car?->model_year;
@@ -113,6 +115,7 @@
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Date Range:</strong> {{ $booking->start_date?->format('M d, Y') }} - {{ $booking->end_date?->format('M d, Y') }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Pickup Location:</strong> {{ $booking->pickup_location ?: 'Not specified' }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Rental Days:</strong> {{ $booking->rental_days }} day(s)</td></tr>
+                                <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Rental Option:</strong> {{ $booking->driver_option === 'with_driver' ? 'With driver' : 'Without driver' }}</td></tr>
                             </table>
 
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:12px;border:1px solid #dbe6f3;border-radius:10px;background:#ffffff;overflow:hidden;">
@@ -122,6 +125,8 @@
                                 <tr>
                                     <td style="padding:0 16px 14px;">
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr><td style="padding:5px 0;color:#334155;font-size:15px;">Rental Amount</td><td style="padding:5px 0;color:#0f172a;font-size:15px;text-align:right;">LKR {{ number_format($rentalAmountOnly, 2) }}</td></tr>
+                                            <tr><td style="padding:5px 0;color:#334155;font-size:15px;">Driver Charge</td><td style="padding:5px 0;color:#0f172a;font-size:15px;text-align:right;">LKR {{ number_format($driverAmount, 2) }}</td></tr>
                                             <tr><td style="padding:5px 0;color:#334155;font-size:15px;">Base Amount</td><td style="padding:5px 0;color:#0f172a;font-size:15px;text-align:right;">LKR {{ number_format($baseAmount, 2) }}</td></tr>
                                             <tr><td style="padding:5px 0;color:#334155;font-size:15px;">Additional Amount</td><td style="padding:5px 0;color:#0f172a;font-size:15px;text-align:right;">LKR {{ number_format($additionalAmount, 2) }}</td></tr>
                                         </table>

@@ -118,6 +118,7 @@
                     <tr><td class="label">Vehicle</td><td class="value">{{ $booking->car?->name }} ({{ $booking->car?->plate_no }})</td></tr>
                     <tr><td class="label">Trip Dates</td><td class="value">{{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}</td></tr>
                     <tr><td class="label">Rental Days</td><td class="value">{{ $booking->rental_days }} day(s)</td></tr>
+                    <tr><td class="label">Rental Option</td><td class="value">{{ $booking->driver_option === 'with_driver' ? 'With driver' : 'Without driver' }}</td></tr>
                     <tr><td class="label">Pickup Location</td><td class="value">{{ $booking->pickup_location ?: '-' }}</td></tr>
                     <tr><td class="label">Trip Status</td><td class="value">{{ ucfirst((string) $booking->status) }}</td></tr>
                 </table>
@@ -141,6 +142,8 @@
             <div class="section-title">Payment Summary</div>
             <div class="section-body">
                 <table class="summary-table">
+                    <tr><td>Rental Amount</td><td class="value">LKR {{ number_format(max($baseAmount - (float) ($booking->driver_total ?? 0), 0), 2) }}</td></tr>
+                    <tr><td>Driver Charge</td><td class="value">LKR {{ number_format((float) ($booking->driver_total ?? 0), 2) }}</td></tr>
                     <tr><td>Base Amount ({{ ucfirst((string) $booking->payment_status) }})</td><td class="value">LKR {{ number_format($baseAmount, 2) }}</td></tr>
                     <tr><td>Additional Amount ({{ $booking->additional_payment_status === 'not_required' ? 'N/A' : ucfirst((string) $booking->additional_payment_status) }})</td><td class="value">LKR {{ number_format($additionalAmount, 2) }}</td></tr>
                     <tr><td>Final Total</td><td class="value">LKR {{ number_format($finalAmount, 2) }}</td></tr>

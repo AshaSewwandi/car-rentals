@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\Car;
 use App\Models\Rental;
 use App\Models\User;
+use App\Support\VehiclePricingResolver;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +17,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Support\Str;
 use Throwable;
 
 class BookingController extends Controller
@@ -41,15 +41,26 @@ class BookingController extends Controller
         }
 
         $days = max(1, (int) Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate)) + 1);
-        $dailyRate = $this->resolveDailyRate($car);
+        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $dailyRate = $pricing['daily_rate'];
+        $driverCostPerDay = $pricing['driver_cost_per_day'];
+        $driverTotal = 0;
         $totalAmount = $dailyRate * $days;
+        $driverMode = (string) ($car->driver_mode ?: 'both');
+        $defaultDriverOption = $driverMode === 'with_driver_only' ? 'with_driver' : 'without_driver';
 
         return view('booking.confirm', [
             'car' => $car,
             'filters' => $validated,
             'rentalDays' => $days,
             'dailyRate' => $dailyRate,
+            'perDayKm' => $pricing['per_day_km'],
+            'extraKmRate' => $pricing['extra_km_rate'],
+            'driverCostPerDay' => $driverCostPerDay,
+            'driverTotal' => $driverTotal,
             'totalAmount' => $totalAmount,
+            'driverMode' => $driverMode,
+            'defaultDriverOption' => $defaultDriverOption,
         ]);
     }
 
@@ -64,18 +75,29 @@ class BookingController extends Controller
             'customer_email' => ['required', 'email', 'max:180'],
             'customer_phone' => ['required', 'string', 'max:40'],
             'payment_method' => ['required', 'in:pay_later_bank,pay_at_pickup_cash'],
+            'driver_option' => ['required', 'in:without_driver,with_driver'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $car = Car::findOrFail($validated['car_id']);
+        $driverMode = (string) ($car->driver_mode ?: 'both');
 
         if (!$this->isCarAvailable($car->id, $validated['start_date'], $validated['end_date'])) {
             return back()->withInput()->with('error', 'Car became unavailable for the selected dates.');
         }
 
+        $validated['driver_option'] = match ($driverMode) {
+            'with_driver_only' => 'with_driver',
+            'without_driver_only' => 'without_driver',
+            default => $validated['driver_option'],
+        };
+
         $days = max(1, (int) Carbon::parse($validated['start_date'])->diffInDays(Carbon::parse($validated['end_date'])) + 1);
-        $dailyRate = $this->resolveDailyRate($car);
-        $totalAmount = $dailyRate * $days;
+        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $dailyRate = $pricing['daily_rate'];
+        $driverRate = $validated['driver_option'] === 'with_driver' ? (float) $pricing['driver_cost_per_day'] : 0;
+        $driverTotal = $driverRate * $days;
+        $totalAmount = ($dailyRate * $days) + $driverTotal;
         [$bookingUser, $guestAccountCreated, $guestAccountMailSent] = $this->resolveBookingUser($request, $validated);
 
         $booking = Booking::create([
@@ -88,11 +110,14 @@ class BookingController extends Controller
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'rental_days' => $days,
+            'driver_option' => $validated['driver_option'],
             'daily_rate' => $dailyRate,
+            'driver_rate' => $driverRate,
             'total_amount' => $totalAmount,
+            'driver_total' => $driverTotal,
             'final_total' => $totalAmount,
-            'included_km' => $days * 150,
-            'extra_km_rate' => 25,
+            'included_km' => $days * $pricing['per_day_km'],
+            'extra_km_rate' => $pricing['extra_km_rate'],
             'currency' => 'LKR',
             'payment_method' => $validated['payment_method'],
             'payment_provider' => null,
@@ -263,37 +288,6 @@ class BookingController extends Controller
         }
 
         $request->session()->put('guest_booking_ids', array_values(array_unique($guestBookingIds)));
-    }
-
-    private function resolveDailyRate(Car $car): float
-    {
-        $noteRate = $this->extractRate($car->note);
-        if ($noteRate !== null) {
-            return $noteRate;
-        }
-
-        $plateKey = strtoupper((string) Str::of((string) $car->plate_no)->replaceMatches('/[^A-Za-z0-9]/', ''));
-        $knownRates = [
-            'CAK8043' => 4000,
-            'CAK9010' => 4000,
-            'CAK9792' => 4000,
-            '588233' => 8000,
-        ];
-
-        return (float) ($knownRates[$plateKey] ?? 4500);
-    }
-
-    private function extractRate(?string $note): ?float
-    {
-        if (!$note) {
-            return null;
-        }
-
-        if (preg_match('/(?:rs\\.?\\s*)?([\\d,]+(?:\\.\\d{1,2})?)/i', $note, $matches)) {
-            return (float) str_replace(',', '', $matches[1]);
-        }
-
-        return null;
     }
 
     private function sendBookingInvoiceEmailAfterResponse(int $bookingId, string $stage): void

@@ -4,12 +4,199 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Car;
+use App\Models\VehiclePricing;
+use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    public function airportHires(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function (Car $car, int $index) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+                $driverMode = $car->driver_mode ?: 'both';
+
+                $driverModeLabel = match ($driverMode) {
+                    'with_driver_only' => 'With driver only',
+                    'without_driver_only' => 'Without driver only',
+                    default => 'With or without driver',
+                };
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'plate_no' => $car->plate_no,
+                    'make' => $car->make,
+                    'model' => $car->model,
+                    'year' => $car->year,
+                    'transmission' => $car->transmission,
+                    'fuel_type' => $car->fuel_type,
+                    'color' => $car->color,
+                    'status' => $car->status,
+                    'daily_rate' => (float) $pricing['daily_rate'],
+                    'per_day_km' => (int) $pricing['per_day_km'],
+                    'extra_km_rate' => (float) $pricing['extra_km_rate'],
+                    'driver_mode_label' => $driverModeLabel,
+                    'airport_tag' => match ($index) {
+                        0 => 'Fuel Efficient',
+                        1 => 'Large Trunk Space',
+                        default => 'Airport Ready',
+                    },
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        $airports = [
+            'Bandaranaike International Airport',
+            'Mattala Rajapaksa International Airport',
+            'Colombo City Pickup',
+            'Galle City Pickup',
+        ];
+
+        return view('airport-hires', compact('featuredCars', 'airports'));
+    }
+
+    public function shortTermRentals(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function (Car $car) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'plate_no' => $car->plate_no,
+                    'model' => $car->model,
+                    'year' => $car->year,
+                    'transmission' => $car->transmission,
+                    'fuel_type' => $car->fuel_type,
+                    'daily_rate' => (float) $pricing['daily_rate'],
+                    'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
+                    'tag' => $car->status === 'available' ? 'Available' : 'Popular',
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        $cities = [
+            'Colombo',
+            'Galle',
+            'Matara',
+            'Negombo',
+            'Kandy',
+        ];
+
+        return view('short-term-rentals', compact('featuredCars', 'cities'));
+    }
+
+    public function medicalTransport(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function (Car $car) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'transmission' => $car->transmission ?: 'Automatic',
+                    'fuel_type' => $car->fuel_type ?: 'Petrol',
+                    'daily_rate' => (float) $pricing['daily_rate'],
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        $transportTypes = [
+            'Standard patient drop-off',
+            'Dialysis transport',
+            'Wheelchair transfer',
+            'Inter-facility transfer',
+        ];
+
+        $faqItems = [
+            [
+                'question' => 'Can I book a medical ride in Colombo, Galle, or Matara?',
+                'answer' => 'Yes. We support patient transport in Colombo, Galle, Matara, and nearby areas depending on vehicle availability.',
+            ],
+            [
+                'question' => 'Can you take patients to hospitals in Sri Lanka?',
+                'answer' => 'Yes. We can arrange transport to hospitals, clinics, dialysis centers, and medical appointments across Sri Lanka.',
+            ],
+            [
+                'question' => 'Do you provide wheelchair-friendly transport?',
+                'answer' => 'Yes. Please tell us in advance if the passenger uses a wheelchair or needs extra assistance so we can assign the correct vehicle.',
+            ],
+            [
+                'question' => 'Can a family member come with the patient?',
+                'answer' => 'Yes. A family member or caregiver can usually travel with the patient if seats are available in the assigned vehicle.',
+            ],
+            [
+                'question' => 'Can I book for early morning clinic visits?',
+                'answer' => 'Yes. We can arrange early morning pickups for clinic visits, hospital admissions, and scheduled treatments.',
+            ],
+            [
+                'question' => 'How do I contact you quickly in Sri Lanka?',
+                'answer' => 'You can call us directly on +94 77 717 3264 or send a request through the booking form on this page.',
+            ],
+        ];
+
+        return view('medical-transport', compact('featuredCars', 'transportTypes', 'faqItems'));
+    }
+
+    public function groupPackages(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
+            ->orderBy('name')
+            ->limit(2)
+            ->get()
+            ->map(function (Car $car, int $index) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'model' => $car->model ?: 'Group travel vehicle',
+                    'transmission' => $car->transmission ?: 'Automatic',
+                    'daily_rate' => (float) $pricing['daily_rate'],
+                    'seats' => $index === 0 ? '7' : '12',
+                    'bags' => $index === 0 ? '5' : '8',
+                    'tag' => $index === 0 ? 'Premium' : 'Group',
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        return view('group-packages', compact('featuredCars'));
+    }
+
+    public function pricingIndex(): View
+    {
+        $pricingRows = VehiclePricing::query()
+            ->orderBy('make')
+            ->orderBy('model')
+            ->get();
+
+        $startingRate = $pricingRows->min('per_day_amount');
+        $highestIncludedKm = $pricingRows->max('per_day_km');
+
+        return view('pricing.index', compact('pricingRows', 'startingRate', 'highestIncludedKm'));
+    }
+
     public function customerDashboard(Request $request): View
     {
         $user = $request->user();
@@ -118,43 +305,12 @@ class HomeController extends Controller
                     'id' => $car->id,
                     'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
                     'plate_no' => $car->plate_no,
-                    'daily_rate' => $this->resolveDailyRate($car),
+                    'daily_rate' => VehiclePricingResolver::resolveForCar($car)['daily_rate'],
                     'image' => $this->resolveImagePath($car),
                 ];
             });
 
         return view('customer.home', compact('user', 'activeTrips', 'canceledTrips', 'completedTrips', 'recommendedCars'));
-    }
-
-    private function extractRate(?string $note): ?float
-    {
-        if (!$note) {
-            return null;
-        }
-
-        if (preg_match('/(?:rs\\.?\\s*)?([\\d,]+(?:\\.\\d{1,2})?)/i', $note, $matches)) {
-            return (float) str_replace(',', '', $matches[1]);
-        }
-
-        return null;
-    }
-
-    private function resolveDailyRate(Car $car): float
-    {
-        $noteRate = $this->extractRate($car->note);
-        if ($noteRate !== null) {
-            return $noteRate;
-        }
-
-        $plateKey = strtoupper((string) Str::of((string) $car->plate_no)->replaceMatches('/[^A-Za-z0-9]/', ''));
-        $knownRates = [
-            'CAK8043' => 4000,
-            'CAK9010' => 4000,
-            'CAK9792' => 4000,
-            '588233' => 8000,
-        ];
-
-        return (float) ($knownRates[$plateKey] ?? 4500);
     }
 
     private function resolveImagePath(Car $car): string

@@ -170,6 +170,47 @@
         .field textarea { min-height: 92px; resize: vertical; }
         .field.full { grid-column: 1 / -1; }
         .help { font-size: .8rem; color: #64748b; margin-top: .25rem; }
+        .rental-option-card {
+            border: 2px solid #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #f8fbff);
+            border-radius: 14px;
+            padding: .9rem 1rem;
+        }
+        .rental-option-card.is-driver-only {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fff7ed, #fffbeb);
+        }
+        .rental-option-card.is-self-drive-only {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+        }
+        .rental-option-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: .28rem .62rem;
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            margin-bottom: .6rem;
+            color: #0f172a;
+            background: #dbeafe;
+        }
+        .rental-option-card.is-driver-only .rental-option-badge {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        .rental-option-card.is-self-drive-only .rental-option-badge {
+            background: #bbf7d0;
+            color: #166534;
+        }
+        .rental-option-message {
+            margin-top: .45rem;
+            font-size: .88rem;
+            line-height: 1.5;
+            color: #475569;
+        }
         .bank-details {
             margin-top: .6rem;
             border: 1px solid #bfdbfe;
@@ -297,9 +338,17 @@
                                         <p class="car-meta">{{ $car->plate_no }} · {{ $car->transmission ?: 'Transmission N/A' }} · {{ $car->fuel_type ?: 'Fuel N/A' }}</p>
                                         <span class="pill">Free cancellation up to 48 hours before pickup</span>
                                         <div class="feature-list">
-                                            <div>With driver or without driver</div>
-                                            <div>150 km/day included</div>
-                                            <div>Rs 25 per extra km</div>
+                                            <div>
+                                                @if($driverMode === 'with_driver_only')
+                                                    With driver only
+                                                @elseif($driverMode === 'without_driver_only')
+                                                    Without driver only
+                                                @else
+                                                    With driver or without driver
+                                                @endif
+                                            </div>
+                                            <div>{{ number_format($perDayKm) }} km/day included</div>
+                                            <div>Rs {{ number_format($extraKmRate, 2) }} per extra km</div>
                                             <div>Customer support available</div>
                                         </div>
                                     </div>
@@ -365,6 +414,29 @@
                                         </div>
                                     </div>
                                     <div class="field full">
+                                        <label>Rental option</label>
+                                        <div class="rental-option-card {{ $driverMode === 'with_driver_only' ? 'is-driver-only' : ($driverMode === 'without_driver_only' ? 'is-self-drive-only' : '') }}">
+                                            <div class="rental-option-badge">Rental Option</div>
+                                            @if($driverMode === 'both')
+                                                <select name="driver_option" id="driverOption" required>
+                                                    <option value="without_driver" {{ old('driver_option', $defaultDriverOption) === 'without_driver' ? 'selected' : '' }}>Without driver</option>
+                                                    <option value="with_driver" {{ old('driver_option', $defaultDriverOption) === 'with_driver' ? 'selected' : '' }}>With driver</option>
+                                                </select>
+                                                <div class="rental-option-message">Choose whether you need a driver. Driver charge per day: LKR {{ number_format($driverCostPerDay, 2) }}.</div>
+                                            @else
+                                                <input type="hidden" name="driver_option" id="driverOption" value="{{ $defaultDriverOption }}">
+                                                <input type="text" class="form-control" value="{{ $driverMode === 'with_driver_only' ? 'With driver only' : 'Without driver only' }}" readonly>
+                                                <div class="rental-option-message">
+                                                    @if($driverMode === 'with_driver_only')
+                                                        This vehicle is available only with driver. Driver charge per day: LKR {{ number_format($driverCostPerDay, 2) }}.
+                                                    @else
+                                                        This vehicle is available only without driver.
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="field full">
                                         <label>Special note</label>
                                         <textarea name="note" placeholder="Any request for pickup time, child seat, driver, etc.">{{ old('note') }}</textarea>
                                     </div>
@@ -377,10 +449,11 @@
                         <div class="card-header">Price breakdown</div>
                         <div class="card-body">
                             <div class="summary-row"><span>Daily rent</span><strong>LKR {{ number_format($dailyRate, 2) }}</strong></div>
+                            <div class="summary-row"><span>Driver cost</span><strong id="driverCostSummary">LKR {{ number_format(old('driver_option', $defaultDriverOption) === 'with_driver' ? $driverCostPerDay * $rentalDays : 0, 2) }}</strong></div>
                             <div class="summary-row"><span>Rental days</span><strong>{{ $rentalDays }}</strong></div>
-                            <div class="summary-row total"><span>Total</span><span>LKR {{ number_format($totalAmount, 2) }}</span></div>
+                            <div class="summary-row total"><span>Total</span><span id="bookingTotalSummary">LKR {{ number_format(old('driver_option', $defaultDriverOption) === 'with_driver' ? $totalAmount + ($driverCostPerDay * $rentalDays) : $totalAmount, 2) }}</span></div>
                             <div class="note">
-                                Included: 150 km/day. Extra usage is charged at Rs 25 per km.
+                                Included: {{ number_format($perDayKm) }} km/day. Extra usage is charged at Rs {{ number_format($extraKmRate, 2) }} per km.
                             </div>
                             <div class="actions">
                                 <a class="btn btn-light" href="{{ route('fleet.index', $filters) }}">Edit selection</a>
@@ -398,9 +471,15 @@
     <script>
         (function () {
             const paymentMethodEl = document.getElementById('paymentMethod');
+            const driverOptionEl = document.getElementById('driverOption');
             const bankDetailsEl = document.getElementById('bankTransferDetails');
             const bookingForm = document.querySelector('form[action="{{ route('booking.store') }}"]');
             const bookingSubmitBtn = bookingForm ? bookingForm.querySelector('.js-loading-submit') : null;
+            const driverCostSummaryEl = document.getElementById('driverCostSummary');
+            const bookingTotalSummaryEl = document.getElementById('bookingTotalSummary');
+            const rentalDays = {{ (int) $rentalDays }};
+            const dailyRate = {{ (float) $dailyRate }};
+            const driverCostPerDay = {{ (float) $driverCostPerDay }};
 
             if (!paymentMethodEl || !bankDetailsEl) {
                 return;
@@ -412,6 +491,23 @@
 
             paymentMethodEl.addEventListener('change', syncBankDetails);
             syncBankDetails();
+
+            const syncDriverSummary = () => {
+                if (!driverOptionEl || !driverCostSummaryEl || !bookingTotalSummaryEl) {
+                    return;
+                }
+
+                const driverTotal = driverOptionEl.value === 'with_driver' ? driverCostPerDay * rentalDays : 0;
+                const total = (dailyRate * rentalDays) + driverTotal;
+
+                driverCostSummaryEl.textContent = `LKR ${driverTotal.toFixed(2)}`;
+                bookingTotalSummaryEl.textContent = `LKR ${total.toFixed(2)}`;
+            };
+
+            if (driverOptionEl) {
+                driverOptionEl.addEventListener('change', syncDriverSummary);
+                syncDriverSummary();
+            }
 
             if (bookingForm && bookingSubmitBtn) {
                 bookingForm.addEventListener('submit', () => {

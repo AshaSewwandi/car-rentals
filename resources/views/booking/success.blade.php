@@ -317,8 +317,10 @@
                             <div class="row"><span>Customer</span><strong>{{ $booking->customer_name }}</strong></div>
                             <div class="row"><span>Trip dates</span><strong>{{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}</strong></div>
                             <div class="row"><span>Pickup location</span><strong>{{ $booking->pickup_location ?: '-' }}</strong></div>
+                            <div class="row"><span>Rental option</span><strong>{{ $booking->driver_option === 'with_driver' ? 'With driver' : 'Without driver' }}</strong></div>
                             <div class="row"><span>Payment method</span><strong>{{ $booking->payment_method === 'pay_later_bank' ? 'Online transfer' : 'Cash at pickup' }}</strong></div>
                             <div class="row"><span>Payment status</span><strong>{{ ucfirst($booking->payment_status) }}</strong></div>
+                            <div class="row"><span>Driver charge</span><strong>{{ $booking->currency }} {{ number_format((float) ($booking->driver_total ?? 0), 2) }}</strong></div>
                             <div class="row"><span>Total</span><strong>{{ $booking->currency }} {{ number_format((float)$booking->total_amount, 2) }}</strong></div>
                         </div>
                     </div>

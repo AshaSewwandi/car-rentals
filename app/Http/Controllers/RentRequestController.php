@@ -9,6 +9,7 @@ use App\Models\Car;
 use App\Models\RentRequest;
 use App\Models\Rental;
 use App\Models\User;
+use App\Support\VehiclePricingResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -101,7 +102,8 @@ class RentRequestController extends Controller
 
         $car = Car::findOrFail((int) $rentRequest->car_id);
         $days = max(1, (int) $rentRequest->start_date->diffInDays($rentRequest->end_date) + 1);
-        $dailyRate = $this->resolveDailyRate($car);
+        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $dailyRate = $pricing['daily_rate'];
         $totalAmount = $dailyRate * $days;
 
         $matchedUserId = null;
@@ -124,8 +126,8 @@ class RentRequestController extends Controller
             'daily_rate' => $dailyRate,
             'total_amount' => $totalAmount,
             'final_total' => $totalAmount,
-            'included_km' => $days * 150,
-            'extra_km_rate' => 25,
+            'included_km' => $days * $pricing['per_day_km'],
+            'extra_km_rate' => $pricing['extra_km_rate'],
             'currency' => 'LKR',
             'payment_method' => 'pay_later_bank',
             'payment_provider' => null,
@@ -203,23 +205,6 @@ class RentRequestController extends Controller
             ->exists();
 
         return !$hasConfirmedBookingOverlap;
-    }
-
-    private function resolveDailyRate(Car $car): float
-    {
-        if ($car->note && preg_match('/(?:rs\\.?\\s*)?([\\d,]+(?:\\.\\d{1,2})?)/i', $car->note, $matches)) {
-            return (float) str_replace(',', '', $matches[1]);
-        }
-
-        $plateKey = strtoupper((string) preg_replace('/[^A-Za-z0-9]/', '', (string) $car->plate_no));
-        $knownRates = [
-            'CAK8043' => 4000,
-            'CAK9010' => 4000,
-            'CAK9792' => 4000,
-            '588233' => 8000,
-        ];
-
-        return (float) ($knownRates[$plateKey] ?? 4500);
     }
 
     private function sendConvertedBookingEmailsAfterResponse(int $bookingId): void

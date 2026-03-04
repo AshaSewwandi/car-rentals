@@ -16,6 +16,7 @@ class Car extends Model
         'color',
         'fuel_type',
         'transmission',
+        'driver_mode',
         'dagps_device_id',
         'tracker_device_name',
         'tracker_device_type',

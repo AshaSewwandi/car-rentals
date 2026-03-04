@@ -782,6 +782,9 @@
           @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('cars.index'))
             <a class="menu-link {{ request()->routeIs('cars.*') ? 'active' : '' }}" href="{{ route('cars.index') }}"><span class="menu-dot"></span>Cars</a>
           @endif
+          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
+            <a class="menu-link {{ request()->routeIs('vehicle-pricings.*') ? 'active' : '' }}" href="{{ route('vehicle-pricings.index') }}"><span class="menu-dot"></span>Pricing</a>
+          @endif
           @if(auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
             <a class="menu-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}"><span class="menu-dot"></span>Customers</a>
           @endif
