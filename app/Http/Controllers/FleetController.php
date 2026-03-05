@@ -142,6 +142,49 @@ class FleetController extends Controller
         return view('fleet.index', compact('cars', 'filters', 'availabilityRows'));
     }
 
+    public function show(Car $car)
+    {
+        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $driverMode = $car->driver_mode ?: 'both';
+
+        $driverModeLabel = match ($driverMode) {
+            'with_driver_only' => 'With driver only',
+            'without_driver_only' => 'Without driver only',
+            default => 'With or without driver',
+        };
+
+        $nameLower = strtolower((string) $car->name);
+        $estimatedSeats = str_contains($nameLower, 'largo') ? 8 : 5;
+        $estimatedBags = str_contains($nameLower, 'largo') ? 4 : 2;
+
+        $vehicle = [
+            'id' => $car->id,
+            'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+            'plate_no' => $car->plate_no,
+            'status' => $car->status,
+            'make' => $car->make,
+            'model' => $car->model,
+            'year' => $car->year,
+            'color' => $car->color,
+            'fuel_type' => $car->fuel_type,
+            'transmission' => $car->transmission,
+            'driver_mode_label' => $driverModeLabel,
+            'allow_long_term' => (bool) $car->allow_long_term,
+            'daily_rate' => (float) $pricing['daily_rate'],
+            'monthly_rate' => (float) ($pricing['monthly_rate'] ?? 0),
+            'per_day_km' => (int) $pricing['per_day_km'],
+            'per_month_km' => (int) ($pricing['per_month_km'] ?? ((int) $pricing['per_day_km'] * 30)),
+            'extra_km_rate' => (float) $pricing['extra_km_rate'],
+            'driver_cost_per_day' => (float) ($pricing['driver_cost_per_day'] ?? 0),
+            'seats' => $estimatedSeats,
+            'bags' => $estimatedBags,
+            'image' => $this->resolveImagePath($car),
+            'note' => $car->note,
+        ];
+
+        return view('fleet.show', compact('vehicle'));
+    }
+
     private function resolveImagePath(Car $car): string
     {
         $candidates = [

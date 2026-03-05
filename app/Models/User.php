@@ -24,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'partner_share_percentage',
+        'admin_share_percentage',
     ];
 
     /**
@@ -43,6 +45,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'partner_share_percentage' => 'decimal:2',
+        'admin_share_percentage' => 'decimal:2',
     ];
 
     public function isAdmin(): bool

@@ -57,16 +57,16 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.92);
-            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #dbe6f3;
         }
 
         .topbar-inner {
-            min-height: 74px;
-            display: flex;
+            min-height: 72px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            justify-content: space-between;
             gap: 1rem;
             position: relative;
         }
@@ -74,45 +74,41 @@
         .brand {
             display: inline-flex;
             align-items: center;
-            gap: .72rem;
+            gap: .6rem;
             text-decoration: none;
             color: inherit;
         }
 
         .brand-logo-wrap {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
-            background: transparent;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 1px;
             flex-shrink: 0;
         }
 
         .brand img {
-            width: 88%;
-            height: 88%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            filter: contrast(1.14) saturate(1.14) drop-shadow(0 1px 1px rgba(15, 23, 42, 0.18));
         }
 
         .brand-name {
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: 1.25rem;
-            line-height: .88;
+            font-size: 1.55rem;
             letter-spacing: -.02em;
             font-weight: 700;
-            color: #0b1f3a;
+            color: #0b2f61;
         }
 
         .nav {
             display: flex;
-            gap: .45rem;
             align-items: center;
+            justify-content: center;
+            gap: .2rem;
             flex-wrap: wrap;
-            justify-content: flex-end;
         }
 
         .nav form {
@@ -137,32 +133,240 @@
 
         .nav a {
             text-decoration: none;
-            color: #475569;
+            color: #233851;
             font-weight: 600;
-            font-size: .95rem;
-            padding: .55rem .8rem;
-            border-radius: 10px;
+            font-size: .9rem;
+            padding: .45rem .62rem;
+            border-radius: 8px;
+            white-space: nowrap;
         }
 
-        .nav button {
-            border: 0;
-            background: transparent;
-            color: #475569;
-            font-weight: 600;
-            font-size: .95rem;
-            padding: .55rem .8rem;
+        .nav a:hover {
+            background: #edf4ff;
+            color: #0d3f85;
+        }
+
+        .nav-mobile-only {
+            display: none;
+        }
+
+        .nav-mobile-action {
+            width: 100%;
+            border: 1px solid #cbdcf0;
+            background: #f7fbff;
+            color: #113e7d;
             border-radius: 10px;
+            padding: .58rem .7rem;
+            font: inherit;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            min-width: 170px;
+            gap: .55rem;
+            position: relative;
+        }
+
+        .header-auth-link {
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            box-shadow: 0 10px 20px rgba(10, 63, 143, 0.24);
+            font-weight: 700;
+            font-size: .9rem;
+            border-radius: 10px;
+            padding: .52rem .95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
             cursor: pointer;
             font-family: inherit;
         }
 
-        .nav a:hover,
-        .nav button:hover { background: var(--surface-soft); color: var(--text); }
+        .account-toggle {
+            border: 1px solid #d5e2f3;
+            background: #fff;
+            color: #0f2f59;
+            border-radius: 999px;
+            padding: .32rem .46rem .32rem .7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+        }
 
-        .nav .cta {
+        .account-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: #e9f2ff;
+            color: #0f4ea1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            font-weight: 800;
+            border: 1px solid #cbe0fb;
+        }
+
+        .account-menu {
+            position: absolute;
+            top: calc(100% + .55rem);
+            right: 0;
+            width: 220px;
+            background: #fff;
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            box-shadow: 0 18px 40px rgba(15, 35, 68, 0.14);
+            overflow: hidden;
+            display: none;
+            z-index: 35;
+        }
+
+        .account-menu a,
+        .account-menu button {
+            width: 100%;
+            text-align: left;
+            border: 0;
+            background: transparent;
+            display: block;
+            padding: .68rem .85rem;
+            color: #243a56;
+            text-decoration: none;
+            font-size: .9rem;
+            border-bottom: 1px solid #edf3fb;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .account-menu a:hover,
+        .account-menu button:hover {
+            background: #f5f9ff;
+        }
+
+        .account-menu .danger {
+            color: #b91c1c;
+            border-bottom: 0;
+        }
+
+        .account-open .account-menu {
+            display: block;
+        }
+
+        .home-hero {
+            padding: 1.3rem 0 1.6rem;
+        }
+
+        .hero-banner {
+            min-height: 500px;
+            border-radius: 18px;
+            border: 1px solid #cddff5;
+            overflow: hidden;
+            position: relative;
+            background: #0f294f;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .hero-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(95deg, rgba(4, 22, 52, 0.92) 0%, rgba(7, 31, 68, 0.82) 38%, rgba(13, 58, 120, 0.25) 68%, rgba(15, 69, 138, 0.08) 100%);
+        }
+
+        .hero-overlay {
+            position: relative;
+            z-index: 1;
             color: #fff;
-            background: linear-gradient(135deg, var(--primary), var(--primary-2));
-            box-shadow: 0 10px 20px rgba(10, 63, 143, 0.24);
+            width: min(760px, 100%);
+            padding: 2.2rem 2.2rem 2.1rem;
+        }
+
+        .hero-overlay h1 {
+            margin: 0 0 .8rem;
+            max-width: 10ch;
+            font-size: clamp(2.2rem, 5.8vw, 4.15rem);
+            line-height: .94;
+            color: #fff;
+        }
+
+        .hero-overlay p {
+            margin: 0 0 1.1rem;
+            color: #dbeafe;
+            font-size: 1.18rem;
+            max-width: 46ch;
+        }
+
+        .hero-search {
+            background: #fff;
+            border: 1px solid #d5e2f3;
+            border-radius: 14px;
+            padding: .36rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr auto;
+            gap: .28rem;
+            width: min(740px, 100%);
+            box-shadow: 0 12px 28px rgba(6, 23, 49, 0.2);
+        }
+
+        .hero-search .search-field {
+            display: flex;
+            flex-direction: column;
+            gap: .2rem;
+        }
+
+        .hero-search label {
+            color: #607793;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin: 0 .45rem;
+        }
+
+        .hero-search input {
+            width: 100%;
+            border: 1px solid #cfddf0;
+            border-radius: 10px;
+            padding: .65rem .75rem;
+            font: inherit;
+            color: #102948;
+            min-height: 42px;
+        }
+
+        .hero-search input:focus {
+            outline: 2px solid #b6d5ff;
+            border-color: #7eb0ec;
+        }
+
+        .hero-search .search-submit {
+            align-self: end;
+            min-height: 42px;
+            border: 0;
+            border-radius: 10px;
+            padding: .65rem 1rem;
+            color: #fff;
+            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
         }
 
         .hero {
@@ -937,6 +1141,285 @@
             text-transform: uppercase;
         }
 
+        .trust-strip {
+            margin-top: .9rem;
+            padding: 0 .5rem;
+        }
+
+        .trust-grid {
+            width: min(1180px, calc(100% - 1rem));
+            margin: 0 auto;
+            min-height: 64px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .7rem;
+            align-items: center;
+            padding: .45rem .85rem;
+            background: #ffffff;
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(15, 35, 68, 0.06);
+        }
+
+        .trust-item {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            color: #0f2b52;
+            font-weight: 700;
+            font-size: .95rem;
+        }
+
+        .trust-item .dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            border: 1px solid #cde0f7;
+            background: #edf5ff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d4ea8;
+            font-size: .8rem;
+            font-weight: 800;
+        }
+
+        .home-services {
+            background: #f5f8fd;
+            padding-bottom: .6rem;
+            padding-top: .35rem;
+        }
+
+        .home-services.section {
+            padding-top: 1.2rem;
+        }
+
+        .service-grid-modern {
+            margin-top: 1.2rem;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: .85rem;
+        }
+
+        .service-card-modern {
+            background: #ffffff;
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            padding: 1rem;
+            min-height: 172px;
+        }
+
+        .service-card-modern h3 {
+            margin: .55rem 0 .4rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: 1.05rem;
+        }
+
+        .service-card-modern p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.55;
+            font-size: .88rem;
+        }
+
+        .service-icon-modern {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: #eaf2ff;
+            border: 1px solid #d2e2f8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f66c3;
+            font-size: 1rem;
+        }
+
+        .modern-fleet {
+            padding-bottom: .6rem;
+        }
+
+        .modern-fleet-head {
+            margin-top: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+        }
+
+        .modern-fleet-head .modern-fleet-nav {
+            margin-left: auto;
+            justify-content: flex-end;
+        }
+
+        .modern-fleet-nav {
+            display: inline-flex;
+            gap: .45rem;
+        }
+
+        .modern-fleet-nav button {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid #cfdff3;
+            background: #fff;
+            color: #28466b;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .showcase-grid {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .9rem;
+        }
+
+        .showcase-card {
+            background: #fff;
+            border: 1px solid #d9e6f5;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .showcase-photo {
+            height: 190px;
+            background: #e9f2ff;
+        }
+
+        .showcase-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .showcase-body {
+            padding: .88rem .9rem .92rem;
+        }
+
+        .showcase-topline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .55rem;
+            margin-bottom: .52rem;
+        }
+
+        .showcase-tag {
+            font-size: .68rem;
+            color: #49658a;
+            border: 1px solid #d7e4f4;
+            border-radius: 999px;
+            padding: .18rem .5rem;
+            font-weight: 700;
+        }
+
+        .showcase-rate {
+            color: #0a49a2;
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -.02em;
+        }
+
+        .showcase-rate small {
+            color: #6b7f97;
+            font-size: .8rem;
+            font-weight: 600;
+            margin-left: .15rem;
+        }
+
+        .showcase-title {
+            margin: 0 0 .48rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: 1.35rem;
+            letter-spacing: -.01em;
+        }
+
+        .showcase-meta {
+            margin: 0;
+            color: #64748b;
+            font-size: .82rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .45rem;
+        }
+
+        .showcase-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: .28rem;
+        }
+
+        .contact-cta {
+            padding: 2.1rem 0 .3rem;
+        }
+
+        .contact-cta-card {
+            border: 1px solid #dbe6f3;
+            background: linear-gradient(135deg, #f6faff, #edf4ff);
+            border-radius: 16px;
+            padding: 1.2rem 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .9rem;
+        }
+
+        .contact-cta-card h3 {
+            margin: 0 0 .25rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: 1.28rem;
+        }
+
+        .contact-cta-card p {
+            margin: 0;
+            color: #5f738d;
+        }
+
+        .contact-cta-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 0;
+            border-radius: 10px;
+            padding: .66rem 1.1rem;
+            color: #fff;
+            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
+            box-shadow: 0 10px 18px rgba(10, 63, 143, .24);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .modern-footer {
+            margin-top: 2.5rem;
+            background: #081a3b;
+            border-top: 1px solid #18386e;
+        }
+
+        .modern-footer .footer-inner {
+            padding-top: 1.5rem;
+            color: #d2e3ff;
+        }
+
+        .modern-footer .footer-grid {
+            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+            border-bottom: 1px solid rgba(151, 182, 230, .2);
+        }
+
+        .modern-footer .newsletter-form input {
+            background: #102956;
+            border-color: #2a4f88;
+            color: #e8f1ff;
+        }
+
+        .modern-footer .newsletter-btn {
+            background: linear-gradient(135deg, #165ec3, #1a74dd);
+        }
+
         @media (max-width: 1024px) {
             .hero-grid { grid-template-columns: 1fr; }
             .hero-side-card { height: auto; min-height: 340px; }
@@ -945,12 +1428,17 @@
             .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .fleet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .contact-card { grid-template-columns: 1fr; }
+            .service-grid-modern { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         @media (max-width: 700px) {
             .container { width: min(1180px, calc(100% - 1.2rem)); }
-            .topbar-inner { min-height: 66px; }
-            .brand-name { font-size: 1.6rem; }
+            .topbar-inner {
+                min-height: 64px;
+                grid-template-columns: auto auto;
+            }
+            .brand-name { font-size: 1.2rem; }
             .availability-grid { grid-template-columns: 1fr; }
             .feature-grid { grid-template-columns: 1fr; }
             .fleet-grid { grid-template-columns: 1fr; }
@@ -974,8 +1462,39 @@
             .contact-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
             .footer-bottom { flex-direction: column; align-items: flex-start; }
-            .nav { gap: .2rem; }
-            .nav a { padding: .48rem .62rem; }
+            .home-hero { padding-top: 1rem; }
+            .hero-banner { min-height: 440px; }
+            .hero-overlay {
+                padding: 1.2rem 1rem 1.2rem;
+            }
+            .hero-overlay p {
+                font-size: 1rem;
+            }
+            .hero-search {
+                grid-template-columns: 1fr;
+            }
+            .hero-search .search-submit {
+                width: 100%;
+            }
+            .trust-grid {
+                grid-template-columns: 1fr;
+                gap: .3rem;
+                padding: .65rem .7rem;
+                width: min(1180px, calc(100% - 1.2rem));
+            }
+            .trust-item {
+                justify-content: flex-start;
+            }
+            .service-grid-modern { grid-template-columns: 1fr; }
+            .showcase-grid { grid-template-columns: 1fr; }
+            .contact-cta-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .modern-fleet-head .modern-fleet-nav {
+                margin-left: 0;
+                justify-content: flex-start;
+            }
         }
 
         @media (max-width: 900px) {
@@ -996,6 +1515,8 @@
                 box-shadow: 0 14px 28px rgba(10, 63, 143, 0.14);
                 z-index: 30;
                 gap: .3rem;
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
             }
 
             .nav a {
@@ -1004,14 +1525,12 @@
                 padding: .62rem .7rem;
             }
 
-            .nav button {
-                width: 100%;
-                text-align: left;
-                padding: .62rem .7rem;
+            .nav-mobile-only {
+                display: block;
             }
 
-            .nav .cta {
-                text-align: center;
+            .header-right {
+                display: none;
             }
 
             body.nav-open .nav {
@@ -1022,6 +1541,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -1032,32 +1552,55 @@
             </a>
             <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" id="menuToggle">&#9776;</button>
             <nav class="nav">
-                <a href="{{ route('group-packages.index') }}">Group Packages</a>
-                <a href="{{ route('medical-transport.index') }}">Medical Transport</a>
-                <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
                 <a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a>
-                <a href="{{ route('pricing.index') }}">Rates</a>
+                <a href="{{ route('long-term-rentals.index') }}">Long-Term Rentals</a>
+                <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
+                <a href="{{ route('group-packages.index') }}">Special Events</a>
+                <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
                 @auth
-                    @if(!auth()->user()->isAdmin())
-                        <a class="cta" href="{{ route('customer.dashboard') }}">My Dashboard</a>
-                        <form method="post" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit">Log out</button>
-                        </form>
-                    @else
+                    @if(auth()->user()->isAdmin())
                         @if(auth()->user()->canAccess('dashboard'))
-                            <a class="cta" href="{{ route('dashboard') }}">Dashboard</a>
+                            <a class="nav-mobile-only" href="{{ route('dashboard') }}">Admin Dashboard</a>
                         @endif
-                        <form method="post" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit">Log out</button>
-                        </form>
+                    @else
+                        <a class="nav-mobile-only" href="{{ route('customer.dashboard') }}">My Dashboard</a>
                     @endif
+                    <form class="nav-mobile-only" method="post" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="nav-mobile-action">Log out</button>
+                    </form>
                 @else
-                    <a href="{{ route('login') }}">Login</a>
-                    <a class="cta" href="{{ route('register') }}">Register</a>
+                    <a class="nav-mobile-only" href="{{ route('login') }}">Sign In</a>
+                    <a class="nav-mobile-only" href="{{ route('register') }}">Register</a>
                 @endauth
             </nav>
+            <div class="header-right">
+                @auth
+                    <div class="account-wrap" id="accountWrap">
+                        <button type="button" class="account-toggle" id="accountToggle" aria-haspopup="true" aria-expanded="false">
+                            <span>Hi, {{ strtok(auth()->user()->name, ' ') }}</span>
+                            <span class="account-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        </button>
+                        <div class="account-menu" id="accountMenu">
+                            @if(auth()->user()->isAdmin())
+                                @if(auth()->user()->canAccess('dashboard'))
+                                    <a href="{{ route('dashboard') }}">Admin Dashboard</a>
+                                @endif
+                            @else
+                                <a href="{{ route('customer.dashboard') }}">My Dashboard</a>
+                            @endif
+                            <a href="#fleet-section">Our Fleet</a>
+                            <a href="#contact-section">Contact Us</a>
+                            <form method="post" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="danger">Log out</button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <a class="header-auth-link" href="{{ route('login') }}">Sign In</a>
+                @endauth
+            </div>
         </div>
     </header>
 
@@ -1081,223 +1624,123 @@
             </div>
         @endif
 
-        <section id="home-section" class="hero section-anchor">
+        <section id="home-section" class="section-anchor home-hero">
             <div class="container">
-                <div class="hero-grid">
-                    <div class="hero-copy">
-                        <span class="kicker">Premium Rental Service</span>
-                        <h1>Drive your dreams with <span class="brand-highlight">R&A Auto Rentals.</span></h1>
-                        <p>
-                            <span class="brand-highlight">R&A Auto Rentals</span> offers reliable and affordable vehicles for any trip, available on a <strong>daily</strong> or <strong>monthly</strong> basis to match your travel needs.
-                        </p>
-                        <div class="hero-highlights">
-                            <article class="hero-highlight-card">
-                                <h3 class="hero-highlight-title">Daily Rental</h3>
-                                <p class="hero-highlight-text">Short trips, airport pickups, and urgent travel plans.</p>
-                            </article>
-                            <article class="hero-highlight-card">
-                                <h3 class="hero-highlight-title">Monthly Rental</h3>
-                                <p class="hero-highlight-text">Long-term stays, business usage, and better monthly rates.</p>
-                            </article>
-                            <article class="hero-highlight-card">
-                                <h3 class="hero-highlight-title">Any Trip Type</h3>
-                                <p class="hero-highlight-text">Family tours, work travel, and weekend getaways.</p>
-                            </article>
-                        </div>
-                    </div>
-
-                    <div class="hero-side-card">
-                        <img src="{{ asset('images/hero.png') }}" alt="R&A rental hero visual" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';">
-                        <!-- <div class="hero-side-overlay">
-                            <h2 class="hero-side-title">Drive your dreams with <span class="brand-highlight" style="color:#dbeafe;">R&A Auto Rentals</span></h2>
-                            <p class="hero-side-sub">Reliable vehicles for any journey, available for daily or monthly rental.</p>
-                            <a class="btn btn-primary" href="#fleet-section">Book Your Ride</a>
-                        </div> -->
-                    </div>
-                </div>
-
-                <div class="availability-wrap">
-                    <div class="availability">
-                        <h2 class="availability-title">Pickup & Dates</h2>
-                        <form class="availability-grid" id="availabilityForm" action="{{ route('fleet.index') }}" method="get" novalidate>
-                            <div class="control full">
+                <div class="hero-banner">
+                    <img src="{{ asset('images/home.png') }}" alt="R&A Auto Rentals home hero image" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';this.style.background='#0b1f3a';">
+                    <div class="hero-overlay">
+                        <h1>Your Journey Starts Here</h1>
+                        <p>Flexible and reliable rental solutions tailored to Sri Lankan travel needs, from city rides to airport and hospital trips.</p>
+                        <form class="hero-search" id="availabilityForm" action="{{ route('fleet.index') }}" method="get" novalidate>
+                            <div class="search-field">
                                 <label for="start_location">Pickup Location</label>
-                                <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address" required aria-describedby="start_location_error">
+                                <input id="start_location" name="start_location" type="text" placeholder="Pickup location" required aria-describedby="start_location_error">
                                 <small class="field-error" id="start_location_error"></small>
                             </div>
-                            <div class="control">
+                            <div class="search-field">
                                 <label for="start_date">Start Date</label>
                                 <input id="start_date" name="start_date" type="date" required aria-describedby="start_date_error">
                                 <small class="field-error" id="start_date_error"></small>
                             </div>
-                            <div class="control">
+                            <div class="search-field">
                                 <label for="end_date">End Date</label>
                                 <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
                                 <small class="field-error" id="end_date_error"></small>
                             </div>
-                            <div class="control full">
-                                <button class="btn btn-primary" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking Availability...">
-                                    <span class="btn-spinner" aria-hidden="true"></span>
-                                    <span class="btn-label">Find Available Cars</span>
-                                </button>
-                            </div>
+                            <button class="search-submit btn" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking...">
+                                <span class="btn-spinner" aria-hidden="true"></span>
+                                <span class="btn-label">Find Vehicle</span>
+                            </button>
                         </form>
                     </div>
-
-                    <aside class="benefits-card">
-                        <div class="benefits-body">
-                            <h3 class="benefits-title">Why book with R&A?</h3>
-                            <div class="benefit-item">
-                                <span class="benefit-icon">✓</span>
-                                <div>
-                                    <p class="benefit-name">Free Cancellation</p>
-                                    <p class="benefit-note">Up to 48 hours before pickup time.</p>
-                                </div>
-                            </div>
-                            <div class="benefit-item">
-                                <span class="benefit-icon">₨</span>
-                                <div>
-                                    <p class="benefit-name">No Hidden Fees</p>
-                                    <p class="benefit-note">Transparent daily and monthly prices.</p>
-                                </div>
-                            </div>
-                            <div class="benefit-item" style="margin-bottom:0;">
-                                <span class="benefit-icon">24</span>
-                                <div>
-                                    <p class="benefit-name">24/7 Roadside Support</p>
-                                    <p class="benefit-note">Quick assistance for every trip.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="benefits-footer">
-                            <p class="support-line">Need help booking?</p>
-                            <p class="support-sub">Call us: +94 77 717 3264</p>
-                        </div>
-                    </aside>
                 </div>
             </div>
         </section>
 
-        <section id="payments-section" class="section section-anchor">
+        <section class="trust-strip" aria-label="Key advantages">
+            <div class="trust-grid">
+                <div class="trust-item"><span class="dot">24</span>24/7 Support</div>
+                <div class="trust-item"><span class="dot">Rs</span>No Hidden Fees</div>
+                <div class="trust-item"><span class="dot">✓</span>Free Cancellation</div>
+            </div>
+        </section>
+
+        <section id="payments-section" class="section section-anchor home-services">
             <div class="container">
-                <h2>Why R&A Auto Rentals?</h2>
-                <p class="head-note">A practical, fast, and team-friendly system to run rental operations without spreadsheet overload.</p>
-                <div class="feature-grid">
-                    <article class="feature">
-                        <span class="icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M3 13l2-6h11l4 6"></path>
-                                <path d="M5 13h15v4H5z"></path>
-                                <circle cx="8" cy="17" r="2"></circle>
-                                <circle cx="17" cy="17" r="2"></circle>
-                            </svg>
-                        </span>
-                        <h3>Fleet Control</h3>
-                        <p>Track active cars, status, and vehicle info in a clear list with quick actions.</p>
+                <h2>Our Premium Services</h2>
+                <p class="head-note">Experience world-class transportation tailored for Sri Lankan daily, airport, family, and event travel.</p>
+                <div class="service-grid-modern">
+                    <article class="service-card-modern">
+                        <span class="service-icon-modern">₨</span>
+                        <h3>Monthly Savings</h3>
+                        <p>Best rates for long-term rentals with cost-effective monthly packages and predictable pricing.</p>
                     </article>
-                    <article class="feature">
-                        <span class="icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 3h7l5 5v13H7z"></path>
-                                <path d="M14 3v6h5"></path>
-                                <path d="M10 13h6"></path>
-                                <path d="M10 17h6"></path>
-                            </svg>
-                        </span>
-                        <h3>Smart Agreements</h3>
-                        <p>Create and maintain rental agreements with date control and customer assignment.</p>
+                    <article class="service-card-modern">
+                        <span class="service-icon-modern">✈</span>
+                        <h3>Airport Transfers</h3>
+                        <p>Fast airport pickups and drop-offs with reliable scheduling and professional trip handling.</p>
                     </article>
-                    <article class="feature">
-                        <span class="icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
-                                <rect x="3" y="6" width="18" height="12" rx="2"></rect>
-                                <path d="M3 10h18"></path>
-                                <path d="M7 15h3"></path>
-                            </svg>
-                        </span>
-                        <h3>Payment Control</h3>
-                        <p>Monitor expected vs received payments and identify upcoming dues early.</p>
+                    <article class="service-card-modern">
+                        <span class="service-icon-modern">👨‍👩‍👧</span>
+                        <h3>Family Travel</h3>
+                        <p>Spacious vehicles and practical safety-focused options for family rides across the island.</p>
+                    </article>
+                    <article class="service-card-modern">
+                        <span class="service-icon-modern">★</span>
+                        <h3>Special Events</h3>
+                        <p>Clean, premium fleet support for weddings, VIP travel, and business events in Sri Lanka.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="fleet-section" class="section section-anchor">
+        <section id="fleet-section" class="section section-anchor modern-fleet">
             <div class="container">
-                <h2>Explore Fleet</h2>
-                <p class="head-note">Quick highlight cards for your most rented vehicles.</p>
-                <div class="fleet-head">
-                    <span class="small text-muted">Our most booked vehicles while you search.</span>
-                    <a class="fleet-head-link" href="{{ route('fleet.index') }}">View Full Fleet</a>
+                <h2>Featured Fleet</h2>
+                <p class="head-note">Choose from our diverse range of high-performance and family-friendly vehicles.</p>
+                <div class="modern-fleet-head">
+
+                    <div class="modern-fleet-nav" aria-hidden="true">
+                        <!-- <button type="button">&#8249;</button>
+                        <button type="button">&#8250;</button> -->
+                        <a class="fleet-head-link" href="{{ route('fleet.index') }}">See More</a>
+                    </div>
                 </div>
-                <div class="fleet-grid">
-                    <article class="fleet-card">
-                        <div class="fleet-photo">
-                            <span class="fleet-tag">Economy</span>
-                            <img src="{{ asset('images/cak_9010.png') }}" alt="2015 Alto Red">
-                        </div>
-                        <div class="fleet-body">
-                            <div class="fleet-title-row">
-                                <h3>Alto 2015</h3>
-                                <div class="fleet-price">Rs 4,000<span class="fleet-rate-unit">/day</span></div>
+                <div class="showcase-grid">
+                    @forelse($featuredCars as $car)
+                        <article class="showcase-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
+                            <div class="showcase-photo">
+                                <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
                             </div>
-                            <div class="fleet-sub">Reliable city ride</div>
-                            <div class="fleet-policy">With driver / Without driver · 150 km/day included · Rs 25 per extra km</div>
-                            <div class="fleet-meta">
-                                <span>Seats 4</span>
-                                <span>Manual</span>
-                                <span>Petrol</span>
-                                <span>Black</span>
+                            <div class="showcase-body">
+                                <div class="showcase-topline">
+                                    <span class="showcase-tag">{{ $car['segment'] }}</span>
+                                    <div class="showcase-rate">Rs {{ number_format($car['daily_rate'], 0) }}<small>/day</small></div>
+                                </div>
+                                <h3 class="showcase-title">{{ $car['name'] }}</h3>
+                                <p class="showcase-meta">
+                                    <span>{{ $car['seats'] }}</span>
+                                    <span>{{ $car['bags'] }}</span>
+                                    <span>{{ $car['transmission'] }}</span>
+                                    <span><a href="{{ route('fleet.show', $car['id']) }}">Details</a></span>
+                                </p>
                             </div>
-                        </div>
-                    </article>
-                    <article class="fleet-card">
-                        <div class="fleet-photo">
-                            <span class="fleet-tag">SUV</span>
-                            <img src="{{ asset('images/58_8233.png') }}" alt="Nissan Largo Gray">
-                        </div>
-                        <div class="fleet-body">
-                            <div class="fleet-title-row">
-                                <h3>Nissan Largo</h3>
-                                <div class="fleet-price">Rs 8,000<span class="fleet-rate-unit">/day</span></div>
+                        </article>
+                    @empty
+                        <article class="showcase-card" style="grid-column:1 / -1;">
+                            <div class="showcase-body">
+                                <h3 class="showcase-title" style="margin:0;">No vehicles found.</h3>
                             </div>
-                            <div class="fleet-sub">Comfortable group travel</div>
-                            <div class="fleet-policy">With driver / Without driver · 150 km/day included · Rs 25 per extra km</div>
-                            <div class="fleet-meta">
-                                <span>Seats 10</span>
-                                <span>Manual</span>
-                                <span>Diesel</span>
-                                <span>Gray</span>
-                            </div>
-                        </div>
-                    </article>
-                    <article class="fleet-card">
-                        <div class="fleet-photo">
-                            <span class="fleet-tag">Economy</span>
-                            <img src="{{ asset('images/cak_8043.png') }}" alt="2015 Alto Red">
-                        </div>
-                        <div class="fleet-body">
-                            <div class="fleet-title-row">
-                                <h3>Alto 2015</h3>
-                                <div class="fleet-price">Rs 4,000<span class="fleet-rate-unit">/day</span></div>
-                            </div>
-                            <div class="fleet-sub">Reliable city ride</div>
-                            <div class="fleet-policy">With driver / Without driver · 150 km/day included · Rs 25 per extra km</div>
-                            <div class="fleet-meta">
-                                <span>Seats 4</span>
-                                <span>Manual</span>
-                                <span>Petrol</span>
-                                <span>Red</span>
-                            </div>
-                        </div>
-                    </article>
+                        </article>
+                    @endforelse
                 </div>
             </div>
         </section>
 
         <section id="contact-section" class="section section-anchor">
             <div class="container">
-                <h2>Find Us</h2>
+                <h2>Find Us & Contact Support</h2>
+                <p class="head-note">Send your request for booking help, pricing questions, or service support. Our team will respond quickly.</p>
                 <div class="contact-card">
                     <div class="contact-lines">
                         <div>
@@ -1312,9 +1755,13 @@
                             <strong>Email</strong>
                             info@rnaautorentals.lk
                         </div>
+                        <div>
+                            <strong>Working Hours</strong>
+                            Monday - Sunday, 7.00 AM - 9.00 PM
+                        </div>
                     </div>
                     <div class="contact-form">
-                        <h3 class="contact-form-title">Contact Us</h3>
+                        <h3 class="contact-form-title">Contact Support Form</h3>
                         <form action="{{ route('support-requests.store') }}" method="post">
                             @csrf
                             <div class="contact-grid">
@@ -1332,7 +1779,7 @@
                                 </div>
                                 <div class="contact-field full">
                                     <label for="contactMessage">Message</label>
-                                    <textarea id="contactMessage" name="message" placeholder="Tell us your rental need (daily or monthly)." required>{{ old('message') }}</textarea>
+                                    <textarea id="contactMessage" name="message" placeholder="Tell us your rental need (daily, monthly, airport, medical)." required>{{ old('message') }}</textarea>
                                 </div>
                             </div>
                             <button type="submit" class="contact-submit">Send Message</button>
@@ -1343,62 +1790,7 @@
         </section>
     </main>
 
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">
-                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
-                        <div>
-                            <p class="footer-brand-name">R&A Auto Rentals</p>
-                            <p class="footer-copy">Reliable daily and monthly rentals with trusted support for business, family, and long-distance travel.</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <p class="footer-title">Quick Links</p>
-                    <ul class="footer-links">
-                        <li><a href="#home-section">Home</a></li>
-                        <li><a href="#fleet-section">Fleet</a></li>
-                        <li><a href="{{ route('group-packages.index') }}">Group Packages</a></li>
-                        <li><a href="{{ route('medical-transport.index') }}">Medical Transport</a></li>
-                        <li><a href="{{ route('airport-hires.index') }}">Airport Hires</a></li>
-                        <li><a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a></li>
-                        <li><a href="{{ route('pricing.index') }}">Pricing</a></li>
-                        <li><a href="{{ route('blogs') }}">Blogs</a></li>
-                        <li><a href="#payments-section">Payments</a></li>
-                        <li><a href="#contact-section">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Customer Care</p>
-                    <ul class="footer-links">
-                        <li><a href="#contact-section">Support Center</a></li>
-                        <li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li>
-                        <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
-                        <li><a href="#contact-section">FAQs</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Newsletter</p>
-                    <p class="newsletter-note">Get exclusive rental updates to your inbox.</p>
-                    <form class="newsletter-form" action="#" method="post">
-                        <input type="email" placeholder="Email">
-                        <button class="newsletter-btn" type="button" aria-label="Subscribe">&#10148;</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <div>&copy; {{ now()->year }} R&A Auto Rentals. All rights reserved.</div>
-                <div class="footer-social">
-                    <a href="#">Twitter</a>
-                    <a href="#">Instagram</a>
-                    <a href="#">Facebook</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
 
     <script>
         (function () {
@@ -1407,6 +1799,24 @@
                 toggle.addEventListener('click', function () {
                     const open = document.body.classList.toggle('nav-open');
                     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+            }
+
+            const accountWrap = document.getElementById('accountWrap');
+            const accountToggle = document.getElementById('accountToggle');
+            if (accountWrap && accountToggle) {
+                accountToggle.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const isOpen = accountWrap.classList.toggle('account-open');
+                    accountToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+
+                document.addEventListener('click', function (event) {
+                    if (!accountWrap.contains(event.target)) {
+                        accountWrap.classList.remove('account-open');
+                        accountToggle.setAttribute('aria-expanded', 'false');
+                    }
                 });
             }
 

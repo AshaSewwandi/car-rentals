@@ -12,6 +12,39 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
+    public function home(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function (Car $car) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+                $dailyRate = (float) $pricing['daily_rate'];
+
+                $segment = 'Economy';
+                if (str_contains(strtolower((string) $car->name), 'largo')) {
+                    $segment = 'SUV';
+                } elseif ($dailyRate >= 10000) {
+                    $segment = 'Luxury';
+                }
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'daily_rate' => $dailyRate,
+                    'segment' => $segment,
+                    'transmission' => $car->transmission ?: 'Auto',
+                    'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
+                    'bags' => str_contains(strtolower((string) $car->name), 'largo') ? '4 Bags' : '2 Bags',
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        return view('welcome', compact('featuredCars'));
+    }
+
     public function airportHires(): View
     {
         $featuredCars = Car::query()
@@ -99,6 +132,51 @@ class HomeController extends Controller
         return view('short-term-rentals', compact('featuredCars', 'cities'));
     }
 
+    public function longTermRentals(): View
+    {
+        $featuredCars = Car::query()
+            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
+            ->where('allow_long_term', true)
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function (Car $car, int $index) {
+                $pricing = VehiclePricingResolver::resolveForCar($car);
+
+                return [
+                    'id' => $car->id,
+                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'model' => $car->model ?: 'Monthly rental vehicle',
+                    'transmission' => $car->transmission ?: 'Automatic',
+                    'daily_rate' => (float) $pricing['daily_rate'],
+                    'monthly_rate' => round((float) ($pricing['monthly_rate'] ?? 0), 0),
+                    'per_month_km' => (int) ($pricing['per_month_km'] ?? 4500),
+                    'tag' => match ($index) {
+                        0 => 'Economy',
+                        1 => 'Family',
+                        default => 'Executive',
+                    },
+                    'image' => $this->resolveImagePath($car),
+                ];
+            });
+
+        $categories = [
+            'Economy Sedan',
+            'Family SUV',
+            'Executive Sedan',
+            'Van / Group',
+        ];
+
+        $durationOptions = [
+            '1 Month',
+            '3 Months',
+            '6 Months',
+            '12 Months',
+        ];
+
+        return view('long-term-rentals', compact('featuredCars', 'categories', 'durationOptions'));
+    }
+
     public function medicalTransport(): View
     {
         $featuredCars = Car::query()
@@ -165,8 +243,27 @@ class HomeController extends Controller
             ->orderBy('name')
             ->limit(2)
             ->get()
-            ->map(function (Car $car, int $index) {
+            ->map(function (Car $car) {
                 $pricing = VehiclePricingResolver::resolveForCar($car);
+                $name = strtolower(trim(($car->name ?? '') . ' ' . ($car->model ?? '')));
+
+                $estimatedSeats = 5;
+                $estimatedBags = 2;
+                $tag = 'Group';
+
+                if (str_contains($name, 'largo') || str_contains($name, 'van') || str_contains($name, 'kdh')) {
+                    $estimatedSeats = 12;
+                    $estimatedBags = 8;
+                    $tag = 'Large Group';
+                } elseif (str_contains($name, 'suv') || str_contains($name, 'prado') || str_contains($name, 'montero')) {
+                    $estimatedSeats = 7;
+                    $estimatedBags = 5;
+                    $tag = 'Family Group';
+                } elseif ((float) $pricing['daily_rate'] >= 10000) {
+                    $estimatedSeats = 7;
+                    $estimatedBags = 4;
+                    $tag = 'Premium Group';
+                }
 
                 return [
                     'id' => $car->id,
@@ -174,9 +271,9 @@ class HomeController extends Controller
                     'model' => $car->model ?: 'Group travel vehicle',
                     'transmission' => $car->transmission ?: 'Automatic',
                     'daily_rate' => (float) $pricing['daily_rate'],
-                    'seats' => $index === 0 ? '7' : '12',
-                    'bags' => $index === 0 ? '5' : '8',
-                    'tag' => $index === 0 ? 'Premium' : 'Group',
+                    'seats' => $estimatedSeats,
+                    'bags' => $estimatedBags,
+                    'tag' => $tag,
                     'image' => $this->resolveImagePath($car),
                 ];
             });

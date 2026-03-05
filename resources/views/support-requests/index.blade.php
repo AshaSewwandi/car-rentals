@@ -23,6 +23,7 @@
             <th style="min-width: 160px;">Name</th>
             <th style="min-width: 140px;">Phone</th>
             <th style="min-width: 180px;">Email</th>
+            <th style="min-width: 180px;">Source</th>
             <th style="min-width: 340px;">Message</th>
           </tr>
         </thead>
@@ -39,11 +40,14 @@
                   -
                 @endif
               </td>
+              <td>
+                <span class="small text-muted">{{ $requestItem->source_page ?: '-' }}</span>
+              </td>
               <td>{{ $requestItem->message }}</td>
             </tr>
           @empty
             <tr>
-              <td colspan="5" class="text-center p-4 text-muted">No support requests yet.</td>
+              <td colspan="6" class="text-center p-4 text-muted">No support requests yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -57,4 +61,3 @@
   @endif
 </div>
 @endsection
-

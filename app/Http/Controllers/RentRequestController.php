@@ -9,6 +9,7 @@ use App\Models\Car;
 use App\Models\RentRequest;
 use App\Models\Rental;
 use App\Models\User;
+use App\Support\RevenueShareResolver;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,6 +106,7 @@ class RentRequestController extends Controller
         $pricing = VehiclePricingResolver::resolveForCar($car);
         $dailyRate = $pricing['daily_rate'];
         $totalAmount = $dailyRate * $days;
+        $revenueSplit = RevenueShareResolver::percentagesForCar($car);
 
         $matchedUserId = null;
         if ($rentRequest->email) {
@@ -126,6 +128,10 @@ class RentRequestController extends Controller
             'daily_rate' => $dailyRate,
             'total_amount' => $totalAmount,
             'final_total' => $totalAmount,
+            'partner_share_percentage' => $revenueSplit['partner_share_percentage'],
+            'admin_share_percentage' => $revenueSplit['admin_share_percentage'],
+            'partner_share_amount' => round($totalAmount * ($revenueSplit['partner_share_percentage'] / 100), 2),
+            'admin_share_amount' => round($totalAmount * ($revenueSplit['admin_share_percentage'] / 100), 2),
             'included_km' => $days * $pricing['per_day_km'],
             'extra_km_rate' => $pricing['extra_km_rate'],
             'currency' => 'LKR',

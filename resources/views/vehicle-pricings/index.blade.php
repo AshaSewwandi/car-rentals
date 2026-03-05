@@ -23,7 +23,10 @@
             <th>Model</th>
             <th>Per Day KM</th>
             <th>Per Day Amount</th>
+            <th>Per Month Amount</th>
+            <th>KM / Month</th>
             <th>Driver Cost / Day</th>
+            <th>Driver Cost / Month</th>
             <th>Extra 1 KM Amount</th>
             <th>Note</th>
             <th>Action</th>
@@ -36,7 +39,10 @@
               <td>{{ $vehiclePricing->model }}</td>
               <td>{{ number_format((int) $vehiclePricing->per_day_km) }} km</td>
               <td>LKR {{ number_format((float) $vehiclePricing->per_day_amount, 2) }}</td>
+              <td>LKR {{ number_format((float) ($vehiclePricing->per_month_amount ?? 0), 2) }}</td>
+              <td>{{ number_format((int) ($vehiclePricing->per_month_km ?? ((int) $vehiclePricing->per_day_km * 30))) }} km</td>
               <td>LKR {{ number_format((float) $vehiclePricing->driver_cost_per_day, 2) }}</td>
+              <td>LKR {{ number_format((float) ($vehiclePricing->driver_cost_per_month ?? 0), 2) }}</td>
               <td>LKR {{ number_format((float) $vehiclePricing->extra_km_rate, 2) }}</td>
               <td>{{ $vehiclePricing->note ?: '-' }}</td>
               <td class="text-nowrap">
@@ -50,7 +56,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="8" class="text-center p-4 text-muted">No pricing rows added yet.</td>
+              <td colspan="11" class="text-center p-4 text-muted">No pricing rows added yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -86,8 +92,20 @@
             <input type="number" name="per_day_amount" min="0" step="0.01" class="form-control" value="{{ old('per_day_amount') }}" required>
           </div>
           <div class="mb-2">
+            <label class="form-label">Per Month Amount</label>
+            <input type="number" name="per_month_amount" min="0" step="0.01" class="form-control" value="{{ old('per_month_amount') }}" placeholder="Optional monthly package">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">KM Per Month</label>
+            <input type="number" name="per_month_km" min="1" class="form-control" value="{{ old('per_month_km', 4500) }}">
+          </div>
+          <div class="mb-2">
             <label class="form-label">Driver Cost Per Day</label>
             <input type="number" name="driver_cost_per_day" min="0" step="0.01" class="form-control" value="{{ old('driver_cost_per_day', 0) }}" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Driver Cost Per Month</label>
+            <input type="number" name="driver_cost_per_month" min="0" step="0.01" class="form-control" value="{{ old('driver_cost_per_month', 0) }}">
           </div>
           <div class="mb-2">
             <label class="form-label">Exceed 1 KM Charge</label>
@@ -136,8 +154,20 @@
                 <input type="number" name="per_day_amount" min="0" step="0.01" class="form-control" value="{{ $vehiclePricing->per_day_amount }}" required>
               </div>
               <div class="mb-2">
+                <label class="form-label">Per Month Amount</label>
+                <input type="number" name="per_month_amount" min="0" step="0.01" class="form-control" value="{{ $vehiclePricing->per_month_amount }}">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">KM Per Month</label>
+                <input type="number" name="per_month_km" min="1" class="form-control" value="{{ $vehiclePricing->per_month_km ?? ((int) $vehiclePricing->per_day_km * 30) }}">
+              </div>
+              <div class="mb-2">
                 <label class="form-label">Driver Cost Per Day</label>
                 <input type="number" name="driver_cost_per_day" min="0" step="0.01" class="form-control" value="{{ $vehiclePricing->driver_cost_per_day }}" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Driver Cost Per Month</label>
+                <input type="number" name="driver_cost_per_month" min="0" step="0.01" class="form-control" value="{{ $vehiclePricing->driver_cost_per_month }}">
               </div>
               <div class="mb-2">
                 <label class="form-label">Exceed 1 KM Charge</label>

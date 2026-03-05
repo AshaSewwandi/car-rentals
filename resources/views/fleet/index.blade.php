@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -620,6 +620,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -698,7 +699,7 @@
 
         <section class="fleet-grid">
             @forelse($cars as $car)
-                <article class="fleet-card">
+                <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] ?: $car['plate_no'] }}">
                     <div class="fleet-photo">
                         <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1.5rem';">
                     </div>
@@ -720,8 +721,8 @@
                             @else
                                 With driver / Without driver
                             @endif
-                            · {{ number_format((float) ($car['per_day_km'] ?? 150), 0) }} km/day included
-                            · Rs {{ number_format((float) ($car['extra_km_rate'] ?? 25), 0) }} per extra km
+                            Â· {{ number_format((float) ($car['per_day_km'] ?? 150), 0) }} km/day included
+                            Â· Rs {{ number_format((float) ($car['extra_km_rate'] ?? 25), 0) }} per extra km
                         </div>
                         <div class="fleet-meta">
                             @if($car['year']) <span>{{ $car['year'] }}</span> @endif
@@ -739,6 +740,13 @@
                             </div>
                         @endif
                         <div class="fleet-actions">
+                            <a
+                                class="btn-request"
+                                style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:.45rem;background:#eef5ff;color:#0a3f8f;border-color:#c8d7ea;"
+                                href="{{ route('fleet.show', $car['id']) }}"
+                            >
+                                Details
+                            </a>
                             @if($filters['start_date'] && $filters['end_date'])
                                 <a
                                     class="btn-request"
@@ -794,6 +802,7 @@
             @endforelse
         </section>
     </main>
+    @include('partials.public-footer')
 
     <div class="request-modal" id="requestModal" aria-hidden="true">
         <div class="request-panel" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
@@ -1174,5 +1183,9 @@
     </script>
 </body>
 </html>
+
+
+
+
 
 

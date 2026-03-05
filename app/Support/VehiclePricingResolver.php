@@ -16,11 +16,18 @@ class VehiclePricingResolver
             ->first();
 
         if ($pricing) {
+            $monthlyRate = $pricing->per_month_amount !== null
+                ? (float) $pricing->per_month_amount
+                : round((float) $pricing->per_day_amount * 30 * 0.72, 2);
+
             return [
                 'daily_rate' => (float) $pricing->per_day_amount,
+                'monthly_rate' => $monthlyRate,
                 'per_day_km' => (int) $pricing->per_day_km,
+                'per_month_km' => (int) ($pricing->per_month_km ?? ((int) $pricing->per_day_km * 30)),
                 'extra_km_rate' => (float) $pricing->extra_km_rate,
                 'driver_cost_per_day' => (float) ($pricing->driver_cost_per_day ?? 0),
+                'driver_cost_per_month' => (float) ($pricing->driver_cost_per_month ?? 0),
                 'pricing' => $pricing,
             ];
         }
@@ -35,9 +42,12 @@ class VehiclePricingResolver
 
         return [
             'daily_rate' => (float) ($knownRates[$plateKey] ?? 4500),
+            'monthly_rate' => round((float) ($knownRates[$plateKey] ?? 4500) * 30 * 0.72, 2),
             'per_day_km' => 150,
+            'per_month_km' => 4500,
             'extra_km_rate' => 25,
             'driver_cost_per_day' => 0,
+            'driver_cost_per_month' => 0,
             'pricing' => null,
         ];
     }

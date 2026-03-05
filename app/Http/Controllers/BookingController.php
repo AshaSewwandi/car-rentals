@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\Car;
 use App\Models\Rental;
 use App\Models\User;
+use App\Support\RevenueShareResolver;
 use App\Support\VehiclePricingResolver;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
 
@@ -98,6 +100,8 @@ class BookingController extends Controller
         $driverRate = $validated['driver_option'] === 'with_driver' ? (float) $pricing['driver_cost_per_day'] : 0;
         $driverTotal = $driverRate * $days;
         $totalAmount = ($dailyRate * $days) + $driverTotal;
+        $revenueSplit = RevenueShareResolver::percentagesForCar($car);
+        $shareableAmount = RevenueShareResolver::shareableAmount($totalAmount, $driverTotal);
         [$bookingUser, $guestAccountCreated, $guestAccountMailSent] = $this->resolveBookingUser($request, $validated);
 
         $booking = Booking::create([
@@ -116,6 +120,10 @@ class BookingController extends Controller
             'total_amount' => $totalAmount,
             'driver_total' => $driverTotal,
             'final_total' => $totalAmount,
+            'partner_share_percentage' => $revenueSplit['partner_share_percentage'],
+            'admin_share_percentage' => $revenueSplit['admin_share_percentage'],
+            'partner_share_amount' => round($shareableAmount * ($revenueSplit['partner_share_percentage'] / 100), 2),
+            'admin_share_amount' => round($shareableAmount * ($revenueSplit['admin_share_percentage'] / 100), 2),
             'included_km' => $days * $pricing['per_day_km'],
             'extra_km_rate' => $pricing['extra_km_rate'],
             'currency' => 'LKR',

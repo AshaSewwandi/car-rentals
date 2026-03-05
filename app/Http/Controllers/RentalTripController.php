@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking;
 use App\Models\Car;
 use App\Models\User;
+use App\Support\RevenueShareResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -134,6 +135,7 @@ class RentalTripController extends Controller
         $extraRate = round((float) ($booking->extra_km_rate ?? 25), 2);
         $extraCharge = round($extraKm * $extraRate, 2);
         $finalTotal = round((float) $booking->total_amount + $extraCharge, 2);
+        $revenueSplit = RevenueShareResolver::splitForBooking($booking);
 
         $booking->update([
             'end_mileage' => $endMileage,
@@ -142,6 +144,10 @@ class RentalTripController extends Controller
             'extra_km' => $extraKm,
             'extra_km_charge' => $extraCharge,
             'final_total' => $finalTotal,
+            'partner_share_percentage' => $revenueSplit['partner_share_percentage'],
+            'admin_share_percentage' => $revenueSplit['admin_share_percentage'],
+            'partner_share_amount' => round($finalTotal * ($revenueSplit['partner_share_percentage'] / 100), 2),
+            'admin_share_amount' => round($finalTotal * ($revenueSplit['admin_share_percentage'] / 100), 2),
             'additional_payment_status' => $extraCharge > 0 ? 'pending' : 'not_required',
             'additional_payment_amount' => $extraCharge > 0 ? $extraCharge : null,
             'additional_paid_at' => null,

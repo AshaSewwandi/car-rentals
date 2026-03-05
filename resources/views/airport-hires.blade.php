@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -113,6 +113,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -196,7 +197,7 @@
                 </div>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
-                        <article class="fleet-card">
+                        <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
                             <div class="fleet-photo">
                                 <span class="fleet-tag">{{ $car['airport_tag'] }}</span>
                                 <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
@@ -256,17 +257,7 @@
             </section>
         </div>
     </main>
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div><div class="footer-brand"><img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals"><div><p class="footer-brand-name">R&A Auto Rentals</p><p class="footer-copy">Reliable daily and monthly rentals with trusted support for business, family, and long-distance travel.</p></div></div></div>
-                <div><p class="footer-title">Quick Links</p><ul class="footer-links"><li><a href="{{ route('home') }}">Home</a></li><li><a href="{{ route('fleet.index') }}">Fleet</a></li><li><a href="{{ route('airport-hires.index') }}">Airport Hires</a></li><li><a href="{{ route('pricing.index') }}">Pricing</a></li></ul></div>
-                <div><p class="footer-title">Customer Care</p><ul class="footer-links"><li><a href="#contact-section">Support Center</a></li><li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li><li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li><li><a href="{{ route('login') }}">Login</a></li></ul></div>
-                <div><p class="footer-title">Newsletter</p><p class="newsletter-note">Get exclusive rental updates to your inbox.</p><form class="newsletter-form" action="#" method="post"><input type="email" placeholder="Email"><button class="newsletter-btn" type="button" aria-label="Subscribe">&#10148;</button></form></div>
-            </div>
-            <div class="footer-bottom"><div>&copy; {{ now()->year }} R&amp;A Auto Rentals. All rights reserved.</div><div class="footer-social"><a href="#">Twitter</a><a href="#">Instagram</a><a href="#">Facebook</a></div></div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
     <script>
         (function () {
             const startDate = document.getElementById('start_date');
@@ -279,3 +270,6 @@
     </script>
 </body>
 </html>
+
+
+

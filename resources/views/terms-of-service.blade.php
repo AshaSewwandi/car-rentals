@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -345,6 +345,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -405,53 +406,9 @@
             </section>
         </div>
     </main>
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">
-                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
-                        <div>
-                            <p class="footer-brand-name">R&A Auto Rentals</p>
-                            <p class="footer-copy">Reliable daily and monthly rentals with trusted support for business, family, and long-distance travel.</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <p class="footer-title">Quick Links</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('fleet.index') }}">Fleet</a></li>
-                        <li><a href="{{ route('blogs') }}">Blogs</a></li>
-                        <li><a href="{{ route('home') }}#contact-section">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Customer Care</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('home') }}#contact-section">Support Center</a></li>
-                        <li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li>
-                        <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Newsletter</p>
-                    <p class="newsletter-note">Get exclusive rental updates to your inbox.</p>
-                    <form class="newsletter-form" action="#" method="post">
-                        <input type="email" placeholder="Email">
-                        <button type="button" aria-label="Subscribe">&#10148;</button>
-                    </form>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div>&copy; {{ now()->year }} R&A Auto Rentals. All rights reserved.</div>
-                <div class="footer-social">
-                    <a href="#">Twitter</a>
-                    <a href="#">Instagram</a>
-                    <a href="#">Facebook</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
 </body>
 </html>
+
+
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -97,6 +97,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -191,7 +192,7 @@
                 <p class="section-sub">Join over 1,000+ satisfied families who trust R&amp;A Medical Transport.</p>
                 <div class="testimonials-grid">
                     <article class="testimonial-card">
-                        <div class="stars">★★★★★</div>
+                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
                         <blockquote>"The drivers are incredibly respectful and patient with my elderly mother. They treat her like family every single time."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar"></div>
@@ -199,7 +200,7 @@
                         </div>
                     </article>
                     <article class="testimonial-card">
-                        <div class="stars">★★★★★</div>
+                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
                         <blockquote>"Extremely reliable for post-surgery pickups. The stretcher service was seamless and very comfortable."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar" style="background:#f1d0a2;"></div>
@@ -207,7 +208,7 @@
                         </div>
                     </article>
                     <article class="testimonial-card">
-                        <div class="stars">★★★★★</div>
+                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
                         <blockquote>"I never have to worry about the time. They are always 5 minutes early and help me right to the door of my clinic."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar" style="background:#d7b48a;"></div>
@@ -222,7 +223,7 @@
                 <p class="section-sub">Comfort-focused vehicles available for patient and caregiver transport.</p>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
-                        <article class="fleet-card">
+                        <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
                             <div class="fleet-photo"><img src="{{ $car['image'] }}" alt="{{ $car['name'] }}"></div>
                             <div class="fleet-body">
                                 <div class="fleet-title-row">
@@ -250,46 +251,9 @@
             </section>
         </div>
     </main>
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">
-                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Medical">
-                        <div>
-                            <p class="footer-brand-name">R&A Medical</p>
-                            <p class="footer-copy">Providing high-quality, non-emergency medical transportation with a focus on safety, empathy, and punctuality.</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <p class="footer-title">Quick Links</p>
-                    <ul class="footer-links">
-                        <li><a href="#services">Our Services</a></li>
-                        <li><a href="#safety">Safety Standards</a></li>
-                        <li><a href="#faq">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Services</p>
-                    <ul class="footer-links">
-                        <li><a href="#booking">Hospital Discharge</a></li>
-                        <li><a href="#booking">Dialysis Transport</a></li>
-                        <li><a href="#booking">Wheelchair Service</a></li>
-                        <li><a href="#booking">Inter-facility Transfer</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Contact Us</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('home') }}">123 Health Ave, Suite 400</a></li>
-                        <li><a href="tel:+94777173264">1-800-CARE-NOW</a></li>
-                        <li><a href="mailto:info@rnaautorentals.lk">info@ramedical.com</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">&copy; {{ now()->year }} R&amp;A Medical Transport. All rights reserved.</div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
 </body>
 </html>
+
+
+

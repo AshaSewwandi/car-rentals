@@ -42,6 +42,10 @@ class Booking extends Model
         'extra_km_rate',
         'extra_km_charge',
         'final_total',
+        'partner_share_percentage',
+        'admin_share_percentage',
+        'partner_share_amount',
+        'admin_share_amount',
         'note',
     ];
 
@@ -64,6 +68,10 @@ class Booking extends Model
         'extra_km_rate' => 'decimal:2',
         'extra_km_charge' => 'decimal:2',
         'final_total' => 'decimal:2',
+        'partner_share_percentage' => 'decimal:2',
+        'admin_share_percentage' => 'decimal:2',
+        'partner_share_amount' => 'decimal:2',
+        'admin_share_amount' => 'decimal:2',
     ];
 
     public function car(): BelongsTo

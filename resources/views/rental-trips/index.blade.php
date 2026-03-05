@@ -96,6 +96,7 @@
             <th>Trip Status</th>
             <th>Base Details</th>
             <th>Additional Details</th>
+            <th>Revenue Split</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -150,6 +151,23 @@
                 <div>{{ $booking->additional_payment_status === 'not_required' ? 'Not Yet' : ucfirst((string) $booking->additional_payment_status) }}</div>
                 <div class="text-muted small">LKR {{ number_format((float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0), 2) }}</div>
               </td>
+              <td>
+                @php
+                  $partnerShareAmount = (float) ($booking->partner_share_amount ?? 0);
+                  $adminShareAmount = (float) ($booking->admin_share_amount ?? ($booking->final_total ?? $booking->total_amount ?? 0));
+                  $partnerSharePercentage = (float) ($booking->partner_share_percentage ?? 0);
+                  $adminSharePercentage = (float) ($booking->admin_share_percentage ?? 100);
+                @endphp
+                @if(auth()->user()->isAdmin())
+                  <div>Partner: <strong>{{ number_format($partnerSharePercentage, 2) }}%</strong></div>
+                  <div class="text-muted small">LKR {{ number_format($partnerShareAmount, 2) }}</div>
+                  <div class="mt-1">Admin: <strong>{{ number_format($adminSharePercentage, 2) }}%</strong></div>
+                  <div class="text-muted small">LKR {{ number_format($adminShareAmount, 2) }}</div>
+                @else
+                  <div>Your Share: <strong>{{ number_format($partnerSharePercentage, 2) }}%</strong></div>
+                  <div class="text-muted small">LKR {{ number_format($partnerShareAmount, 2) }}</div>
+                @endif
+              </td>
               <td style="min-width: 240px;">
                 @if(auth()->user()->isAdmin())
                   @if($booking->status === 'cancelled')
@@ -201,7 +219,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="10" class="text-center p-4 text-muted">No bookings found yet.</td>
+              <td colspan="11" class="text-center p-4 text-muted">No bookings found yet.</td>
             </tr>
           @endforelse
         </tbody>

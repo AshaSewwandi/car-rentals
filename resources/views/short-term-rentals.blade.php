@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -87,6 +87,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -171,7 +172,7 @@
                 </div>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
-                        <article class="fleet-card">
+                        <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
                             <div class="fleet-photo">
                                 <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
                                 <span class="fleet-tag">{{ $car['tag'] }}</span>
@@ -216,45 +217,9 @@
             </section>
         </div>
     </main>
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">
-                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
-                        <div>
-                            <p class="footer-brand-name">R&A Auto Rentals</p>
-                            <p class="footer-copy">Providing premium car rental services across Sri Lanka. Specializing in daily and weekly short-term hires with full support.</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <p class="footer-title">Company</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('home') }}">About Us</a></li>
-                        <li><a href="{{ route('fleet.index') }}">Our Fleet</a></li>
-                        <li><a href="{{ route('pricing.index') }}">Rates</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Support</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('login') }}">Help Center</a></li>
-                        <li><a href="{{ route('terms-of-service') }}">Insurance Details</a></li>
-                        <li><a href="{{ route('privacy-policy') }}">Cancellation Policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Contact</p>
-                    <ul class="footer-links">
-                        <li><a href="tel:+94777173264">+94 77 717 3264</a></li>
-                        <li><a href="mailto:info@rnaautorentals.lk">info@rnaautorentals.lk</a></li>
-                        <li><a href="{{ route('home') }}">123 Galle Road, Colombo</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">&copy; {{ now()->year }} R&amp;A Auto Rentals. All rights reserved.</div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
 </body>
 </html>
+
+
+

@@ -17,6 +17,7 @@ class Car extends Model
         'fuel_type',
         'transmission',
         'driver_mode',
+        'allow_long_term',
         'dagps_device_id',
         'tracker_device_name',
         'tracker_device_type',
@@ -52,6 +53,7 @@ class Car extends Model
         'maintenance_last_service_date' => 'date',
         'maintenance_next_service_date' => 'date',
         'tracker_last_seen_at' => 'datetime',
+        'allow_long_term' => 'boolean',
     ];
 
     public function rentals(): HasMany { return $this->hasMany(Rental::class); }

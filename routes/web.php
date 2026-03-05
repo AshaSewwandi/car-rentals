@@ -21,13 +21,15 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
 Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
 Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');
 Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
+Route::get('/fleet/{car}', [FleetController::class, 'show'])->name('fleet.show');
 Route::get('/airport-hires', [HomeController::class, 'airportHires'])->name('airport-hires.index');
 Route::get('/short-term-rentals', [HomeController::class, 'shortTermRentals'])->name('short-term-rentals.index');
+Route::get('/long-term-rentals', [HomeController::class, 'longTermRentals'])->name('long-term-rentals.index');
 Route::get('/medical-transport', [HomeController::class, 'medicalTransport'])->name('medical-transport.index');
 Route::get('/group-packages', [HomeController::class, 'groupPackages'])->name('group-packages.index');
 Route::get('/pricing', [HomeController::class, 'pricingIndex'])->name('pricing.index');
@@ -37,6 +39,7 @@ Route::get('/booking/{booking}/success', [BookingController::class, 'success'])-
 Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->middleware('auth')->name('support-requests.store');
 Route::post('/airport-hires/support', [CustomerSupportRequestController::class, 'store'])->name('airport-hires.support.store');
+Route::post('/long-term-rentals/inquiry', [CustomerSupportRequestController::class, 'storeLongTerm'])->name('long-term-rentals.inquiry.store');
 Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {

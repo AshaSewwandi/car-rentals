@@ -31,6 +31,7 @@
             <th>Email</th>
             <th>Phone</th>
             <th>Role</th>
+            <th>Revenue Split</th>
             <th>Created</th>
             <th>Action</th>
           </tr>
@@ -45,6 +46,14 @@
                 <span class="badge {{ $user->role === 'admin' ? 'bg-success' : ($user->role === 'partner' ? 'bg-primary' : 'bg-secondary') }}">
                   {{ ucfirst($user->role) }}
                 </span>
+              </td>
+              <td>
+                @if($user->role === 'partner')
+                  <div class="small fw-semibold">Partner {{ number_format((float) $user->partner_share_percentage, 2) }}%</div>
+                  <div class="small text-muted">Admin {{ number_format((float) $user->admin_share_percentage, 2) }}%</div>
+                @else
+                  <span class="text-muted">-</span>
+                @endif
               </td>
               <td>{{ $user->created_at?->format('Y-m-d') }}</td>
               <td class="text-nowrap">
@@ -64,7 +73,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="6" class="text-center p-4 text-muted">No users found.</td></tr>
+            <tr><td colspan="7" class="text-center p-4 text-muted">No users found.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -101,6 +110,19 @@
               <option value="partner" @selected(old('role') === 'partner')>Partner</option>
               <option value="admin" @selected(old('role') === 'admin')>Admin</option>
             </select>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-md-6">
+              <label class="form-label">Partner Percentage</label>
+              <input type="number" step="0.01" min="0" max="100" name="partner_share_percentage" class="form-control" value="{{ old('partner_share_percentage', 80) }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Admin Percentage</label>
+              <input type="number" step="0.01" min="0" max="100" name="admin_share_percentage" class="form-control" value="{{ old('admin_share_percentage', 20) }}">
+            </div>
+            <div class="col-12">
+              <small class="text-muted">For partner accounts, partner percentage plus admin percentage must equal 100.</small>
+            </div>
           </div>
           <div class="mb-2">
             <label class="form-label">Password</label>
@@ -154,6 +176,19 @@
               @if(auth()->id() === $user->id)
                 <small class="text-muted">Your own role cannot be changed from admin to customer.</small>
               @endif
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label class="form-label">Partner Percentage</label>
+                <input type="number" step="0.01" min="0" max="100" name="partner_share_percentage" class="form-control" value="{{ old('partner_share_percentage', $user->partner_share_percentage ?? 80) }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Admin Percentage</label>
+                <input type="number" step="0.01" min="0" max="100" name="admin_share_percentage" class="form-control" value="{{ old('admin_share_percentage', $user->admin_share_percentage ?? 20) }}">
+              </div>
+              <div class="col-12">
+                <small class="text-muted">For partner accounts, partner percentage plus admin percentage must equal 100.</small>
+              </div>
             </div>
             <div class="mb-2">
               <label class="form-label">New Password (optional)</label>

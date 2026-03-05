@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -92,6 +92,7 @@
     </style>
 </head>
 <body>
+    @include('partials.public-header')
     <header class="topbar">
         <div class="container topbar-inner">
             <a class="brand" href="{{ route('home') }}">
@@ -180,7 +181,7 @@
                 </div>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
-                        <article class="fleet-card">
+                        <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
                             <div class="fleet-photo">
                                 <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
                             </div>
@@ -198,7 +199,7 @@
                                     <span>{{ $car['transmission'] }}</span>
                                 </div>
                                 <div class="fleet-footer">
-                                    <div class="fleet-rate">${{ number_format($car['daily_rate'] / 30, 0) }}<small>/ day</small></div>
+                                    <div class="fleet-rate">Rs {{ number_format($car['daily_rate'], 0) }}<small>/ day</small></div>
                                     <a class="book-btn" href="{{ route('booking.confirm', ['car' => $car['id']]) }}">Book Now</a>
                                 </div>
                             </div>
@@ -232,49 +233,9 @@
             </section>
         </div>
     </main>
-    <footer>
-        <div class="container footer-inner">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">
-                        <img class="footer-logo" src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals">
-                        <div>
-                            <p class="footer-brand-name">R&A Auto Rentals</p>
-                            <p class="footer-copy">Premium group transportation solutions since 2012. We make traveling together easy, safe, and comfortable.</p>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <p class="footer-title">Explore</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('fleet.index') }}">Our Fleet</a></li>
-                        <li><a href="{{ route('group-packages.index') }}">Group Packages</a></li>
-                        <li><a href="{{ route('airport-hires.index') }}">Airport Transfers</a></li>
-                        <li><a href="{{ route('short-term-rentals.index') }}">Corporate Rentals</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Support</p>
-                    <ul class="footer-links">
-                        <li><a href="{{ route('login') }}">Help Center</a></li>
-                        <li><a href="{{ route('terms-of-service') }}">Rental Policies</a></li>
-                        <li><a href="{{ route('privacy-policy') }}">Insurance Details</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="footer-title">Get in Touch</p>
-                    <ul class="footer-links">
-                        <li><a href="tel:+94777173264">1-800-GROUPS-RA</a></li>
-                        <li><a href="mailto:bookings@rnaautorentals.lk">bookings@rnaautorentals.lk</a></li>
-                        <li><a href="{{ route('home') }}">Global Airport Hubs & Downtown</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div>&copy; {{ now()->year }} R&A Auto Rentals. All rights reserved.</div>
-                <div>Privacy Policy &nbsp; Terms of Service</div>
-            </div>
-        </div>
-    </footer>
+    @include('partials.public-footer')
 </body>
 </html>
+
+
+

@@ -56,6 +56,9 @@
                     With / Without driver
                   @endif
                 </span>
+                <span class="badge {{ $car->allow_long_term ? 'text-bg-info' : 'text-bg-secondary' }}">
+                  {{ $car->allow_long_term ? 'Long-term enabled' : 'No long-term' }}
+                </span>
                 @if($car->dagps_device_id)
                   <span class="badge text-bg-light">DAGPS: {{ $car->dagps_device_id }}</span>
                 @endif
@@ -162,6 +165,13 @@
                     <option value="both" @selected(($car->driver_mode ?? 'both') === 'both')>With or Without Driver</option>
                     <option value="with_driver_only" @selected(($car->driver_mode ?? 'both') === 'with_driver_only')>With Driver Only</option>
                     <option value="without_driver_only" @selected(($car->driver_mode ?? 'both') === 'without_driver_only')>Without Driver Only</option>
+                  </select>
+                </div>
+                <div class="col-12 col-lg-3">
+                  <label class="form-label small mb-1">Long-Term Rental</label>
+                  <select name="allow_long_term" class="form-select form-select-sm" required>
+                    <option value="1" @selected($car->allow_long_term)>Yes</option>
+                    <option value="0" @selected(!$car->allow_long_term)>No</option>
                   </select>
                 </div>
                 <div class="col-12 col-lg-3">
@@ -319,6 +329,10 @@
                       With or without driver
                     @endif
                   </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="small text-muted">Long-Term Rental</div>
+                  <div>{{ $car->allow_long_term ? 'Enabled' : 'Not allowed' }}</div>
                 </div>
               </div>
 
@@ -515,6 +529,13 @@
               <option value="both" @selected(old('driver_mode', 'both') === 'both')>With or Without Driver</option>
               <option value="with_driver_only" @selected(old('driver_mode') === 'with_driver_only')>With Driver Only</option>
               <option value="without_driver_only" @selected(old('driver_mode') === 'without_driver_only')>Without Driver Only</option>
+            </select>
+          </div>
+          <div class="mb-2 mt-2">
+            <label class="form-label">Long-Term Rental</label>
+            <select name="allow_long_term" class="form-select" required>
+              <option value="1" @selected(old('allow_long_term', '1') === '1')>Yes</option>
+              <option value="0" @selected(old('allow_long_term') === '0')>No</option>
             </select>
           </div>
           <div class="mb-2 mt-2">

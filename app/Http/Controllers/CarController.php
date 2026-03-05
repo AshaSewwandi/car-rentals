@@ -133,6 +133,7 @@ class CarController extends Controller
             'fuel_type' => ['nullable', 'string', 'max:50'],
             'transmission' => ['nullable', 'string', 'max:50'],
             'driver_mode' => ['required', 'in:both,with_driver_only,without_driver_only'],
+            'allow_long_term' => ['required', 'boolean'],
             'dagps_device_id' => ['nullable', 'string', 'max:100'],
             'tracker_device_name' => ['nullable', 'string', 'max:100'],
             'tracker_device_type' => ['nullable', 'string', 'max:100'],
@@ -170,8 +171,11 @@ class CarController extends Controller
             ],
             'per_day_km' => ['required', 'integer', 'min:1'],
             'per_day_amount' => ['required', 'numeric', 'min:0'],
+            'per_month_amount' => ['nullable', 'numeric', 'min:0'],
+            'per_month_km' => ['nullable', 'integer', 'min:1'],
             'extra_km_rate' => ['required', 'numeric', 'min:0'],
             'driver_cost_per_day' => ['required', 'numeric', 'min:0'],
+            'driver_cost_per_month' => ['nullable', 'numeric', 'min:0'],
             'note' => ['nullable', 'string', 'max:255'],
         ]);
     }
