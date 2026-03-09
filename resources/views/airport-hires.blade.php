@@ -43,8 +43,15 @@
         .search-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr auto; gap:.8rem; align-items:end; }
         .field label, .form-field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
         .field input, .field select, .form-field input, .form-field textarea { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
+        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; min-height:1.05rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; }
+        .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; }
         .search-btn, .submit-btn { border:0; border-radius:10px; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; }
-        .search-btn { height:46px; padding:0 1rem; }
+        .search-btn { width:100%; height:46px; padding:0 1rem; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
+        .search-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
+        .search-btn.is-loading .btn-spinner { display:inline-block; }
+        .search-btn.is-loading { pointer-events:none; opacity:.95; }
+        @keyframes btn-spin { to { transform:rotate(360deg); } }
         .submit-btn { margin-top:.9rem; width:100%; padding:.8rem .95rem; }
         .section { padding:1.4rem 0 0; }
         .section h2 { margin:0 0 .3rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.65rem,3vw,2.2rem); letter-spacing:-.03em; }
@@ -160,7 +167,8 @@
             </section>
             <section class="search-card">
                 <p class="search-title">Book Your Airport Ride</p>
-                <form class="search-grid" action="{{ route('fleet.index') }}" method="get">
+                <form id="airportSearchForm" class="search-grid" action="{{ route('fleet.index') }}" method="get" novalidate>
+                    <div id="airport_search_alert" class="form-alert" style="display:none;grid-column:1 / -1;"></div>
                     <div class="field">
                         <label for="start_location">Pickup Airport</label>
                         <select id="start_location" name="start_location" required>
@@ -168,17 +176,27 @@
                                 <option value="{{ $airport }}">{{ $airport }}</option>
                             @endforeach
                         </select>
+                        <small id="start_location_error" class="field-error"></small>
                     </div>
                     <div class="field">
                         <label for="start_date">Pickup Date</label>
                         <input id="start_date" name="start_date" type="date" required>
+                        <small id="start_date_error" class="field-error"></small>
                     </div>
                     <div class="field">
                         <label for="pickup_time">Pickup Time</label>
                         <input id="pickup_time" name="pickup_time" type="time" required>
+                        <small id="pickup_time_error" class="field-error"></small>
                     </div>
                     <input id="end_date" name="end_date" type="hidden">
-                    <button class="search-btn" type="submit">Find Available Cars</button>
+                    <div class="field">
+                        <label aria-hidden="true" style="visibility:hidden;">Search</label>
+                        <button class="search-btn" type="submit" id="airportSubmitBtn" data-loading-text="Checking...">
+                            <span class="btn-spinner" aria-hidden="true"></span>
+                            <span class="btn-label">Find Available Cars</span>
+                        </button>
+                        <small class="field-error">&nbsp;</small>
+                    </div>
                 </form>
             </section>
             <section class="section">
@@ -260,16 +278,133 @@
     @include('partials.public-footer')
     <script>
         (function () {
+            const form = document.getElementById('airportSearchForm');
             const startDate = document.getElementById('start_date');
             const endDate = document.getElementById('end_date');
-            if (!startDate || !endDate) return;
-            const syncEndDate = () => { endDate.value = startDate.value; };
+            const startLocation = document.getElementById('start_location');
+            const pickupTime = document.getElementById('pickup_time');
+            const alertBox = document.getElementById('airport_search_alert');
+            const submitBtn = document.getElementById('airportSubmitBtn');
+            if (!form || !startDate || !endDate || !startLocation || !pickupTime) return;
+
+            const fieldErrors = {
+                start_location: document.getElementById('start_location_error'),
+                start_date: document.getElementById('start_date_error'),
+                pickup_time: document.getElementById('pickup_time_error'),
+            };
+
+            const clearError = (field, key) => {
+                if (field) field.classList.remove('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = '';
+            };
+
+            const setError = (field, key, message) => {
+                if (field) field.classList.add('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = message;
+            };
+
+            const hideAlertIfNoErrors = () => {
+                if (!alertBox) return;
+                const hasErrors = Object.values(fieldErrors).some((el) => el && el.textContent.trim() !== '');
+                if (!hasErrors) {
+                    alertBox.style.display = 'none';
+                }
+            };
+
+            const setLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = submitBtn.dataset.loadingText || 'Checking...';
+                }
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+            };
+
+            const clearLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+            };
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            startDate.min = `${yyyy}-${mm}-${dd}`;
+
+            const syncEndDate = () => {
+                endDate.value = startDate.value;
+            };
             startDate.addEventListener('change', syncEndDate);
+            startLocation.addEventListener('change', () => {
+                clearError(startLocation, 'start_location');
+                hideAlertIfNoErrors();
+            });
+            startDate.addEventListener('change', () => {
+                if (startDate.value && (!startDate.min || startDate.value >= startDate.min)) {
+                    clearError(startDate, 'start_date');
+                    hideAlertIfNoErrors();
+                }
+            });
+            pickupTime.addEventListener('change', () => {
+                if (pickupTime.value) {
+                    clearError(pickupTime, 'pickup_time');
+                    hideAlertIfNoErrors();
+                }
+            });
+
+            form.addEventListener('submit', (event) => {
+                let hasErrors = false;
+
+                clearError(startLocation, 'start_location');
+                clearError(startDate, 'start_date');
+                clearError(pickupTime, 'pickup_time');
+                if (alertBox) alertBox.style.display = 'none';
+
+                if (!startLocation.value) {
+                    setError(startLocation, 'start_location', 'Please select pickup airport.');
+                    hasErrors = true;
+                }
+
+                if (!startDate.value) {
+                    setError(startDate, 'start_date', 'Please select pickup date.');
+                    hasErrors = true;
+                } else if (startDate.min && startDate.value < startDate.min) {
+                    setError(startDate, 'start_date', 'Pickup date cannot be in the past.');
+                    hasErrors = true;
+                }
+
+                if (!pickupTime.value) {
+                    setError(pickupTime, 'pickup_time', 'Please select pickup time.');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    clearLoadingState();
+                    return;
+                }
+
+                syncEndDate();
+                setLoadingState();
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        clearLoadingState();
+                    }
+                }, 5000);
+            });
+
             syncEndDate();
+            window.addEventListener('pageshow', clearLoadingState);
+            window.addEventListener('focus', clearLoadingState);
         })();
     </script>
 </body>
 </html>
-
-
 

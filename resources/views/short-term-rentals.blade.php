@@ -37,10 +37,17 @@
         .btn-light { color:var(--text); background:#fff; border-color:#dbe6f3; }
         .search-card { position:relative; z-index:2; width:min(1080px, calc(100% - 2rem)); margin:-3.1rem auto 0; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:1rem 1rem 1.1rem; }
         .search-card h2 { margin:0 0 1rem; font-size:1.35rem; }
-        .search-grid { display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:.8rem; align-items:end; }
+        .search-grid { display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:.8rem; align-items:start; }
         .field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
         .field input, .field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
-        .search-btn { height:46px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; }
+        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; height:2.25rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }
+        .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; grid-column:1 / -1; }
+        .search-btn { width:100%; height:46px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
+        .search-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
+        .search-btn.is-loading .btn-spinner { display:inline-block; }
+        .search-btn.is-loading { pointer-events:none; opacity:.95; }
+        @keyframes btn-spin { to { transform:rotate(360deg); } }
         .section { padding:3rem 0 0; }
         .section h2 { margin:0 0 .35rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.8rem, 3vw, 2.5rem); letter-spacing:-.03em; }
         .section-sub { margin:0 0 1.5rem; color:var(--muted); }
@@ -118,7 +125,8 @@
 
         <section id="search" class="search-card">
             <h2>Search Daily Rentals</h2>
-            <form class="search-grid" action="{{ route('fleet.index') }}" method="get">
+            <form id="shortTermSearchForm" class="search-grid" action="{{ route('fleet.index') }}" method="get" novalidate>
+                <div id="short_search_alert" class="form-alert" style="display:none;"></div>
                 <div class="field">
                     <label for="start_location">Pickup Location</label>
                     <select id="start_location" name="start_location" required>
@@ -126,16 +134,26 @@
                             <option value="{{ $city }}">{{ $city }}</option>
                         @endforeach
                     </select>
+                    <small id="start_location_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="start_date">Start Date</label>
                     <input id="start_date" name="start_date" type="date" required>
+                    <small id="start_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="end_date">End Date</label>
                     <input id="end_date" name="end_date" type="date" required>
+                    <small id="end_date_error" class="field-error"></small>
                 </div>
-                <button class="search-btn" type="submit">Search Available Cars</button>
+                <div class="field">
+                    <label aria-hidden="true" style="visibility:hidden;">Search</label>
+                    <button class="search-btn" type="submit" id="shortTermSubmitBtn" data-loading-text="Checking...">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span class="btn-label">Search Available Cars</span>
+                    </button>
+                    <small class="field-error">&nbsp;</small>
+                </div>
             </form>
         </section>
 
@@ -218,8 +236,144 @@
         </div>
     </main>
     @include('partials.public-footer')
+    <script>
+        (function () {
+            const form = document.getElementById('shortTermSearchForm');
+            const startLocation = document.getElementById('start_location');
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            const alertBox = document.getElementById('short_search_alert');
+            const submitBtn = document.getElementById('shortTermSubmitBtn');
+            if (!form || !startLocation || !startDate || !endDate) return;
+
+            const fieldErrors = {
+                start_location: document.getElementById('start_location_error'),
+                start_date: document.getElementById('start_date_error'),
+                end_date: document.getElementById('end_date_error'),
+            };
+
+            const clearError = (field, key) => {
+                if (field) field.classList.remove('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = '';
+            };
+
+            const setError = (field, key, message) => {
+                if (field) field.classList.add('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = message;
+            };
+
+            const hideAlertIfNoErrors = () => {
+                if (!alertBox) return;
+                const hasErrors = Object.values(fieldErrors).some((el) => el && el.textContent.trim() !== '');
+                if (!hasErrors) {
+                    alertBox.style.display = 'none';
+                }
+            };
+
+            const setLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = submitBtn.dataset.loadingText || 'Checking...';
+                }
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+            };
+
+            const clearLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+            };
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            startDate.min = `${yyyy}-${mm}-${dd}`;
+            endDate.min = `${yyyy}-${mm}-${dd}`;
+
+            startLocation.addEventListener('change', () => {
+                clearError(startLocation, 'start_location');
+                hideAlertIfNoErrors();
+            });
+
+            startDate.addEventListener('change', () => {
+                if (startDate.value) {
+                    if (startDate.min && startDate.value < startDate.min) {
+                        setError(startDate, 'start_date', 'Start date cannot be in the past.');
+                        return;
+                    }
+                    clearError(startDate, 'start_date');
+                    endDate.min = startDate.value;
+                    if (endDate.value && endDate.value < startDate.value) {
+                        setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                    }
+                    hideAlertIfNoErrors();
+                }
+            });
+
+            endDate.addEventListener('change', () => {
+                if (!endDate.value) return;
+                if (startDate.value && endDate.value < startDate.value) {
+                    setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                    return;
+                }
+                clearError(endDate, 'end_date');
+                hideAlertIfNoErrors();
+            });
+
+            form.addEventListener('submit', (event) => {
+                let hasErrors = false;
+                clearError(startLocation, 'start_location');
+                clearError(startDate, 'start_date');
+                clearError(endDate, 'end_date');
+                if (alertBox) alertBox.style.display = 'none';
+
+                if (!startLocation.value) {
+                    setError(startLocation, 'start_location', 'Please select pickup location.');
+                    hasErrors = true;
+                }
+
+                if (!startDate.value) {
+                    setError(startDate, 'start_date', 'Please select start date.');
+                    hasErrors = true;
+                } else if (startDate.min && startDate.value < startDate.min) {
+                    setError(startDate, 'start_date', 'Start date cannot be in the past.');
+                    hasErrors = true;
+                }
+
+                if (!endDate.value) {
+                    setError(endDate, 'end_date', 'Please select end date.');
+                    hasErrors = true;
+                } else if (startDate.value && endDate.value < startDate.value) {
+                    setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    clearLoadingState();
+                    return;
+                }
+
+                setLoadingState();
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        clearLoadingState();
+                    }
+                }, 5000);
+            });
+
+            window.addEventListener('pageshow', clearLoadingState);
+            window.addEventListener('focus', clearLoadingState);
+        })();
+    </script>
 </body>
 </html>
-
-
 

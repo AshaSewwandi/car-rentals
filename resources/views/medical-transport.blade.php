@@ -41,8 +41,16 @@
         .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
         .form-field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
         .form-field input, .form-field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
+        .form-field input.input-error, .form-field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; min-height:1.05rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; }
+        .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; }
+        .time-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.5rem; }
         .form-field.full { grid-column:1 / -1; }
-        .submit-btn { margin-top:.9rem; width:100%; border:0; border-radius:10px; padding:.85rem .95rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; }
+        .submit-btn { margin-top:.9rem; width:100%; border:0; border-radius:10px; padding:.85rem .95rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
+        .submit-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
+        .submit-btn.is-loading .btn-spinner { display:inline-block; }
+        .submit-btn.is-loading { pointer-events:none; opacity:.95; }
+        @keyframes btn-spin { to { transform:rotate(360deg); } }
         .section { padding:2.8rem 0 0; }
         .section h2 { margin:0 0 .35rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.8rem, 3vw, 2.4rem); letter-spacing:-.03em; text-align:center; }
         .section-sub { margin:0 0 1.5rem; color:var(--muted); text-align:center; }
@@ -127,31 +135,51 @@
                 </div>
                 <div id="booking" class="quick-card">
                     <h2>Quick Booking</h2>
-                    <form method="post" action="{{ route('support-requests.store') }}">
-                        @csrf
+                    <form method="get" action="{{ route('fleet.index') }}" novalidate>
+                        <div id="booking_form_alert" class="form-alert" style="display:none;"></div>
                         <div class="form-grid">
                             <div class="form-field">
                                 <label for="pickup_location">Pickup Location</label>
-                                <input id="pickup_location" type="text" name="name" placeholder="Hospital or Home Address" required>
+                                <input id="pickup_location" type="text" name="start_location" placeholder="Hospital or Home Address" required>
+                                <small id="pickup_location_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
                                 <label for="destination">Destination</label>
-                                <input id="destination" type="text" name="phone" placeholder="Medical Facility">
+                                <input id="destination" type="text" name="destination" placeholder="Medical Facility" required>
+                                <small id="destination_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
-                                <label for="transport_type">Transport Type</label>
-                                <select id="transport_type" name="email">
-                                    @foreach($transportTypes as $type)
-                                        <option value="{{ $type }}">{{ $type }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="ride_date">Date</label>
+                                <input id="ride_date" type="date" name="start_date" required>
+                                <small id="ride_date_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
-                                <label for="date_time">Date & Time</label>
-                                <input id="date_time" type="text" name="message" placeholder="mm/dd/yyyy, --:-- --" required>
+                                <label for="ride_time">Time</label>
+                                <div class="time-grid">
+                                    <select id="ride_hour" required>
+                                        @for($h = 1; $h <= 12; $h++)
+                                            <option value="{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}</option>
+                                        @endfor
+                                    </select>
+                                    <select id="ride_minute" required>
+                                        @for($m = 0; $m < 60; $m += 5)
+                                            <option value="{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}</option>
+                                        @endfor
+                                    </select>
+                                    <select id="ride_ampm" required>
+                                        <option value="AM">AM</option>
+                                        <option value="PM">PM</option>
+                                    </select>
+                                </div>
+                                <small id="ride_time_error" class="field-error"></small>
                             </div>
                         </div>
-                        <button type="submit" class="submit-btn">Calculate Estimate</button>
+                        <input id="ride_end_date" type="hidden" name="end_date" value="">
+                        <input id="pickup_time" type="hidden" name="pickup_time" value="">
+                        <button type="submit" class="submit-btn" id="medicalSubmitBtn" data-loading-text="Checking...">
+                            <span class="btn-spinner" aria-hidden="true"></span>
+                            <span class="btn-label">Calculate Estimate</span>
+                        </button>
                     </form>
                 </div>
             </section>
@@ -192,27 +220,27 @@
                 <p class="section-sub">Join over 1,000+ satisfied families who trust R&amp;A Medical Transport.</p>
                 <div class="testimonials-grid">
                     <article class="testimonial-card">
-                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
+                        <div class="stars" aria-label="5 stars">★★★★★</div>
                         <blockquote>"The drivers are incredibly respectful and patient with my elderly mother. They treat her like family every single time."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar"></div>
-                            <div><div class="testimonial-name">Sarah Jenkins</div><div class="testimonial-role">Daughter of Patient</div></div>
+                            <div><div class="testimonial-name">Nadeesha Perera</div><div class="testimonial-role">Daughter of Patient</div></div>
                         </div>
                     </article>
                     <article class="testimonial-card">
-                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
+                        <div class="stars" aria-label="5 stars">★★★★★</div>
                         <blockquote>"Extremely reliable for post-surgery pickups. The stretcher service was seamless and very comfortable."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar" style="background:#f1d0a2;"></div>
-                            <div><div class="testimonial-name">Robert Miller</div><div class="testimonial-role">Dialysis Patient</div></div>
+                            <div><div class="testimonial-name">Ruwan Jayasinghe</div><div class="testimonial-role">Dialysis Patient</div></div>
                         </div>
                     </article>
                     <article class="testimonial-card">
-                        <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
+                        <div class="stars" aria-label="5 stars">★★★★</div>
                         <blockquote>"I never have to worry about the time. They are always 5 minutes early and help me right to the door of my clinic."</blockquote>
                         <div class="testimonial-person">
                             <div class="testimonial-avatar" style="background:#d7b48a;"></div>
-                            <div><div class="testimonial-name">Ellen Thompson</div><div class="testimonial-role">Recurring Client</div></div>
+                            <div><div class="testimonial-name">Tharushi Fernando</div><div class="testimonial-role">Recurring Client</div></div>
                         </div>
                     </article>
                 </div>
@@ -223,7 +251,7 @@
                 <p class="section-sub">Comfort-focused vehicles available for patient and caregiver transport.</p>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
-                        <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
+                        <article class="fleet-card" data-card-link="{{ route('fleet.index') }}" tabindex="0" role="link" aria-label="Go to fleet page">
                             <div class="fleet-photo"><img src="{{ $car['image'] }}" alt="{{ $car['name'] }}"></div>
                             <div class="fleet-body">
                                 <div class="fleet-title-row">
@@ -231,7 +259,7 @@
                                     <div class="fleet-rate">Rs {{ number_format($car['daily_rate'], 0) }}<small>/ day</small></div>
                                 </div>
                                 <p class="fleet-sub">{{ $car['transmission'] }} &bull; {{ $car['fuel_type'] }}</p>
-                                <a class="fleet-btn" href="{{ route('booking.confirm', ['car' => $car['id']]) }}">Select Vehicle</a>
+                                <a class="fleet-btn" href="{{ route('fleet.index') }}">Select Vehicle</a>
                             </div>
                         </article>
                     @endforeach
@@ -252,8 +280,184 @@
         </div>
     </main>
     @include('partials.public-footer')
+    <script>
+        (function () {
+            const form = document.querySelector('#booking form');
+            if (!form) return;
+
+            const alertBox = document.getElementById('booking_form_alert');
+            const pickupField = document.getElementById('pickup_location');
+            const destinationField = document.getElementById('destination');
+            const dateField = document.getElementById('ride_date');
+            const hourField = document.getElementById('ride_hour');
+            const minuteField = document.getElementById('ride_minute');
+            const ampmField = document.getElementById('ride_ampm');
+            const submitBtn = document.getElementById('medicalSubmitBtn');
+
+            const fieldErrors = {
+                pickup_location: document.getElementById('pickup_location_error'),
+                destination: document.getElementById('destination_error'),
+                ride_date: document.getElementById('ride_date_error'),
+                ride_time: document.getElementById('ride_time_error'),
+            };
+
+            const clearError = (field, errorKey) => {
+                if (field) field.classList.remove('input-error');
+                if (fieldErrors[errorKey]) fieldErrors[errorKey].textContent = '';
+            };
+
+            const setError = (field, errorKey, message) => {
+                if (field) field.classList.add('input-error');
+                if (fieldErrors[errorKey]) fieldErrors[errorKey].textContent = message;
+            };
+
+            const setLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = submitBtn.dataset.loadingText || 'Checking...';
+                }
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+            };
+
+            const clearLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+            };
+
+            if (dateField) {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                dateField.min = `${yyyy}-${mm}-${dd}`;
+            }
+
+            const hideAlertIfNoErrors = () => {
+                if (!alertBox) return;
+                const hasErrors = Object.values(fieldErrors).some((el) => el && el.textContent.trim() !== '');
+                if (!hasErrors) {
+                    alertBox.style.display = 'none';
+                }
+            };
+
+            if (pickupField) {
+                pickupField.addEventListener('input', () => {
+                    if (pickupField.value.trim() !== '') {
+                        clearError(pickupField, 'pickup_location');
+                        hideAlertIfNoErrors();
+                    }
+                });
+            }
+
+            if (destinationField) {
+                destinationField.addEventListener('input', () => {
+                    if (destinationField.value.trim() !== '') {
+                        clearError(destinationField, 'destination');
+                        hideAlertIfNoErrors();
+                    }
+                });
+            }
+
+            if (dateField) {
+                dateField.addEventListener('change', () => {
+                    if (!dateField.value) return;
+                    if (dateField.min && dateField.value < dateField.min) {
+                        setError(dateField, 'ride_date', 'Date cannot be in the past.');
+                        return;
+                    }
+                    clearError(dateField, 'ride_date');
+                    hideAlertIfNoErrors();
+                });
+            }
+
+            [hourField, minuteField, ampmField].forEach((field) => {
+                if (!field) return;
+                field.addEventListener('change', () => {
+                    if (hourField?.value && minuteField?.value && ampmField?.value) {
+                        clearError(hourField, 'ride_time');
+                        clearError(minuteField, 'ride_time');
+                        clearError(ampmField, 'ride_time');
+                        hideAlertIfNoErrors();
+                    }
+                });
+            });
+
+            form.addEventListener('submit', function (event) {
+                const rideDate = document.getElementById('ride_date')?.value || '-';
+                const rideHour = document.getElementById('ride_hour')?.value || '';
+                const rideMinute = document.getElementById('ride_minute')?.value || '';
+                const rideAmPm = document.getElementById('ride_ampm')?.value || '';
+                const rideTime = (rideHour && rideMinute && rideAmPm)
+                    ? (rideHour + ':' + rideMinute + ' ' + rideAmPm)
+                    : '-';
+                const endDateInput = document.getElementById('ride_end_date');
+                const pickupTimeInput = document.getElementById('pickup_time');
+                let hasErrors = false;
+
+                clearError(pickupField, 'pickup_location');
+                clearError(destinationField, 'destination');
+                clearError(dateField, 'ride_date');
+                clearError(hourField, 'ride_time');
+                clearError(minuteField, 'ride_time');
+                clearError(ampmField, 'ride_time');
+                if (alertBox) alertBox.style.display = 'none';
+
+                if (!pickupField?.value?.trim()) {
+                    setError(pickupField, 'pickup_location', 'Please enter pickup location.');
+                    hasErrors = true;
+                }
+
+                if (!destinationField?.value?.trim()) {
+                    setError(destinationField, 'destination', 'Please enter destination (hospital or clinic).');
+                    hasErrors = true;
+                }
+
+                if (!dateField?.value) {
+                    setError(dateField, 'ride_date', 'Please select date.');
+                    hasErrors = true;
+                } else if (dateField.min && dateField.value < dateField.min) {
+                    setError(dateField, 'ride_date', 'Date cannot be in the past.');
+                    hasErrors = true;
+                }
+
+                if (!rideHour || !rideMinute || !rideAmPm) {
+                    setError(hourField, 'ride_time', 'Please select time.');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    clearLoadingState();
+                    return;
+                }
+
+                if (endDateInput) {
+                    endDateInput.value = rideDate;
+                }
+
+                if (pickupTimeInput) {
+                    pickupTimeInput.value = rideTime;
+                }
+
+                setLoadingState();
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        clearLoadingState();
+                    }
+                }, 5000);
+            });
+
+            window.addEventListener('pageshow', clearLoadingState);
+            window.addEventListener('focus', clearLoadingState);
+        })();
+    </script>
 </body>
 </html>
-
-
-

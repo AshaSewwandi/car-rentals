@@ -30,6 +30,9 @@ class BookingController extends Controller
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'start_location' => ['nullable', 'string', 'max:255'],
+            'destination' => ['nullable', 'string', 'max:255'],
+            'pickup_time' => ['nullable', 'string', 'max:40'],
+            'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $car = Car::findOrFail($validated['car_id']);
@@ -50,6 +53,23 @@ class BookingController extends Controller
         $totalAmount = $dailyRate * $days;
         $driverMode = (string) ($car->driver_mode ?: 'both');
         $defaultDriverOption = $driverMode === 'with_driver_only' ? 'with_driver' : 'without_driver';
+        $prefillNote = trim((string) ($validated['note'] ?? ''));
+
+        if ($prefillNote === '') {
+            $destination = trim((string) ($validated['destination'] ?? ''));
+            $pickupTime = trim((string) ($validated['pickup_time'] ?? ''));
+            $parts = [];
+
+            if ($destination !== '') {
+                $parts[] = "Destination: {$destination}";
+            }
+
+            if ($pickupTime !== '') {
+                $parts[] = "Preferred pickup time: {$pickupTime}";
+            }
+
+            $prefillNote = implode("\n", $parts);
+        }
 
         return view('booking.confirm', [
             'car' => $car,
@@ -63,6 +83,7 @@ class BookingController extends Controller
             'totalAmount' => $totalAmount,
             'driverMode' => $driverMode,
             'defaultDriverOption' => $defaultDriverOption,
+            'prefillNote' => $prefillNote,
         ]);
     }
 

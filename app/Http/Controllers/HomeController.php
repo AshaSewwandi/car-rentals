@@ -7,7 +7,6 @@ use App\Models\Car;
 use App\Models\VehiclePricing;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -15,6 +14,7 @@ class HomeController extends Controller
     public function home(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(3)
@@ -38,7 +38,7 @@ class HomeController extends Controller
                     'transmission' => $car->transmission ?: 'Auto',
                     'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
                     'bags' => str_contains(strtolower((string) $car->name), 'largo') ? '4 Bags' : '2 Bags',
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -48,11 +48,12 @@ class HomeController extends Controller
     public function airportHires(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(3)
             ->get()
-            ->map(function (Car $car, int $index) {
+            ->map(function (Car $car) {
                 $pricing = VehiclePricingResolver::resolveForCar($car);
                 $driverMode = $car->driver_mode ?: 'both';
 
@@ -77,12 +78,8 @@ class HomeController extends Controller
                     'per_day_km' => (int) $pricing['per_day_km'],
                     'extra_km_rate' => (float) $pricing['extra_km_rate'],
                     'driver_mode_label' => $driverModeLabel,
-                    'airport_tag' => match ($index) {
-                        0 => 'Fuel Efficient',
-                        1 => 'Large Trunk Space',
-                        default => 'Airport Ready',
-                    },
-                    'image' => $this->resolveImagePath($car),
+                    'airport_tag' => $this->resolveAirportTag($car, (float) $pricing['daily_rate']),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -99,6 +96,7 @@ class HomeController extends Controller
     public function shortTermRentals(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(3)
@@ -117,7 +115,7 @@ class HomeController extends Controller
                     'daily_rate' => (float) $pricing['daily_rate'],
                     'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
                     'tag' => $car->status === 'available' ? 'Available' : 'Popular',
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -135,6 +133,7 @@ class HomeController extends Controller
     public function longTermRentals(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->where('allow_long_term', true)
             ->orderBy('name')
@@ -156,7 +155,7 @@ class HomeController extends Controller
                         1 => 'Family',
                         default => 'Executive',
                     },
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -180,6 +179,7 @@ class HomeController extends Controller
     public function medicalTransport(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -194,16 +194,9 @@ class HomeController extends Controller
                     'transmission' => $car->transmission ?: 'Automatic',
                     'fuel_type' => $car->fuel_type ?: 'Petrol',
                     'daily_rate' => (float) $pricing['daily_rate'],
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
-
-        $transportTypes = [
-            'Standard patient drop-off',
-            'Dialysis transport',
-            'Wheelchair transfer',
-            'Inter-facility transfer',
-        ];
 
         $faqItems = [
             [
@@ -232,12 +225,13 @@ class HomeController extends Controller
             ],
         ];
 
-        return view('medical-transport', compact('featuredCars', 'transportTypes', 'faqItems'));
+        return view('medical-transport', compact('featuredCars', 'faqItems'));
     }
 
     public function groupPackages(): View
     {
         $featuredCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -274,7 +268,7 @@ class HomeController extends Controller
                     'seats' => $estimatedSeats,
                     'bags' => $estimatedBags,
                     'tag' => $tag,
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -393,6 +387,7 @@ class HomeController extends Controller
             ->get();
 
         $recommendedCars = Car::query()
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(4)
@@ -403,47 +398,26 @@ class HomeController extends Controller
                     'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
                     'plate_no' => $car->plate_no,
                     'daily_rate' => VehiclePricingResolver::resolveForCar($car)['daily_rate'],
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
         return view('customer.home', compact('user', 'activeTrips', 'canceledTrips', 'completedTrips', 'recommendedCars'));
     }
 
-    private function resolveImagePath(Car $car): string
+    private function resolveAirportTag(Car $car, float $dailyRate): string
     {
-        $candidates = [
-            $this->normalize($car->plate_no) . '.png',
-            $this->normalize($car->plate_no) . '.jpg',
-            $this->normalize($car->plate_no) . '.jpeg',
-            $this->normalize($car->name) . '.png',
-            $this->normalize($car->name) . '.jpg',
-            $this->normalize($car->name) . '.jpeg',
-        ];
+        $name = strtolower(trim(($car->name ?? '') . ' ' . ($car->make ?? '') . ' ' . ($car->model ?? '')));
+        $fuel = strtolower((string) ($car->fuel_type ?? ''));
 
-        foreach ($candidates as $file) {
-            if (in_array($file, ['.png', '.jpg', '.jpeg'], true)) {
-                continue;
-            }
-
-            if (file_exists(public_path('images/' . $file))) {
-                return asset('images/' . $file);
-            }
+        if (str_contains($name, 'largo') || str_contains($name, 'van') || str_contains($name, 'kdh')) {
+            return 'Large Trunk Space';
         }
 
-        return asset('images/logo.png');
-    }
-
-    private function normalize(?string $value): string
-    {
-        if (!$value) {
-            return '';
+        if (in_array($fuel, ['hybrid', 'diesel'], true) || $dailyRate <= 5500) {
+            return 'Fuel Efficient';
         }
 
-        return Str::of($value)
-            ->lower()
-            ->replace([' ', '-', '/', '\\'], '_')
-            ->replaceMatches('/[^a-z0-9_]/', '')
-            ->value();
+        return 'Airport Ready';
     }
 }

@@ -6,6 +6,8 @@ use App\Models\Car;
 use App\Models\User;
 use App\Models\VehiclePricing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class CarController extends Controller
@@ -13,7 +15,7 @@ class CarController extends Controller
     public function index(Request $request)
     {
         $cars = Car::query()
-            ->with('partner')
+            ->with(['partner', 'images'])
             ->when($request->user()?->isPartner(), function ($query) use ($request) {
                 $query->where('partner_user_id', $request->user()->id);
             })
@@ -48,7 +50,8 @@ class CarController extends Controller
         abort_unless($request->user()?->isAdmin(), 403);
 
         $data = $this->validateCar($request);
-        Car::create($data);
+        $car = Car::create($data);
+        $this->storeUploadedImages($request, $car);
 
         return back()->with('success', 'Car added successfully.');
     }
@@ -59,6 +62,8 @@ class CarController extends Controller
 
         $data = $this->validateCar($request, $car->id);
         $car->update($data);
+        $this->removeSelectedImages($request, $car);
+        $this->storeUploadedImages($request, $car);
 
         return back()->with('success', 'Car updated successfully.');
     }
@@ -154,7 +159,69 @@ class CarController extends Controller
             'plate_no' => ['required', 'string', 'max:100', Rule::unique('cars', 'plate_no')->ignore($carId)],
             'status' => ['required', 'in:available,rented'],
             'note' => ['nullable', 'string', 'max:255'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_image_ids' => ['nullable', 'array'],
+            'remove_image_ids.*' => ['integer'],
+        ], [
+            'images.*.image' => 'Each selected file must be an image.',
+            'images.*.mimes' => 'Only JPG, JPEG, PNG, and WEBP images are allowed.',
+            'images.*.max' => 'Each image must be 4MB or smaller.',
+            'images.*.uploaded' => 'Image upload failed. Please use a smaller file (max 4MB).',
         ]);
+    }
+
+    private function storeUploadedImages(Request $request, Car $car): void
+    {
+        if (!$request->hasFile('images')) {
+            return;
+        }
+
+        $uploadDir = public_path('uploads/cars');
+        if (!File::exists($uploadDir)) {
+            File::makeDirectory($uploadDir, 0755, true);
+        }
+
+        $nextSort = (int) ($car->images()->max('sort_order') ?? -1) + 1;
+
+        foreach ($request->file('images', []) as $file) {
+            if (!$file || !$file->isValid()) {
+                continue;
+            }
+
+            $fileName = sprintf(
+                '%s_%s_%s.%s',
+                $car->id,
+                now()->format('YmdHis'),
+                Str::random(8),
+                $file->getClientOriginalExtension()
+            );
+
+            $file->move($uploadDir, $fileName);
+
+            $car->images()->create([
+                'path' => 'uploads/cars/' . $fileName,
+                'sort_order' => $nextSort++,
+            ]);
+        }
+    }
+
+    private function removeSelectedImages(Request $request, Car $car): void
+    {
+        $ids = collect($request->input('remove_image_ids', []))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return;
+        }
+
+        $images = $car->images()->whereIn('id', $ids)->get();
+        foreach ($images as $image) {
+            File::delete(public_path($image->path));
+            $image->delete();
+        }
     }
 
     private function validateVehiclePricing(Request $request, ?int $pricingId = null): array

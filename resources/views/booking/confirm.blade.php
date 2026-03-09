@@ -332,7 +332,7 @@
                             <div class="card-header">Your deal</div>
                             <div class="card-body">
                                 <div class="car-row">
-                                    <img src="{{ asset('images/' . strtolower(str_replace([' ', '-'], '_', $car->plate_no)) . '.png') }}" alt="{{ $car->name }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1rem';">
+                                    <img src="{{ $car->primaryImageUrl() }}" alt="{{ $car->name }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1rem';">
                                     <div>
                                         <h2 class="car-name">{{ trim($car->name . ' ' . ($car->year ?? '')) }}</h2>
                                         <p class="car-meta">{{ $car->plate_no }} · {{ $car->transmission ?: 'Transmission N/A' }} · {{ $car->fuel_type ?: 'Fuel N/A' }}</p>
@@ -438,7 +438,7 @@
                                     </div>
                                     <div class="field full">
                                         <label>Special note</label>
-                                        <textarea name="note" placeholder="Any request for pickup time, child seat, driver, etc.">{{ old('note') }}</textarea>
+                                        <textarea name="note" placeholder="Any request for pickup time, child seat, driver, etc.">{{ old('note', $prefillNote ?? '') }}</textarea>
                                     </div>
                                 </div>
                             </div>

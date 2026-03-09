@@ -43,7 +43,14 @@
         .quick-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:.7rem; align-items:end; }
         .field label { display:block; margin-bottom:.3rem; font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#64748b; }
         .field input, .field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.7rem .75rem; font:inherit; color:#0f172a; }
-        .search-btn { height:44px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; }
+        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; height:2.25rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }
+        .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; grid-column:1 / -1; }
+        .search-btn { height:44px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
+        .search-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
+        .search-btn.is-loading .btn-spinner { display:inline-block; }
+        .search-btn.is-loading { pointer-events:none; opacity:.95; }
+        @keyframes btn-spin { to { transform:rotate(360deg); } }
         .section { padding:2.7rem 0 0; }
         .section h2 { margin:0 0 .35rem; text-align:center; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.8rem, 3vw, 2.4rem); letter-spacing:-.03em; }
         .section-sub { margin:0 0 1.3rem; text-align:center; color:var(--muted); }
@@ -139,20 +146,12 @@
 
         <section class="quick-card">
             <h2 class="quick-title">Quick Inquiry</h2>
-            <form class="quick-grid" action="{{ route('long-term-rentals.inquiry.store') }}" method="post">
-                @csrf
-                <input type="hidden" name="inquiry_type" value="quick">
-                <div class="field">
-                    <label for="category">Vehicle Category</label>
-                    <select id="category" name="category">
-                        @foreach($categories as $category)
-                            <option value="{{ $category }}">{{ $category }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            <form id="longTermQuickForm" class="quick-grid" action="{{ route('fleet.index') }}" method="get" novalidate>
+                <div id="quick_form_alert" class="form-alert" style="display:none;"></div>
                 <div class="field">
                     <label for="start_date">Start Date</label>
                     <input id="start_date" name="start_date" type="date" required>
+                    <small id="start_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="duration">Duration (Months)</label>
@@ -161,17 +160,27 @@
                             <option value="{{ $duration }}">{{ $duration }}</option>
                         @endforeach
                     </select>
+                    <small class="field-error">&nbsp;</small>
                 </div>
                 <div class="field">
                     <label for="quick_name">Name</label>
-                    <input id="quick_name" name="name" type="text" required>
+                    <input id="quick_name" name="quick_name" type="text">
+                    <small class="field-error">&nbsp;</small>
                 </div>
                 <div class="field">
                     <label for="quick_phone">Phone</label>
-                    <input id="quick_phone" name="phone" type="text" placeholder="+94 ..." required>
+                    <input id="quick_phone" name="quick_phone" type="text" placeholder="+94 ...">
+                    <small class="field-error">&nbsp;</small>
                 </div>
-                <input type="hidden" name="email" value="">
-                <button class="search-btn" type="submit">Check Availability</button>
+                <input type="hidden" id="end_date" name="end_date" value="">
+                <div class="field">
+                    <label aria-hidden="true" style="visibility:hidden;">Submit</label>
+                    <button class="search-btn" type="submit" id="longTermSubmitBtn" data-loading-text="Checking...">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span class="btn-label">Check Availability</span>
+                    </button>
+                    <small class="field-error">&nbsp;</small>
+                </div>
             </form>
         </section>
 
@@ -259,8 +268,128 @@
     </main>
 
     @include('partials.public-footer')
+    <script>
+        (function () {
+            const form = document.getElementById('longTermQuickForm');
+            const startDate = document.getElementById('start_date');
+            const duration = document.getElementById('duration');
+            const endDate = document.getElementById('end_date');
+            const alertBox = document.getElementById('quick_form_alert');
+            const submitBtn = document.getElementById('longTermSubmitBtn');
+            if (!form || !startDate || !duration || !endDate) return;
+
+            const fieldErrors = {
+                start_date: document.getElementById('start_date_error'),
+            };
+
+            const clearError = (field, key) => {
+                if (field) field.classList.remove('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = '';
+            };
+
+            const setError = (field, key, message) => {
+                if (field) field.classList.add('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = message;
+            };
+
+            const hideAlertIfNoErrors = () => {
+                if (!alertBox) return;
+                const hasErrors = Object.values(fieldErrors).some((el) => el && el.textContent.trim() !== '');
+                if (!hasErrors) {
+                    alertBox.style.display = 'none';
+                }
+            };
+
+            const setLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = submitBtn.dataset.loadingText || 'Checking...';
+                }
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+            };
+
+            const clearLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+            };
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            startDate.min = `${yyyy}-${mm}-${dd}`;
+
+            startDate.addEventListener('change', () => {
+                if (!startDate.value) return;
+                if (startDate.min && startDate.value < startDate.min) {
+                    setError(startDate, 'start_date', 'Start date cannot be in the past.');
+                    return;
+                }
+                clearError(startDate, 'start_date');
+                hideAlertIfNoErrors();
+            });
+
+            const computeEndDate = () => {
+                if (!startDate.value) {
+                    endDate.value = '';
+                    return;
+                }
+
+                const months = Math.max(1, parseInt(duration.value, 10) || 1);
+                const start = new Date(startDate.value + 'T00:00:00');
+                const end = new Date(start);
+                end.setMonth(end.getMonth() + months);
+                end.setDate(end.getDate() - 1);
+
+                const yyyy = end.getFullYear();
+                const mm = String(end.getMonth() + 1).padStart(2, '0');
+                const dd = String(end.getDate()).padStart(2, '0');
+                endDate.value = `${yyyy}-${mm}-${dd}`;
+            };
+
+            duration.addEventListener('change', computeEndDate);
+            startDate.addEventListener('change', computeEndDate);
+
+            form.addEventListener('submit', (event) => {
+                let hasErrors = false;
+
+                clearError(startDate, 'start_date');
+                if (alertBox) alertBox.style.display = 'none';
+
+                if (!startDate.value) {
+                    setError(startDate, 'start_date', 'Please select start date.');
+                    hasErrors = true;
+                } else if (startDate.min && startDate.value < startDate.min) {
+                    setError(startDate, 'start_date', 'Start date cannot be in the past.');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    clearLoadingState();
+                    return;
+                }
+
+                computeEndDate();
+                setLoadingState();
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        clearLoadingState();
+                    }
+                }, 5000);
+            });
+
+            window.addEventListener('pageshow', clearLoadingState);
+            window.addEventListener('focus', clearLoadingState);
+        })();
+    </script>
 </body>
 </html>
-
-
-

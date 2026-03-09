@@ -100,6 +100,38 @@
             background: #eef3fb;
         }
 
+        .media-thumbs {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding: .7rem .8rem;
+            border-top: 1px solid var(--line);
+            background: #f8fbff;
+        }
+
+        .media-thumb {
+            width: 74px;
+            height: 52px;
+            border-radius: 8px;
+            border: 1px solid #c8d7ea;
+            overflow: hidden;
+            cursor: pointer;
+            background: #fff;
+            padding: 0;
+        }
+
+        .media-thumb.active {
+            border-color: #0f66c3;
+            box-shadow: 0 0 0 2px rgba(15, 102, 195, 0.18);
+        }
+
+        .media-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         .vehicle-head {
             padding: 1rem;
             display: flex;
@@ -389,8 +421,22 @@
                 <article class="panel vehicle-media">
                     <div class="media-wrap">
                         <span class="vehicle-badge">{{ $vehicle['driver_mode_label'] }}</span>
-                        <img src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';">
+                        <img id="primaryVehicleImage" src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';">
                     </div>
+                    @if(!empty($vehicle['images']) && count($vehicle['images']) > 1)
+                        <div class="media-thumbs" id="vehicleImageThumbs">
+                            @foreach($vehicle['images'] as $imageUrl)
+                                <button
+                                    type="button"
+                                    class="media-thumb {{ $loop->first ? 'active' : '' }}"
+                                    data-image-url="{{ $imageUrl }}"
+                                    aria-label="Show image {{ $loop->iteration }}"
+                                >
+                                    <img src="{{ $imageUrl }}" alt="{{ $vehicle['name'] }} thumbnail {{ $loop->iteration }}">
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                     <div class="vehicle-head">
                         <div>
                             <h1>{{ $vehicle['name'] }}</h1>
@@ -493,5 +539,27 @@
         </div>
     </main>
     @include('partials.public-footer')
+    <script>
+        (function () {
+            const primaryImage = document.getElementById('primaryVehicleImage');
+            const thumbs = document.querySelectorAll('#vehicleImageThumbs .media-thumb');
+            if (!primaryImage || !thumbs.length) {
+                return;
+            }
+
+            thumbs.forEach((thumb) => {
+                thumb.addEventListener('click', () => {
+                    const nextUrl = thumb.dataset.imageUrl;
+                    if (!nextUrl) {
+                        return;
+                    }
+
+                    primaryImage.src = nextUrl;
+                    thumbs.forEach((item) => item.classList.remove('active'));
+                    thumb.classList.add('active');
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

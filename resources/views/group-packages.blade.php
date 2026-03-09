@@ -36,10 +36,17 @@
         .btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; border-radius:12px; padding:.85rem 1.2rem; font-weight:800; border:1px solid transparent; }
         .btn-primary { color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 12px 24px rgba(10,63,143,.24); }
         .search-card { position:relative; z-index:2; width:min(1120px, calc(100% - 2rem)); margin:-1.2rem auto 0; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:1rem; }
-        .search-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr auto; gap:.8rem; align-items:end; }
+        .search-grid { display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr auto; gap:.8rem; align-items:end; }
         .field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
         .field input, .field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
-        .search-btn { height:46px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; }
+        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; min-height:1.05rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; }
+        .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; }
+        .search-btn { width:100%; height:46px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
+        .search-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
+        .search-btn.is-loading .btn-spinner { display:inline-block; }
+        .search-btn.is-loading { pointer-events:none; opacity:.95; }
+        @keyframes btn-spin { to { transform:rotate(360deg); } }
         .section { padding:3rem 0 0; }
         .section h2 { margin:0 0 .35rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.8rem, 3vw, 2.4rem); letter-spacing:-.03em; text-align:center; }
         .section-sub { margin:0 0 1.5rem; color:var(--muted); text-align:center; }
@@ -67,11 +74,17 @@
         .fleet-rate { color:var(--primary); font-weight:800; font-size:1.65rem; line-height:1; }
         .fleet-rate small { display:block; color:#64748b; font-size:.8rem; font-weight:700; margin-top:.15rem; text-align:right; }
         .book-btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; border-radius:10px; padding:.7rem .95rem; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); }
-        .package-band { margin-top:3rem; background:linear-gradient(135deg, #0a3f8f, #0f66c3); color:#fff; padding:2rem; display:flex; justify-content:space-between; align-items:center; gap:1.2rem; overflow:hidden; }
-        .package-band h3 { margin:0 0 .6rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:2rem; line-height:1.02; }
-        .package-band p { margin:0; color:rgba(255,255,255,.92); line-height:1.7; max-width:40rem; }
-        .package-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem; }
-        .btn-outline { color:#fff; border-color:rgba(255,255,255,.45); background:transparent; }
+        .package-band { margin-top:3rem; background:linear-gradient(135deg, #0a3f8f, #0f66c3); color:#fff; padding:2.4rem; display:flex; justify-content:space-between; align-items:center; gap:1.5rem; overflow:hidden; border-radius:20px; position:relative; }
+        .package-band::after { content:""; position:absolute; width:240px; height:240px; border-radius:999px; right:-80px; top:-80px; background:rgba(255,255,255,.09); pointer-events:none; }
+        .package-copy { position:relative; z-index:1; max-width:44rem; }
+        .package-band h3 { margin:0 0 .65rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:2.1rem; line-height:1.05; letter-spacing:-.02em; }
+        .package-band p { margin:0; color:rgba(255,255,255,.94); line-height:1.75; font-size:1.03rem; max-width:42rem; }
+        .package-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1.15rem; }
+        .btn-light { background:#fff; color:var(--primary); border-color:#fff; box-shadow:0 12px 24px rgba(2,16,43,.22); }
+        .btn-light:hover { background:#f2f7ff; color:#07306d; }
+        .btn-outline { color:#fff; border-color:rgba(255,255,255,.55); background:transparent; }
+        .btn-outline:hover { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.82); }
+        .package-mark { width:96px; height:96px; border-radius:999px; border:1px solid rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center; font-size:1.9rem; font-weight:800; color:rgba(255,255,255,.92); position:relative; z-index:1; }
         .quote-block { text-align:center; padding:3rem 0 0; }
         .quote-mark { color:var(--primary); font-size:3.4rem; line-height:1; }
         .quote-text { margin:.5rem auto 1rem; max-width:38rem; font-style:italic; font-size:1.6rem; line-height:1.45; color:#0f172a; }
@@ -122,14 +135,22 @@
         </section>
 
         <section class="search-card">
-            <form class="search-grid" action="{{ route('fleet.index') }}" method="get">
+            <form class="search-grid" id="groupSearchForm" action="{{ route('fleet.index') }}" method="get" novalidate>
+                <div id="group_search_alert" class="form-alert" style="display:none; grid-column:1 / -1;"></div>
                 <div class="field">
                     <label for="start_location">Location</label>
                     <input id="start_location" name="start_location" type="text" placeholder="Pickup & Drop-off">
+                    <small id="start_location_error" class="field-error"></small>
                 </div>
                 <div class="field">
-                    <label for="start_date">Dates</label>
-                    <input id="start_date" name="start_date" type="text" placeholder="Jan 12 - Jan 18">
+                    <label for="start_date">Start Date</label>
+                    <input id="start_date" name="start_date" type="date">
+                    <small id="start_date_error" class="field-error"></small>
+                </div>
+                <div class="field">
+                    <label for="end_date">End Date</label>
+                    <input id="end_date" name="end_date" type="date">
+                    <small id="end_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="passengers">Passengers</label>
@@ -138,8 +159,16 @@
                         <option>8-12 People</option>
                         <option>12+ People</option>
                     </select>
+                    <small class="field-error">&nbsp;</small>
                 </div>
-                <button class="search-btn" type="submit">Search Deals</button>
+                <div class="field">
+                    <label aria-hidden="true" style="visibility:hidden;">Search</label>
+                    <button class="search-btn" type="submit" id="groupSubmitBtn" data-loading-text="Checking...">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span class="btn-label">Search Deals</span>
+                    </button>
+                    <small class="field-error">&nbsp;</small>
+                </div>
             </form>
         </section>
 
@@ -209,7 +238,7 @@
             </section>
 
             <section class="package-band">
-                <div>
+                <div class="package-copy">
                     <h3>Special Group Packages</h3>
                     <p>Planning a wedding, corporate retreat, or a multi-generational family vacation? Let our specialists design a custom itinerary and fleet package for your event.</p>
                     <div class="package-actions">
@@ -217,16 +246,15 @@
                         <a class="btn btn-outline" href="{{ route('pricing.index') }}">View Packages</a>
                     </div>
                 </div>
-                <div style="font-size:4rem;opacity:.25;font-weight:800;">Group</div>
             </section>
 
             <section class="quote-block">
                 <div class="quote-mark">"</div>
-                <div class="quote-text">Our experience with R&amp;A for our annual family reunion was flawless. We booked a 12-seater van and it was spotless, ready on time, and fit all our luggage effortlessly.</div>
+                <div class="quote-text">Our family trip from Galle to Kandy was smooth from start to finish. We booked a 12-seater van, it arrived on time, and the vehicle was clean and comfortable for everyone.</div>
                 <div class="quote-person">
                     <div class="quote-avatar"></div>
                     <div>
-                        <div style="font-weight:800;color:#0f172a;">The Henderson Family</div>
+                        <div style="font-weight:800;color:#0f172a;">The Wijesinghe Family</div>
                         <div>12-Seater Van Rental</div>
                     </div>
                 </div>
@@ -234,6 +262,141 @@
         </div>
     </main>
     @include('partials.public-footer')
+    <script>
+        (function () {
+            const form = document.getElementById('groupSearchForm');
+            const startLocation = document.getElementById('start_location');
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            const alertBox = document.getElementById('group_search_alert');
+            const submitBtn = document.getElementById('groupSubmitBtn');
+            if (!form || !startDate || !endDate) return;
+
+            const fieldErrors = {
+                start_location: document.getElementById('start_location_error'),
+                start_date: document.getElementById('start_date_error'),
+                end_date: document.getElementById('end_date_error'),
+            };
+
+            const clearError = (field, key) => {
+                if (field) field.classList.remove('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = '';
+            };
+
+            const setError = (field, key, message) => {
+                if (field) field.classList.add('input-error');
+                if (fieldErrors[key]) fieldErrors[key].textContent = message;
+            };
+
+            const hideAlertIfNoErrors = () => {
+                if (!alertBox) return;
+                const hasErrors = Object.values(fieldErrors).some((el) => el && el.textContent.trim() !== '');
+                if (!hasErrors) {
+                    alertBox.style.display = 'none';
+                }
+            };
+
+            const setLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label) {
+                    label.dataset.originalText = label.textContent;
+                    label.textContent = submitBtn.dataset.loadingText || 'Checking...';
+                }
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+            };
+
+            const clearLoadingState = () => {
+                if (!submitBtn) return;
+                const label = submitBtn.querySelector('.btn-label');
+                if (label && label.dataset.originalText) {
+                    label.textContent = label.dataset.originalText;
+                }
+                submitBtn.classList.remove('is-loading');
+                submitBtn.disabled = false;
+            };
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            startDate.min = `${yyyy}-${mm}-${dd}`;
+            endDate.min = `${yyyy}-${mm}-${dd}`;
+
+            if (startLocation) {
+                startLocation.addEventListener('input', () => {
+                    if (startLocation.value.trim() !== '') {
+                        clearError(startLocation, 'start_location');
+                        hideAlertIfNoErrors();
+                    }
+                });
+            }
+
+            startDate.addEventListener('change', () => {
+                if (!startDate.value) return;
+                clearError(startDate, 'start_date');
+                endDate.min = startDate.value;
+                if (endDate.value && endDate.value < startDate.value) {
+                    setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                }
+                hideAlertIfNoErrors();
+            });
+
+            endDate.addEventListener('change', () => {
+                if (!endDate.value) return;
+                if (startDate.value && endDate.value < startDate.value) {
+                    setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                    return;
+                }
+                clearError(endDate, 'end_date');
+                hideAlertIfNoErrors();
+            });
+
+            form.addEventListener('submit', (event) => {
+                let hasErrors = false;
+
+                clearError(startLocation, 'start_location');
+                clearError(startDate, 'start_date');
+                clearError(endDate, 'end_date');
+                if (alertBox) alertBox.style.display = 'none';
+
+                if (!startLocation?.value?.trim()) {
+                    setError(startLocation, 'start_location', 'Please enter pickup location.');
+                    hasErrors = true;
+                }
+
+                if (!startDate.value) {
+                    setError(startDate, 'start_date', 'Please select start date.');
+                    hasErrors = true;
+                }
+
+                if (!endDate.value) {
+                    setError(endDate, 'end_date', 'Please select end date.');
+                    hasErrors = true;
+                } else if (startDate.value && endDate.value < startDate.value) {
+                    setError(endDate, 'end_date', 'End date must be same day or after start date.');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) {
+                    event.preventDefault();
+                    clearLoadingState();
+                    return;
+                }
+
+                setLoadingState();
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        clearLoadingState();
+                    }
+                }, 5000);
+            });
+
+            window.addEventListener('pageshow', clearLoadingState);
+            window.addEventListener('focus', clearLoadingState);
+        })();
+    </script>
 </body>
 </html>
 

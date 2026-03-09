@@ -357,7 +357,7 @@
         }
 
         .hero-search .search-submit {
-            align-self: end;
+            width: 100%;
             min-height: 42px;
             border: 0;
             border-radius: 10px;
@@ -367,6 +367,22 @@
             font: inherit;
             font-weight: 800;
             cursor: pointer;
+        }
+
+        .hero-search .field-error {
+            display: block;
+            height: 1.35rem;
+            margin: .25rem .45rem 0;
+            color: #b91c1c;
+            font-size: .8rem;
+            font-weight: 600;
+            line-height: 1.25;
+            visibility: hidden;
+            overflow: hidden;
+        }
+
+        .hero-search .field-error.show {
+            visibility: visible;
         }
 
         .hero {
@@ -1647,10 +1663,14 @@
                                 <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
                                 <small class="field-error" id="end_date_error"></small>
                             </div>
-                            <button class="search-submit btn" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking...">
-                                <span class="btn-spinner" aria-hidden="true"></span>
-                                <span class="btn-label">Find Vehicle</span>
-                            </button>
+                            <div class="search-field">
+                                <label aria-hidden="true" style="visibility:hidden;">Search</label>
+                                <button class="search-submit btn" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking...">
+                                    <span class="btn-spinner" aria-hidden="true"></span>
+                                    <span class="btn-label">Find Vehicle</span>
+                                </button>
+                                <small class="field-error">&nbsp;</small>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1856,6 +1876,10 @@
                 button.disabled = false;
             };
 
+            const resetAvailabilitySubmitState = () => {
+                clearLoadingState(availabilitySubmitBtn);
+            };
+
             const showError = (input, errorEl, message) => {
                 input.classList.add('input-error');
                 errorEl.textContent = message;
@@ -1920,13 +1944,29 @@
             };
 
             form.addEventListener('submit', function (event) {
+                event.preventDefault();
                 hasTriedSubmit = true;
+
                 if (!validateAvailabilityForm()) {
-                    event.preventDefault();
                     clearLoadingState(availabilitySubmitBtn);
                     return;
                 }
+
                 setLoadingState(availabilitySubmitBtn);
+
+                const params = new URLSearchParams({
+                    start_location: pickupInput.value.trim(),
+                    start_date: startDateInput.value,
+                    end_date: endDateInput.value,
+                });
+
+                const targetUrl = `${form.action}?${params.toString()}`;
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        resetAvailabilitySubmitState();
+                    }
+                }, 5000);
+                window.location.assign(targetUrl);
             });
 
             [pickupInput, startDateInput, endDateInput].forEach((input) => {
@@ -1942,6 +1982,8 @@
             });
 
             syncEndDateMin();
+            window.addEventListener('pageshow', resetAvailabilitySubmitState);
+            window.addEventListener('focus', resetAvailabilitySubmitState);
         })();
     </script>
 </body>

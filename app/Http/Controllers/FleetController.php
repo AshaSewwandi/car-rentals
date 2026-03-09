@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class FleetController extends Controller
 {
@@ -20,7 +19,7 @@ class FleetController extends Controller
         $startDate = $validated['start_date'] ?? null;
         $endDate = $validated['end_date'] ?? null;
 
-        $allCars = Car::query()->orderBy('name')->get();
+        $allCars = Car::query()->with('images')->orderBy('name')->get();
         $availabilityRows = collect();
         $availableCarIds = null;
 
@@ -108,6 +107,7 @@ class FleetController extends Controller
         }
 
         $cars = $carsQuery
+            ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->get()
@@ -129,7 +129,7 @@ class FleetController extends Controller
                     'per_day_km' => $pricing['per_day_km'],
                     'extra_km_rate' => $pricing['extra_km_rate'],
                     'rate' => number_format((float) $pricing['daily_rate'], 0),
-                    'image' => $this->resolveImagePath($car),
+                    'image' => $car->primaryImageUrl(),
                 ];
             });
 
@@ -144,6 +144,7 @@ class FleetController extends Controller
 
     public function show(Car $car)
     {
+        $car->loadMissing('images');
         $pricing = VehiclePricingResolver::resolveForCar($car);
         $driverMode = $car->driver_mode ?: 'both';
 
@@ -178,47 +179,12 @@ class FleetController extends Controller
             'driver_cost_per_day' => (float) ($pricing['driver_cost_per_day'] ?? 0),
             'seats' => $estimatedSeats,
             'bags' => $estimatedBags,
-            'image' => $this->resolveImagePath($car),
+            'image' => $car->primaryImageUrl(),
+            'images' => $car->galleryImageUrls(),
             'note' => $car->note,
         ];
 
         return view('fleet.show', compact('vehicle'));
     }
 
-    private function resolveImagePath(Car $car): string
-    {
-        $candidates = [
-            $this->normalize($car->plate_no) . '.png',
-            $this->normalize($car->plate_no) . '.jpg',
-            $this->normalize($car->plate_no) . '.jpeg',
-            $this->normalize($car->name) . '.png',
-            $this->normalize($car->name) . '.jpg',
-            $this->normalize($car->name) . '.jpeg',
-        ];
-
-        foreach ($candidates as $file) {
-            if ($file === '.png' || $file === '.jpg' || $file === '.jpeg') {
-                continue;
-            }
-
-            if (file_exists(public_path('images/' . $file))) {
-                return asset('images/' . $file);
-            }
-        }
-
-        return asset('images/logo.png');
-    }
-
-    private function normalize(?string $value): string
-    {
-        if (!$value) {
-            return '';
-        }
-
-        return Str::of($value)
-            ->lower()
-            ->replace([' ', '-', '/', '\\'], '_')
-            ->replaceMatches('/[^a-z0-9_]/', '')
-            ->value();
-    }
 }

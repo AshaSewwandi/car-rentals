@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Car extends Model
 {
@@ -62,5 +63,71 @@ class Car extends Model
     public function agreements(): HasMany { return $this->hasMany(Agreement::class); }
     public function gpsLogs(): HasMany { return $this->hasMany(GpsLog::class); }
     public function bookings(): HasMany { return $this->hasMany(Booking::class); }
+    public function images(): HasMany { return $this->hasMany(CarImage::class)->orderBy('sort_order')->orderBy('id'); }
     public function partner(): BelongsTo { return $this->belongsTo(User::class, 'partner_user_id'); }
+
+    public function primaryImageUrl(): string
+    {
+        if (!$this->relationLoaded('images')) {
+            $this->loadMissing('images');
+        }
+
+        $uploaded = $this->images->first();
+        if ($uploaded?->path) {
+            return asset($uploaded->path);
+        }
+
+        foreach ($this->legacyImageCandidates() as $file) {
+            if (file_exists(public_path('images/' . $file))) {
+                return asset('images/' . $file);
+            }
+        }
+
+        return asset('images/logo.png');
+    }
+
+    public function galleryImageUrls(): array
+    {
+        if (!$this->relationLoaded('images')) {
+            $this->loadMissing('images');
+        }
+
+        $urls = $this->images
+            ->pluck('path')
+            ->filter()
+            ->map(fn (string $path) => asset($path))
+            ->values()
+            ->all();
+
+        if (!empty($urls)) {
+            return $urls;
+        }
+
+        return [$this->primaryImageUrl()];
+    }
+
+    private function legacyImageCandidates(): array
+    {
+        return array_values(array_filter([
+            $this->normalizeForImage($this->plate_no) . '.png',
+            $this->normalizeForImage($this->plate_no) . '.jpg',
+            $this->normalizeForImage($this->plate_no) . '.jpeg',
+            $this->normalizeForImage($this->name) . '.png',
+            $this->normalizeForImage($this->name) . '.jpg',
+            $this->normalizeForImage($this->name) . '.jpeg',
+        ], fn ($file) => !in_array($file, ['.png', '.jpg', '.jpeg'], true)));
+    }
+
+    private function normalizeForImage(?string $value): string
+    {
+        if (!$value) {
+            return '';
+        }
+
+        return Str::of($value)
+            ->lower()
+            ->replace([' ', '-', '/', '\\'], '_')
+            ->replaceMatches('/[^a-z0-9_]/', '')
+            ->value();
+    }
 }

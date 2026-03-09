@@ -19,6 +19,19 @@
     <div class="text-muted">{{ auth()->user()->isAdmin() ? 'Manage fleet information, tracker details, and current rental status.' : 'View only the vehicles assigned to your partner account.' }}</div>
   </div>
 </div>
+@if(session('success'))
+  <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if($errors->any())
+  <div class="alert alert-danger">
+    <div class="fw-semibold mb-1">Please fix the following:</div>
+    <ul class="mb-0 ps-3">
+      @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+      @endforeach
+    </ul>
+  </div>
+@endif
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="header-title">Car List</span>
@@ -66,6 +79,9 @@
               @if($car->note)
                 <div class="small text-muted mt-2">Note: {{ $car->note }}</div>
               @endif
+              @if($car->images->isNotEmpty())
+                <div class="small text-muted mt-1">{{ $car->images->count() }} image(s) uploaded</div>
+              @endif
               @if($car->maintenance_last_service_date || $car->maintenance_next_service_date || $car->tracker_maintenance_mileage)
                 <div class="small text-muted mt-2">
                   Maintenance:
@@ -103,7 +119,7 @@
 
           @if(auth()->user()->isAdmin())
             <div class="collapse mt-3" id="edit-car-{{ $car->id }}">
-              <form method="post" action="{{ route('cars.update', $car) }}">
+              <form method="post" action="{{ route('cars.update', $car) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -182,6 +198,24 @@
                   <label class="form-label small mb-1">Note</label>
                   <input type="text" name="note" class="form-control form-control-sm" value="{{ $car->note }}">
                 </div>
+                <div class="col-12">
+                  <label class="form-label small mb-1">Add Vehicle Images</label>
+                  <input type="file" name="images[]" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png,.webp,image/*">
+                  <div class="form-text">You can upload multiple images. Supported: JPG, PNG, WEBP (max 4MB each).</div>
+                </div>
+                @if($car->images->isNotEmpty())
+                  <div class="col-12">
+                    <label class="form-label small mb-1">Remove Existing Images</label>
+                    <div class="d-flex flex-wrap gap-3">
+                      @foreach($car->images as $image)
+                        <label class="d-flex align-items-center gap-2 border rounded p-2">
+                          <input type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}">
+                          <img src="{{ asset($image->path) }}" alt="Car image {{ $loop->iteration }}" style="width:72px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #dbe6f3;">
+                        </label>
+                      @endforeach
+                    </div>
+                  </div>
+                @endif
               </div>
 
               <hr class="my-3">
@@ -277,6 +311,16 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              @if($car->images->isNotEmpty())
+                <div class="mb-3">
+                  <div class="small text-muted mb-2">Vehicle Images</div>
+                  <div class="d-flex flex-wrap gap-2">
+                    @foreach($car->images as $image)
+                      <img src="{{ asset($image->path) }}" alt="{{ $car->name }} image {{ $loop->iteration }}" style="width:140px;height:96px;object-fit:cover;border-radius:8px;border:1px solid #dbe6f3;">
+                    @endforeach
+                  </div>
+                </div>
+              @endif
               <div class="row g-3">
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Plate Number</div>
@@ -486,7 +530,7 @@
           <h5 class="modal-title" id="addCarModalLabel">Add Car Details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form method="post" action="{{ route('cars.store') }}">
+        <form method="post" action="{{ route('cars.store') }}" enctype="multipart/form-data">
           @csrf
           <div class="modal-body">
           <div class="mb-2">
@@ -645,6 +689,11 @@
           <div class="mb-1">
             <label class="form-label">Note</label>
             <input type="text" name="note" class="form-control" value="{{ old('note') }}">
+          </div>
+          <div class="mb-2 mt-2">
+            <label class="form-label">Vehicle Images</label>
+            <input type="file" name="images[]" class="form-control" multiple accept=".jpg,.jpeg,.png,.webp,image/*">
+            <div class="form-text">Upload one or more images (JPG, PNG, WEBP. Max 4MB each).</div>
           </div>
         </div>
           <div class="modal-footer">
