@@ -48,9 +48,30 @@
         .field-control.date-control, .field-control.time-control { position:relative; }
         .field-control.date-control::after { content:""; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); width:18px; height:18px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:18px 18px; pointer-events:none; opacity:.9; }
         .field-control.time-control::after { content:"\23F0"; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); font-size:1rem; color:#6b7f9a; pointer-events:none; opacity:.9; }
-        .field-control input[type="date"], .field-control input[type="time"] { width:100%; min-width:0; max-width:100%; height:100% !important; min-height:100% !important; padding:0 2.1rem 0 .8rem; line-height:1.2; -webkit-appearance:auto; appearance:auto; text-align:left; }
+        .field-control input[type="date"], .field-control input[type="time"] { width:100%; min-width:0; max-width:100%; height:100% !important; min-height:100% !important; padding:0 2.1rem 0 .8rem; line-height:1.2; text-align:left; }
+        .field-control input[type="date"] { -webkit-appearance:none; appearance:none; }
+        .field-control input[type="time"] { -webkit-appearance:none; appearance:none; }
         .field-control input[type="date"]::-webkit-datetime-edit, .field-control input[type="time"]::-webkit-datetime-edit { height:100%; display:flex; align-items:center; }
         .field-control input[type="date"]::-webkit-date-and-time-value, .field-control input[type="time"]::-webkit-date-and-time-value { text-align:left; height:100%; display:flex; align-items:center; }
+        .field-control input[type="date"]::-webkit-calendar-picker-indicator,
+        .field-control input[type="time"]::-webkit-calendar-picker-indicator {
+            position:absolute;
+            inset:0;
+            width:100%;
+            height:100%;
+            margin:0;
+            padding:0;
+            opacity:0;
+            color:transparent;
+            background:transparent;
+            display:block;
+            cursor:pointer;
+        }
+        .field-control input[type="time"]::-webkit-clear-button,
+        .field-control input[type="time"]::-webkit-inner-spin-button {
+            display:none;
+            -webkit-appearance:none;
+        }
         .field input.input-error, .field select.input-error { background:#fff7f7; }
         .field-control.input-error { border-color:#dc2626; background:#fff7f7; }
         .field-error { display:block; min-height:1.05rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; }
@@ -102,8 +123,22 @@
         .contact-kicker { margin:0 0 1.1rem; font-size:.74rem; color:#64748b; text-transform:uppercase; letter-spacing:.08em; font-weight:800; }
         .contact-line { margin-bottom:1.2rem; color:#476280; line-height:1.7; }
         .contact-line strong { display:block; color:#0f172a; margin-bottom:.2rem; }
+        .contact-line a { color:#35537a; text-decoration:none; font-weight:600; word-break:break-word; }
+        .contact-line a:hover { color:#0a3f8f; text-decoration:underline; text-underline-offset:.15em; }
         .contact-form h3 { margin:0 0 1rem; font-size:1.15rem; }
         .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+        .contact-form .form-field input,
+        .contact-form .form-field textarea {
+            width:100%;
+            display:block;
+            border:1px solid #c8d7ea;
+            background:#f8fbff;
+            border-radius:10px;
+            padding:.72rem .8rem;
+            font:inherit;
+            color:#0f172a;
+            box-sizing:border-box;
+        }
         .form-field.full { grid-column:1 / -1; }
         .form-field textarea { min-height:120px; resize:vertical; }
         footer { margin-top:2.6rem; border-top:1px solid #215fb2; background:linear-gradient(135deg, #0a3f8f, #0f66c3); }
@@ -125,7 +160,7 @@
         .footer-bottom { padding-top:.8rem; display:flex; justify-content:space-between; align-items:center; gap:.6rem; flex-wrap:wrap; font-size:.82rem; }
         .footer-social { display:inline-flex; gap:.75rem; }
         .footer-social a { color:#d9e8ff; text-decoration:none; font-size:.76rem; letter-spacing:.04em; text-transform:uppercase; }
-        @media (max-width:980px) { .hero,.contact-card,.footer-grid,.package-grid,.fleet-grid,.benefits-grid,.hero-points,.search-grid,.form-grid { grid-template-columns:1fr; } .hero { margin-bottom:1rem; } .search-card { transform:translateY(-.5rem); } .section { padding-top:1rem; } .footer-bottom { flex-direction:column; align-items:flex-start; } .contact-info { border-right:0; border-bottom:1px solid var(--line); } }
+        @media (max-width:980px) { .hero,.contact-card,.footer-grid,.package-grid,.fleet-grid,.benefits-grid,.hero-points,.search-grid,.form-grid { grid-template-columns:1fr; } .hero { margin-bottom:1rem; } .search-card { transform:translateY(-.5rem); } .section { padding-top:1rem; } .footer-bottom { flex-direction:column; align-items:flex-start; } .contact-info { border-right:0; border-bottom:1px solid var(--line); } .contact-form .form-field input,.contact-form .form-field textarea { font-size:16px; } }
     </style>
 </head>
 <body>
@@ -269,9 +304,9 @@
                 <div class="contact-card">
                     <div class="contact-info">
                         <p class="contact-kicker">Find Us</p>
-                        <div class="contact-line"><strong>Main Office</strong>Galle, Sri Lanka</div>
-                        <div class="contact-line"><strong>Phone</strong>+94 77 717 3264</div>
-                        <div class="contact-line" style="margin-bottom:0;"><strong>Email</strong>info@rnaautorentals.com.lk</div>
+                        <div class="contact-line"><strong>Main Office</strong><a href="https://maps.google.com/?q=Galle,Sri Lanka" target="_blank" rel="noopener">Galle, Sri Lanka</a></div>
+                        <div class="contact-line"><strong>Phone</strong><a href="tel:+94777173264">+94 77 717 3264</a></div>
+                        <div class="contact-line" style="margin-bottom:0;"><strong>Email</strong><a href="mailto:info@rnaautorentals.com.lk">info@rnaautorentals.com.lk</a></div>
                     </div>
                     <div class="contact-form">
                         <h3>Contact Us</h3>

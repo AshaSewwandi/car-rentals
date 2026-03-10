@@ -48,9 +48,11 @@
         .field-control input::placeholder { text-align:center; }
         .field-control.date-control { position:relative; }
         .field-control.date-control::after { content:""; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); width:18px; height:18px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:18px 18px; pointer-events:none; opacity:.9; }
-        .field-control input[type="date"] { padding:0 2.1rem 0 .75rem; -webkit-appearance:auto; appearance:auto; text-align:center; }
+        .field-control input[type="date"] { padding:0 2.1rem 0 .75rem; -webkit-appearance:none; appearance:none; text-align:center; }
         .field-control input[type="date"]::-webkit-datetime-edit { height:100%; display:flex; align-items:center; }
         .field-control input[type="date"]::-webkit-date-and-time-value { text-align:center; height:100%; display:flex; align-items:center; justify-content:center; }
+        #quick_phone { text-align:left; }
+        #quick_phone::placeholder { text-align:left; }
         .field input.input-error, .field select.input-error { background:#fff7f7; }
         .field-control.input-error { border-color:#dc2626; background:#fff7f7; }
         .field-error { display:block; height:2.25rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }

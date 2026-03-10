@@ -36,11 +36,42 @@
 
     input[type="date"],
     input[type="datetime-local"] {
+      position: relative;
+      -webkit-appearance: none;
+      appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right .7rem center;
       background-size: 18px 18px;
       padding-right: 2.3rem !important;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      opacity: 0;
+      color: transparent;
+      background: transparent;
+      cursor: pointer;
+      display: block;
+    }
+
+    input[type="date"]::-webkit-clear-button,
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="datetime-local"]::-webkit-clear-button,
+    input[type="datetime-local"]::-webkit-inner-spin-button {
+      display: none;
+      -webkit-appearance: none;
+    }
+
+    .control-shell input[type="date"],
+    .field-control input[type="date"] {
+      background-image: none;
     }
 
     .topbar {
@@ -123,6 +154,41 @@
     .nav-link:hover {
       color: var(--text) !important;
       background: rgba(241, 245, 249, 0.95);
+    }
+
+    .mobile-admin-menu {
+      margin-top: .6rem;
+      border-top: 1px solid var(--line);
+      padding-top: .6rem;
+      display: grid;
+      gap: .35rem;
+    }
+
+    .mobile-admin-title {
+      margin: .35rem 0 .15rem;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 0 .1rem;
+    }
+
+    .mobile-admin-link {
+      display: block;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 700;
+      border: 1px solid #dbe6f3;
+      border-radius: .7rem;
+      background: #f8fbff;
+      padding: .55rem .7rem;
+    }
+
+    .mobile-admin-link:hover {
+      color: #0a3f8f;
+      border-color: #bfd5f3;
+      background: #f0f7ff;
     }
 
     .shell-wrap {
@@ -481,6 +547,15 @@
         font-size: 1.42rem;
       }
 
+      .navbar-collapse {
+        margin-top: .55rem;
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+        padding: .55rem .65rem;
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.07);
+      }
+
       .navbar-brand {
         max-width: calc(100vw - 110px);
       }
@@ -806,6 +881,68 @@
           <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
         @endauth
       </ul>
+      @auth
+        <div class="mobile-admin-menu d-lg-none">
+          <div class="mobile-admin-title">Core</div>
+          @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+            <a class="mobile-admin-link" href="{{ route('dashboard') }}">Dashboard</a>
+          @endif
+          @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+            <a class="mobile-admin-link" href="{{ route('gps-logs.index') }}">DAGPS KM Logs</a>
+          @endif
+
+          @if(auth()->user()->isAdmin() || auth()->user()->canAccess('rental_trips'))
+            <div class="mobile-admin-title">Trips</div>
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
+              <a class="mobile-admin-link" href="{{ route('rent-requests.index') }}">Rent Requests</a>
+            @endif
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
+              <a class="mobile-admin-link" href="{{ route('availability-check.index') }}">Availability Check</a>
+            @endif
+            @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
+              <a class="mobile-admin-link" href="{{ route('rental-trips.index') }}">Rental Trips</a>
+            @endif
+          @endif
+
+          <div class="mobile-admin-title">Operations</div>
+          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('cars.index'))
+            <a class="mobile-admin-link" href="{{ route('cars.index') }}">Cars</a>
+          @endif
+          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
+            <a class="mobile-admin-link" href="{{ route('vehicle-pricings.index') }}">Pricing</a>
+          @endif
+          @if(auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
+            <a class="mobile-admin-link" href="{{ route('customers.index') }}">Customers</a>
+          @endif
+          @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('rentals.index'))
+            <a class="mobile-admin-link" href="{{ route('rentals.index') }}">Rentals</a>
+          @endif
+          @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('payments.index'))
+            <a class="mobile-admin-link" href="{{ route('payments.index') }}">Payments</a>
+          @endif
+          @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
+            <a class="mobile-admin-link" href="{{ route('expenses.index') }}">Expenses</a>
+          @endif
+          @if(auth()->user()->canAccess('agreements') && \Illuminate\Support\Facades\Route::has('agreements.index'))
+            <a class="mobile-admin-link" href="{{ route('agreements.index') }}">Agreements</a>
+          @endif
+          @if(auth()->user()->canAccess('vehicle_maintenance') && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
+            <a class="mobile-admin-link" href="{{ route('vehicle-maintenance.index') }}">Maintenance</a>
+          @endif
+
+          <div class="mobile-admin-title">Administration</div>
+          <a class="mobile-admin-link" href="{{ route('profile.edit') }}">My Profile</a>
+          @if(auth()->user()->canAccess('users_manage') && \Illuminate\Support\Facades\Route::has('users.index'))
+            <a class="mobile-admin-link" href="{{ route('users.index') }}">Users & Roles</a>
+          @endif
+          @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
+            <a class="mobile-admin-link" href="{{ route('permissions.index') }}">Permissions</a>
+          @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('support-requests.index'))
+            <a class="mobile-admin-link" href="{{ route('support-requests.index') }}">Support Requests</a>
+          @endif
+        </div>
+      @endauth
     </div>
   </div>
 </nav>
@@ -954,7 +1091,7 @@
         || findByNameOrId(container, 'from_date');
     };
 
-    const applyMin = (startInput, endInput) => {
+    const applyMin = (startInput, endInput, shouldPromptEnd = false) => {
       if (!endInput.dataset.baseMin) {
         endInput.dataset.baseMin = endInput.getAttribute('min') || '';
       }
@@ -972,6 +1109,23 @@
       if (endInput.value && nextMin && endInput.value < nextMin) {
         endInput.value = '';
       }
+
+      const isMobile = window.matchMedia('(max-width: 920px)').matches;
+      if (
+        shouldPromptEnd &&
+        isMobile &&
+        startValue &&
+        !endInput.value &&
+        typeof endInput.showPicker === 'function'
+      ) {
+        setTimeout(() => {
+          try {
+            endInput.showPicker();
+          } catch (_) {
+            endInput.focus();
+          }
+        }, 120);
+      }
     };
 
     containers.forEach((container) => {
@@ -982,9 +1136,10 @@
         const startInput = findStartMatch(container, endInput);
         if (!startInput || startInput === endInput) return;
 
-        const sync = () => applyMin(startInput, endInput);
+        const sync = () => applyMin(startInput, endInput, false);
+        const syncAndPrompt = () => applyMin(startInput, endInput, true);
         startInput.addEventListener('input', sync);
-        startInput.addEventListener('change', sync);
+        startInput.addEventListener('change', syncAndPrompt);
         sync();
       });
     });

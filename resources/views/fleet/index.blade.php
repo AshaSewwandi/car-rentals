@@ -276,9 +276,10 @@
             height: 100% !important;
             min-height: 100% !important;
             padding: 0 2.2rem 0 .7rem;
-            -webkit-appearance: auto;
-            appearance: auto;
+            -webkit-appearance: none;
+            appearance: none;
             text-align: left;
+            position: relative;
         }
 
         .control-shell input[type="date"]::-webkit-datetime-edit {
@@ -292,6 +293,26 @@
             height: 100%;
             display: flex;
             align-items: center;
+        }
+
+        .control-shell input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            color: transparent;
+            background: transparent;
+            cursor: pointer;
+            display: block;
+        }
+
+        .control-shell input[type="date"]::-webkit-clear-button,
+        .control-shell input[type="date"]::-webkit-inner-spin-button {
+            display: none;
+            -webkit-appearance: none;
         }
 
         .control input.input-error {
@@ -333,18 +354,24 @@
             margin: 1rem 0 2rem;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
+            gap: .72rem;
         }
 
         .fleet-card {
-            border: 1px solid var(--line);
+            border: 1px solid #d6e3f2;
             background: var(--surface);
-            border-radius: var(--radius);
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+            transition: transform .2s ease, box-shadow .2s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .fleet-photo {
-            height: 210px;
+            position: relative;
+            height: 162px;
             background: #eef4ff;
             overflow: hidden;
         }
@@ -357,105 +384,218 @@
             display: block;
         }
 
+        .fleet-availability {
+            position: absolute;
+            top: .8rem;
+            right: .8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            border-radius: 999px;
+            padding: .38rem .75rem;
+            background: rgba(255, 255, 255, 0.96);
+            color: #0f172a;
+            font-size: .77rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            border: 1px solid #d9e5f4;
+        }
+
+        .fleet-availability::before {
+            content: "";
+            width: .5rem;
+            height: .5rem;
+            border-radius: 999px;
+            background: #16a34a;
+        }
+
+        .fleet-availability.rented::before {
+            background: #f97316;
+        }
+
         .fleet-body {
-            padding: .9rem;
+            padding: .68rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .fleet-kicker {
+            margin: 0 0 .24rem;
+            color: #0a3f8f;
+            font-size: .64rem;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: uppercase;
         }
 
         .fleet-title-row {
             display: flex;
-            align-items: baseline;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: .6rem;
-            margin-bottom: .25rem;
+            gap: .62rem;
+            margin-bottom: .4rem;
+        }
+
+        .fleet-title-meta {
+            min-width: 0;
         }
 
         .fleet-title-row h3 {
             margin: 0;
-            font-size: 1.05rem;
+            font-size: 1.18rem;
+            line-height: 1.06;
+            letter-spacing: -.02em;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            word-break: break-word;
         }
 
         .fleet-price {
-            color: var(--primary-2);
+            text-align: right;
+            white-space: normal;
+            flex-shrink: 0;
+            min-width: 100px;
+        }
+
+        .fleet-price-amount {
+            display: block;
+            color: #0f172a;
             font-weight: 800;
-            white-space: nowrap;
+            font-size: 1.38rem;
+            line-height: 1;
+            letter-spacing: -.01em;
         }
 
         .fleet-rate-unit {
             color: #64748b;
-            font-size: .74rem;
-            font-weight: 700;
-            margin-left: .1rem;
-        }
-
-        .fleet-sub {
-            color: #64748b;
-            font-size: .9rem;
-            margin-bottom: .35rem;
+            font-size: .8rem;
+            font-weight: 600;
+            margin-top: .22rem;
+            display: block;
         }
 
         .fleet-policy {
             color: #1e3a8a;
-            font-size: .78rem;
-            line-height: 1.35;
-            margin-bottom: .45rem;
-            font-weight: 600;
+            font-size: .7rem;
+            line-height: 1.45;
+            margin-bottom: .48rem;
+            font-weight: 700;
+            min-height: calc(1.45em * 2);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .fleet-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .3rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .36rem;
+            margin-bottom: .7rem;
         }
 
         .fleet-meta span {
-            font-size: .77rem;
-            color: #475569;
-            border: 1px solid #dbe6f3;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d8e4f4;
+            background: #f4f8ff;
+            color: #334155;
+            border-radius: 9px;
+            font-size: .72rem;
+            font-weight: 700;
+            padding: .28rem .34rem;
+            text-align: center;
+        }
+
+        .fleet-actions {
+            margin-top: .1rem;
+            margin-top: auto;
+        }
+
+        .fleet-primary-action {
+            margin-bottom: .45rem;
+        }
+
+        .fleet-secondary-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .42rem;
+        }
+
+        .btn-request {
+            width: 100%;
+            border: 1px solid #d2dff0;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 700;
+            border-radius: 9px;
+            padding: .5rem .62rem;
+            min-height: 38px;
+            cursor: pointer;
+            transition: all .2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: .84rem;
+        }
+
+        .btn-request:hover {
             background: #f8fbff;
-            border-radius: 999px;
-            padding: .2rem .52rem;
+            border-color: #bfd1e9;
+        }
+
+        .btn-request.btn-primary-action {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
+            box-shadow: 0 12px 22px rgba(15, 102, 195, 0.24);
+            font-size: .88rem;
+            font-weight: 800;
+        }
+
+        .btn-request.btn-primary-action:hover {
+            filter: brightness(1.03);
+        }
+
+        .btn-request.btn-muted-action {
+            background: #eef4ff;
+            color: #64748b;
+            border-color: #d4e1f2;
+        }
+
+        .fleet-tip {
+            margin: 0 0 .36rem;
+            color: #64748b;
+            font-size: .68rem;
+            font-weight: 600;
         }
 
         .fleet-status {
-            margin-top: .55rem;
+            margin: 0 0 .45rem;
             display: inline-flex;
             align-items: center;
             gap: .35rem;
-            font-size: .78rem;
+            font-size: .64rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: .04em;
+            letter-spacing: .05em;
+            color: #0f172a;
         }
 
         .fleet-status::before {
             content: "";
-            width: .48rem;
-            height: .48rem;
+            width: .45rem;
+            height: .45rem;
             border-radius: 999px;
             background: #16a34a;
         }
 
         .fleet-status.rented::before {
-            background: #f59e0b;
-        }
-
-        .fleet-actions {
-            margin-top: .7rem;
-        }
-
-        .btn-request {
-            width: 100%;
-            border: 1px solid #c6d9f2;
-            background: #eef5ff;
-            color: #0a3f8f;
-            font-weight: 700;
-            border-radius: 10px;
-            padding: .5rem .75rem;
-            cursor: pointer;
-        }
-
-        .btn-request:hover {
-            background: #e2eeff;
+            background: #f97316;
         }
 
         .alert {
@@ -676,12 +816,75 @@
             .topbar-inner { min-height: 66px; }
             .brand-name { font-size: 1rem; }
             .hero-title { font-size: 1.5rem; }
+            .hero-card {
+                padding: .85rem;
+                border-radius: 12px;
+            }
+            .hero-sub { font-size: .9rem; }
+            .hero-policy {
+                font-size: .82rem;
+                line-height: 1.35;
+            }
             .fleet-grid { grid-template-columns: 1fr; }
             .filter-grid { grid-template-columns: 1fr; }
-            .fleet-photo { height: 190px; }
+            .fleet-card {
+                border-radius: 14px;
+                box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+            }
+            .fleet-photo { height: 170px; }
+            .fleet-availability {
+                top: .55rem;
+                right: .55rem;
+                font-size: .68rem;
+                padding: .26rem .58rem;
+            }
+            .fleet-body { padding: .8rem; }
+            .fleet-title-row { gap: .5rem; }
+            .fleet-title-row h3 { font-size: 1.12rem; }
+            .fleet-price {
+                text-align: right;
+                min-width: 0;
+            }
+            .fleet-price-amount { font-size: 1.3rem; }
+            .fleet-rate-unit { font-size: .78rem; }
+            .fleet-policy {
+                font-size: .74rem;
+                min-height: auto;
+                -webkit-line-clamp: 3;
+            }
+            .fleet-meta {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: .4rem;
+            }
+            .fleet-meta span {
+                min-height: 34px;
+                font-size: .69rem;
+                white-space: nowrap;
+            }
+            .fleet-status {
+                font-size: .7rem;
+                margin-bottom: .5rem;
+            }
+            .btn-request {
+                min-height: 42px;
+                font-size: .9rem;
+            }
+            .fleet-secondary-actions { grid-template-columns: 1fr; }
+            .top-actions .btn-light { display: none; }
+            .top-actions .btn-primary { min-height: 38px; }
             .top-actions .btn { padding: .5rem .72rem; font-size: .82rem; }
             .request-grid { grid-template-columns: 1fr; }
             .request-summary-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 420px) {
+            .container { width: calc(100% - .9rem); }
+            .fleet-photo { height: 158px; }
+            .fleet-body { padding: .7rem; }
+            .fleet-title-row h3 { font-size: 1.03rem; }
+            .fleet-price-amount { font-size: 1.2rem; }
+            .fleet-meta span { min-height: 32px; font-size: .66rem; }
+            .btn-request { min-height: 40px; font-size: .86rem; }
         }
     </style>
 </head>
@@ -709,7 +912,7 @@
             <div class="hero-card">
                 <h1 class="hero-title">Full Fleet</h1>
                 <p class="hero-sub">Check vehicle availability for your selected date period and pickup location.</p>
-                <p class="hero-policy">Rental options vary by vehicle. Check each vehicle card for driver availability, included daily KM, and extra KM charge.</p>
+                <p class="hero-policy">Each vehicle has different rental details. Check the card to see driver option, daily KM included, and extra KM cost.</p>
                 <form class="filter-grid" id="fleetFilterForm" method="get" action="{{ route('fleet.index') }}" novalidate>
                     <div class="control">
                         <label for="start_location">Pickup Location</label>
@@ -743,16 +946,16 @@
 
                 @if($filters['start_date'] && $filters['end_date'])
                     <div class="results-note">
-                        System check completed for {{ $filters['start_date'] }} to {{ $filters['end_date'] }}.
-                        Showing only available vehicles.
+                        Availability checked for {{ $filters['start_date'] }} to {{ $filters['end_date'] }}.
+                        We are showing vehicles available for your selected dates.
                         @if($filters['start_location'])
-                            | Pickup: {{ $filters['start_location'] }}
+                            Pickup location: {{ $filters['start_location'] }}.
                         @endif
-                        ({{ $cars->count() }} result{{ $cars->count() === 1 ? '' : 's' }})
+                        {{ $cars->count() }} vehicle{{ $cars->count() === 1 ? '' : 's' }} found.
                     </div>
                 @else
                     <div class="results-note">
-                        Showing all vehicles. Select start and end dates to filter by availability.
+                        Showing all vehicles. Select your start and end dates to check availability.
                     </div>
                 @endif
 
@@ -771,20 +974,33 @@
 
         <section class="fleet-grid">
             @forelse($cars as $car)
+                @php
+                    $hasDateFilter = !empty($filters['start_date']) && !empty($filters['end_date']);
+                    $isAvailable = $hasDateFilter ? true : (($car['status'] ?? 'available') !== 'rented');
+                    $availabilityLabel = $isAvailable ? 'Available' : 'Rented';
+                @endphp
                 <article class="fleet-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] ?: $car['plate_no'] }}">
                     <div class="fleet-photo">
                         <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1.5rem';">
+                        <span class="fleet-availability {{ $isAvailable ? '' : 'rented' }}">{{ $availabilityLabel }}</span>
                     </div>
                     <div class="fleet-body">
+                        <p class="fleet-kicker">R&A Fleet</p>
                         <div class="fleet-title-row">
-                            <h3>{{ $car['name'] ?: $car['plate_no'] }}</h3>
+                            <div class="fleet-title-meta">
+                                <h3>{{ $car['name'] ?: $car['plate_no'] }}</h3>
+                            </div>
                             @if($car['rate'])
-                                <div class="fleet-price">Rs {{ $car['rate'] }}<span class="fleet-rate-unit">/day</span></div>
+                                <div class="fleet-price">
+                                    <span class="fleet-price-amount">Rs {{ $car['rate'] }}</span>
+                                    <span class="fleet-rate-unit">per day</span>
+                                </div>
                             @else
-                                <div class="fleet-price">Rate on request</div>
+                                <div class="fleet-price">
+                                    <span class="fleet-price-amount" style="font-size:1.2rem;">Rate on request</span>
+                                </div>
                             @endif
                         </div>
-                        <div class="fleet-sub">{{ $car['plate_no'] }}</div>
                         <div class="fleet-policy">
                             @if(($car['driver_mode'] ?? 'both') === 'with_driver_only')
                                 With driver only
@@ -797,34 +1013,18 @@
                             · Rs {{ number_format((float) ($car['extra_km_rate'] ?? 25), 0) }} per extra km
                         </div>
                         <div class="fleet-meta">
-                            @if($car['year']) <span>{{ $car['year'] }}</span> @endif
-                            @if($car['make']) <span>{{ $car['make'] }}</span> @endif
-                            @if($car['model']) <span>{{ $car['model'] }}</span> @endif
-                            @if($car['transmission']) <span>{{ $car['transmission'] }}</span> @endif
-                            @if($car['fuel_type']) <span>{{ $car['fuel_type'] }}</span> @endif
-                            @if($car['color']) <span>{{ $car['color'] }}</span> @endif
+                            @if($car['transmission']) <span>{{ $car['transmission'] }}</span> @else <span>Manual</span> @endif
+                            @if($car['fuel_type']) <span>{{ $car['fuel_type'] }}</span> @else <span>Petrol</span> @endif
+                            @if($car['color']) <span>{{ $car['color'] }}</span> @elseif($car['year']) <span>{{ $car['year'] }}</span> @else <span>R&A Ready</span> @endif
                         </div>
-                        @if($filters['start_date'] && $filters['end_date'])
-                            <div class="fleet-status">Available</div>
-                        @else
-                            <div class="fleet-status {{ $car['status'] === 'rented' ? 'rented' : '' }}">
-                                {{ $car['status'] === 'rented' ? 'Rented' : 'Available' }}
-                            </div>
-                        @endif
+                        <div class="fleet-status {{ $isAvailable ? '' : 'rented' }}">{{ $availabilityLabel }}</div>
                         <div class="fleet-actions">
-                            <a
-                                class="btn-request"
-                                style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:.45rem;background:#eef5ff;color:#0a3f8f;border-color:#c8d7ea;"
-                                href="{{ route('fleet.show', $car['id']) }}"
-                            >
-                                Details
-                            </a>
-                            @if($filters['start_date'] && $filters['end_date'])
+                            <div class="fleet-primary-action">
+                            @if($hasDateFilter)
                                 <a
-                                    class="btn-request"
+                                    class="btn-request btn-primary-action"
                                     data-loading-link="true"
                                     data-loading-text="Opening..."
-                                    style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-bottom:.45rem;background:linear-gradient(135deg,#0a3f8f,#0f66c3);color:#fff;border-color:transparent;"
                                     href="{{ route('booking.confirm', [
                                         'car_id' => $car['id'],
                                         'start_date' => $filters['start_date'],
@@ -838,28 +1038,38 @@
                             @else
                                 <button
                                     type="button"
-                                    class="btn-request"
-                                    style="margin-bottom:.45rem;background:#dbe6f3;color:#475569;border-color:#c8d7ea;cursor:not-allowed;"
+                                    class="btn-request btn-muted-action"
                                     title="Select start date and end date first"
                                     disabled
                                 >
                                     Continue to Book
                                 </button>
-                                <div style="font-size:.78rem;color:#64748b;margin:-.2rem 0 .35rem;">Select start and end dates first.</div>
                             @endif
-                            <button
-                                type="button"
-                                class="btn-request js-request-btn"
-                                data-car-id="{{ $car['id'] }}"
-                                data-car="{{ $car['name'] ?: $car['plate_no'] }}"
-                                data-plate="{{ $car['plate_no'] }}"
-                                data-start-date="{{ $filters['start_date'] }}"
-                                data-end-date="{{ $filters['end_date'] }}"
-                                data-start-location="{{ $filters['start_location'] }}"
-                            >
-                                <span class="btn-spinner" aria-hidden="true"></span>
-                                <span class="btn-label">Rent on Request</span>
-                            </button>
+                            </div>
+                            @unless($hasDateFilter)
+                                <p class="fleet-tip">Select start and end dates to continue booking.</p>
+                            @endunless
+                            <div class="fleet-secondary-actions">
+                                <a
+                                    class="btn-request"
+                                    href="{{ route('fleet.show', $car['id']) }}"
+                                >
+                                    View Details
+                                </a>
+                                <button
+                                    type="button"
+                                    class="btn-request js-request-btn"
+                                    data-car-id="{{ $car['id'] }}"
+                                    data-car="{{ $car['name'] ?: $car['plate_no'] }}"
+                                    data-plate="{{ $car['plate_no'] }}"
+                                    data-start-date="{{ $filters['start_date'] }}"
+                                    data-end-date="{{ $filters['end_date'] }}"
+                                    data-start-location="{{ $filters['start_location'] }}"
+                                >
+                                    <span class="btn-spinner" aria-hidden="true"></span>
+                                    <span class="btn-label">Rent on Request</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </article>
@@ -972,6 +1182,12 @@
                 if (button.tagName === 'BUTTON') {
                     button.disabled = false;
                 }
+            };
+
+            const resetAllLoadingButtons = () => {
+                document.querySelectorAll('.is-loading').forEach((el) => {
+                    clearButtonLoading(el);
+                });
             };
 
             const modal = document.getElementById('requestModal');
@@ -1255,6 +1471,10 @@
             });
 
             syncFilterEndDateMin();
+
+            window.addEventListener('pageshow', () => {
+                resetAllLoadingButtons();
+            });
         })();
     </script>
 </body>

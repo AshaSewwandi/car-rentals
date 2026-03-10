@@ -68,6 +68,9 @@
 
     input[type="date"],
     input[type="datetime-local"] {
+        position: relative;
+        -webkit-appearance: none;
+        appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right .7rem center;
@@ -75,7 +78,31 @@
         padding-right: 2.3rem !important;
     }
 
-    .field-control input[type="date"] {
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        color: transparent;
+        background: transparent;
+        cursor: pointer;
+        display: block;
+    }
+
+    input[type="date"]::-webkit-clear-button,
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="datetime-local"]::-webkit-clear-button,
+    input[type="datetime-local"]::-webkit-inner-spin-button {
+        display: none;
+        -webkit-appearance: none;
+    }
+
+    .field-control input[type="date"],
+    .control-shell input[type="date"] {
         background-image: none;
     }
 
@@ -143,7 +170,7 @@
                 || findByNameOrId(container, 'from_date');
         };
 
-        const applyMin = (startInput, endInput) => {
+        const applyMin = (startInput, endInput, shouldPromptEnd = false) => {
             if (!endInput.dataset.baseMin) {
                 endInput.dataset.baseMin = endInput.getAttribute('min') || '';
             }
@@ -161,6 +188,23 @@
             if (endInput.value && nextMin && endInput.value < nextMin) {
                 endInput.value = '';
             }
+
+            const isMobile = window.matchMedia('(max-width: 920px)').matches;
+            if (
+                shouldPromptEnd &&
+                isMobile &&
+                startValue &&
+                !endInput.value &&
+                typeof endInput.showPicker === 'function'
+            ) {
+                setTimeout(() => {
+                    try {
+                        endInput.showPicker();
+                    } catch (_) {
+                        endInput.focus();
+                    }
+                }, 120);
+            }
         };
 
         containers.forEach((container) => {
@@ -171,9 +215,10 @@
                 const startInput = findStartMatch(container, endInput);
                 if (!startInput || startInput === endInput) return;
 
-                const sync = () => applyMin(startInput, endInput);
+                const sync = () => applyMin(startInput, endInput, false);
+                const syncAndPrompt = () => applyMin(startInput, endInput, true);
                 startInput.addEventListener('input', sync);
-                startInput.addEventListener('change', sync);
+                startInput.addEventListener('change', syncAndPrompt);
                 sync();
             });
         });

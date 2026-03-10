@@ -163,6 +163,68 @@
       min-width: 100%;
     }
   }
+
+  @media (max-width: 767.98px) {
+    .dashboard-toolbar {
+      gap: .6rem;
+      margin-bottom: .8rem;
+    }
+
+    .dashboard-toolbar-left,
+    .dashboard-toolbar-right {
+      width: 100%;
+    }
+
+    .dashboard-toolbar-left h4 {
+      width: 100%;
+      margin-bottom: .1rem !important;
+      font-size: 1.95rem;
+    }
+
+    .dashboard-toolbar-right {
+      justify-content: flex-start;
+      gap: .5rem;
+    }
+
+    .dashboard-toolbar-right form {
+      width: 100%;
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: .5rem !important;
+    }
+
+    .dashboard-toolbar-right form .form-control,
+    .dashboard-toolbar-right form .btn,
+    .dashboard-toolbar-right > .btn {
+      min-height: 42px;
+    }
+
+    .dashboard-toolbar-right > .btn {
+      width: auto;
+      max-width: 100%;
+    }
+
+    .dashboard-page .kpi-value {
+      font-size: 1.9rem;
+    }
+
+    .dashboard-page .panel-card .card-header {
+      padding: .85rem .9rem;
+      flex-wrap: wrap;
+      gap: .35rem;
+      align-items: flex-start !important;
+    }
+
+    .dashboard-page .panel-card .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-page .panel-card .table {
+      min-width: 640px;
+      margin-bottom: 0;
+    }
+  }
 </style>
 <div class="dashboard-page">
 @php
