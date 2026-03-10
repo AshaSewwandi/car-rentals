@@ -269,7 +269,6 @@
                 </form>
             @else
                 <a class="mobile-auth" href="{{ route('login') }}">Sign In</a>
-                <a class="mobile-auth" href="{{ route('register') }}">Register</a>
             @endauth
         </nav>
 

@@ -39,9 +39,17 @@
         .quick-card { padding:1.2rem; }
         .quick-card h2 { margin:0 0 1rem; font-size:1.35rem; }
         .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+        .form-field { min-width:0; overflow:hidden; }
         .form-field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
-        .form-field input, .form-field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
-        .form-field input.input-error, .form-field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-control { --control-h:46px; width:100%; height:var(--control-h); border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; overflow:hidden; }
+        .field-control input, .field-control select { width:100%; min-width:0; max-width:100%; height:100%; min-height:100%; border:0; background:transparent; border-radius:10px; padding:0 .8rem; font:inherit; color:#0f172a; box-sizing:border-box; }
+        .field-control.date-control { position:relative; }
+        .field-control.date-control::after { content:""; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); width:18px; height:18px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:18px 18px; pointer-events:none; opacity:.9; }
+        .field-control input[type="date"] { padding:0 2.1rem 0 .8rem; -webkit-appearance:auto; appearance:auto; text-align:left; }
+        .field-control input[type="date"]::-webkit-datetime-edit { height:100%; display:flex; align-items:center; }
+        .field-control input[type="date"]::-webkit-date-and-time-value { text-align:left; height:100%; display:flex; align-items:center; }
+        .form-field input.input-error, .form-field select.input-error { background:#fff7f7; }
+        .field-control.input-error { border-color:#dc2626; background:#fff7f7; }
         .field-error { display:block; min-height:1.05rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; }
         .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; }
         .time-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.5rem; }
@@ -52,6 +60,7 @@
         .submit-btn.is-loading { pointer-events:none; opacity:.95; }
         @keyframes btn-spin { to { transform:rotate(360deg); } }
         .section { padding:2.8rem 0 0; }
+        section[id] { scroll-margin-top: 96px; }
         .section h2 { margin:0 0 .35rem; font-family:"Space Grotesk","Segoe UI",Tahoma,sans-serif; font-size:clamp(1.8rem, 3vw, 2.4rem); letter-spacing:-.03em; text-align:center; }
         .section-sub { margin:0 0 1.5rem; color:var(--muted); text-align:center; }
         .features-grid, .fleet-grid, .testimonials-grid, .footer-grid { display:grid; gap:1rem; }
@@ -101,7 +110,21 @@
         .footer-links { list-style:none; margin:0; padding:0; display:grid; gap:.42rem; }
         .footer-links a { color:#e7f0ff; text-decoration:none; font-size:.85rem; }
         .footer-bottom { padding-top:.9rem; text-align:center; font-size:.82rem; color:#bcd0ef; }
-        @media (max-width:980px) { .hero,.features-grid,.fleet-grid,.testimonials-grid,.footer-grid,.form-grid { grid-template-columns:1fr; } .banner-card { height:180px; } .banner-overlay { max-width:none; } }
+        @media (max-width:980px) {
+            .hero,.features-grid,.fleet-grid,.testimonials-grid,.footer-grid,.form-grid { grid-template-columns:1fr; }
+            section[id] { scroll-margin-top: 84px; }
+            .banner-card { height:auto; display:flex; flex-direction:column; }
+            .banner-card img { height:220px; }
+            .banner-overlay {
+                position:static;
+                inset:auto;
+                max-width:none;
+                padding:1rem 1rem 1.15rem;
+                background:linear-gradient(180deg, rgba(10,63,143,.9), rgba(10,63,143,.82));
+            }
+            .banner-overlay h3 { font-size:2rem; line-height:1.08; }
+            .banner-overlay p { line-height:1.55; margin-bottom:.55rem; }
+        }
     </style>
 </head>
 <body>
@@ -140,36 +163,48 @@
                         <div class="form-grid">
                             <div class="form-field">
                                 <label for="pickup_location">Pickup Location</label>
-                                <input id="pickup_location" type="text" name="start_location" placeholder="Hospital or Home Address" required>
+                                <div class="field-control">
+                                    <input id="pickup_location" type="text" name="start_location" placeholder="Hospital or Home Address" required>
+                                </div>
                                 <small id="pickup_location_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
                                 <label for="destination">Destination</label>
-                                <input id="destination" type="text" name="destination" placeholder="Medical Facility" required>
+                                <div class="field-control">
+                                    <input id="destination" type="text" name="destination" placeholder="Medical Facility" required>
+                                </div>
                                 <small id="destination_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
                                 <label for="ride_date">Date</label>
-                                <input id="ride_date" type="date" name="start_date" required>
+                                <div class="field-control date-control">
+                                    <input id="ride_date" type="date" name="start_date" required>
+                                </div>
                                 <small id="ride_date_error" class="field-error"></small>
                             </div>
                             <div class="form-field">
                                 <label for="ride_time">Time</label>
                                 <div class="time-grid">
-                                    <select id="ride_hour" required>
-                                        @for($h = 1; $h <= 12; $h++)
-                                            <option value="{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}</option>
-                                        @endfor
-                                    </select>
-                                    <select id="ride_minute" required>
-                                        @for($m = 0; $m < 60; $m += 5)
-                                            <option value="{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}</option>
-                                        @endfor
-                                    </select>
-                                    <select id="ride_ampm" required>
-                                        <option value="AM">AM</option>
-                                        <option value="PM">PM</option>
-                                    </select>
+                                    <div class="field-control">
+                                        <select id="ride_hour" required>
+                                            @for($h = 1; $h <= 12; $h++)
+                                                <option value="{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $h, 2, '0', STR_PAD_LEFT) }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div class="field-control">
+                                        <select id="ride_minute" required>
+                                            @for($m = 0; $m < 60; $m += 5)
+                                                <option value="{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}">{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div class="field-control">
+                                        <select id="ride_ampm" required>
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <small id="ride_time_error" class="field-error"></small>
                             </div>
@@ -302,12 +337,20 @@
             };
 
             const clearError = (field, errorKey) => {
-                if (field) field.classList.remove('input-error');
+                if (field) {
+                    field.classList.remove('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.remove('input-error');
+                }
                 if (fieldErrors[errorKey]) fieldErrors[errorKey].textContent = '';
             };
 
             const setError = (field, errorKey, message) => {
-                if (field) field.classList.add('input-error');
+                if (field) {
+                    field.classList.add('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.add('input-error');
+                }
                 if (fieldErrors[errorKey]) fieldErrors[errorKey].textContent = message;
             };
 

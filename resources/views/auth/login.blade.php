@@ -95,7 +95,7 @@
 
     <p class="mb-0 mt-3 text-center text-muted">
       No account?
-      <a href="{{ route('register') }}">Create one</a>
+      <a href="{{ route('register') }}">Sign up</a>
     </p>
   </div>
 </body>

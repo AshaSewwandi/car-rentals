@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:payments')->group(function () {
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+        Route::post('/payments/bank-details', [PaymentController::class, 'updateBankDetails'])->name('payments.bank-details.update');
         Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
         Route::post('/payments/{payment}/paid', [PaymentController::class, 'markPaid'])->name('payments.paid');
         Route::put('/payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');

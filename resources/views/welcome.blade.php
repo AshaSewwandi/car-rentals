@@ -324,12 +324,19 @@
             gap: .28rem;
             width: min(740px, 100%);
             box-shadow: 0 12px 28px rgba(6, 23, 49, 0.2);
+            overflow: hidden;
         }
 
         .hero-search .search-field {
             display: flex;
             flex-direction: column;
             gap: .2rem;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .hero-search .search-field.date-field {
+            position: relative;
         }
 
         .hero-search label {
@@ -349,6 +356,50 @@
             font: inherit;
             color: #102948;
             min-height: 42px;
+            min-width: 0;
+            max-width: 100%;
+            display: block;
+            box-sizing: border-box;
+            background-clip: padding-box;
+        }
+
+        .hero-search input[type="date"] {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden;
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 10px !important;
+            -webkit-border-radius: 10px !important;
+            position: relative;
+            padding-right: 2.35rem;
+            background-color: #f8fbff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7rem center;
+            background-size: 18px 18px;
+        }
+
+        .hero-search input[type="date"]::-webkit-datetime-edit {
+            padding: 0;
+            width: 100%;
+        }
+
+        .hero-search input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
+            width: 100%;
+        }
+
+        .hero-search input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            cursor: pointer;
         }
 
         .hero-search input:focus {
@@ -1653,12 +1704,12 @@
                                 <input id="start_location" name="start_location" type="text" placeholder="Pickup location" required aria-describedby="start_location_error">
                                 <small class="field-error" id="start_location_error"></small>
                             </div>
-                            <div class="search-field">
+                            <div class="search-field date-field">
                                 <label for="start_date">Start Date</label>
                                 <input id="start_date" name="start_date" type="date" required aria-describedby="start_date_error">
                                 <small class="field-error" id="start_date_error"></small>
                             </div>
-                            <div class="search-field">
+                            <div class="search-field date-field">
                                 <label for="end_date">End Date</label>
                                 <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
                                 <small class="field-error" id="end_date_error"></small>
@@ -1739,6 +1790,8 @@
                                 </div>
                                 <h3 class="showcase-title">{{ $car['name'] }}</h3>
                                 <p class="showcase-meta">
+                                    <span>Vehicle No: {{ $car['plate_no'] ?: '-' }}</span>
+                                    <span>Reg Year: {{ $car['year'] ?: '-' }}</span>
                                     <span>{{ $car['seats'] }}</span>
                                     <span>{{ $car['bags'] }}</span>
                                     <span>{{ $car['transmission'] }}</span>
@@ -1773,7 +1826,7 @@
                         </div>
                         <div>
                             <strong>Email</strong>
-                            info@rnaautorentals.lk
+                            info@rnaautorentals.com.lk
                         </div>
                         <div>
                             <strong>Working Hours</strong>

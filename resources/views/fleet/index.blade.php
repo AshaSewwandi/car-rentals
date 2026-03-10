@@ -221,18 +221,84 @@
             color: #64748b;
         }
 
-        .control input {
+        .control {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .control-shell {
             width: 100%;
             height: var(--filter-control-height);
             border: 1px solid #c8d7ea;
             background: #f8fbff;
             border-radius: 10px;
-            padding: .65rem .7rem;
+            overflow: hidden;
+        }
+
+        .control-shell input {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: 0;
+            background: transparent;
+            border-radius: 10px;
+            padding: 0 .7rem;
             color: #0f172a;
             font: inherit;
+            box-sizing: border-box;
+        }
+
+        .control-shell.date-shell {
+            position: relative;
+        }
+
+        .control-shell.date-shell::after {
+            content: "";
+            position: absolute;
+            right: .7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: 18px 18px;
+            pointer-events: none;
+            opacity: .9;
+        }
+
+        .control-shell input[type="date"] {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            height: 100% !important;
+            min-height: 100% !important;
+            padding: 0 2.2rem 0 .7rem;
+            -webkit-appearance: auto;
+            appearance: auto;
+            text-align: left;
+        }
+
+        .control-shell input[type="date"]::-webkit-datetime-edit {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .control-shell input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
+            height: 100%;
+            display: flex;
+            align-items: center;
         }
 
         .control input.input-error {
+            background: #fff7f7;
+        }
+
+        .control-shell.input-error {
             border-color: #dc2626;
             background: #fff7f7;
         }
@@ -647,17 +713,23 @@
                 <form class="filter-grid" id="fleetFilterForm" method="get" action="{{ route('fleet.index') }}" novalidate>
                     <div class="control">
                         <label for="start_location">Pickup Location</label>
-                        <input id="start_location" name="start_location" type="text" value="{{ $filters['start_location'] }}" placeholder="City, Airport, or Address" required aria-describedby="fleet_start_location_error">
+                        <div class="control-shell">
+                            <input id="start_location" name="start_location" type="text" value="{{ $filters['start_location'] }}" placeholder="City, Airport, or Address" required aria-describedby="fleet_start_location_error">
+                        </div>
                         <small class="field-error" id="fleet_start_location_error"></small>
                     </div>
                     <div class="control">
                         <label for="start_date">Start Date</label>
-                        <input id="start_date" name="start_date" type="date" value="{{ $filters['start_date'] }}" required aria-describedby="fleet_start_date_error">
+                        <div class="control-shell date-shell">
+                            <input id="start_date" name="start_date" type="date" value="{{ $filters['start_date'] }}" required aria-describedby="fleet_start_date_error">
+                        </div>
                         <small class="field-error" id="fleet_start_date_error"></small>
                     </div>
                     <div class="control">
                         <label for="end_date">End Date</label>
-                        <input id="end_date" name="end_date" type="date" value="{{ $filters['end_date'] }}" required aria-describedby="fleet_end_date_error">
+                        <div class="control-shell date-shell">
+                            <input id="end_date" name="end_date" type="date" value="{{ $filters['end_date'] }}" required aria-describedby="fleet_end_date_error">
+                        </div>
                         <small class="field-error" id="fleet_end_date_error"></small>
                     </div>
                     <div class="control filter-submit-wrap">
@@ -1089,12 +1161,16 @@
 
             const showFilterError = (input, errorEl, message) => {
                 input.classList.add('input-error');
+                const wrapper = input.closest('.control-shell');
+                if (wrapper) wrapper.classList.add('input-error');
                 errorEl.textContent = message;
                 errorEl.classList.add('show');
             };
 
             const clearFilterError = (input, errorEl) => {
                 input.classList.remove('input-error');
+                const wrapper = input.closest('.control-shell');
+                if (wrapper) wrapper.classList.remove('input-error');
                 errorEl.textContent = '';
                 errorEl.classList.remove('show');
             };

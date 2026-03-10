@@ -41,9 +41,18 @@
         .quick-card { margin:-1.2rem auto 0; width:min(1020px, calc(100% - 2rem)); background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1rem; box-shadow:var(--shadow); position:relative; z-index:2; }
         .quick-title { margin:0 0 .8rem; font-size:1.1rem; font-weight:800; }
         .quick-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr auto; gap:.7rem; align-items:end; }
+        .field { min-width:0; overflow:hidden; }
         .field label { display:block; margin-bottom:.3rem; font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#64748b; }
-        .field input, .field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.7rem .75rem; font:inherit; color:#0f172a; }
-        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-control { --control-h:44px; width:100%; height:var(--control-h); border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; overflow:hidden; }
+        .field-control input, .field-control select { width:100%; min-width:0; max-width:100%; height:100%; min-height:100%; border:0; background:transparent; border-radius:10px; padding:0 .75rem; font:inherit; color:#0f172a; box-sizing:border-box; text-align:center; }
+        .field-control input::placeholder { text-align:center; }
+        .field-control.date-control { position:relative; }
+        .field-control.date-control::after { content:""; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); width:18px; height:18px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:18px 18px; pointer-events:none; opacity:.9; }
+        .field-control input[type="date"] { padding:0 2.1rem 0 .75rem; -webkit-appearance:auto; appearance:auto; text-align:center; }
+        .field-control input[type="date"]::-webkit-datetime-edit { height:100%; display:flex; align-items:center; }
+        .field-control input[type="date"]::-webkit-date-and-time-value { text-align:center; height:100%; display:flex; align-items:center; justify-content:center; }
+        .field input.input-error, .field select.input-error { background:#fff7f7; }
+        .field-control.input-error { border-color:#dc2626; background:#fff7f7; }
         .field-error { display:block; height:2.25rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }
         .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; grid-column:1 / -1; }
         .search-btn { height:44px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
@@ -108,6 +117,8 @@
             .hero img { height:420px; }
             .quick-card { margin-top:-1rem; }
             .section-row { flex-direction:column; align-items:flex-start; }
+            .benefit { text-align:center; }
+            .icon { display:flex; margin:0 auto .7rem; }
         }
     </style>
 </head>
@@ -146,30 +157,38 @@
 
         <section class="quick-card">
             <h2 class="quick-title">Quick Inquiry</h2>
-            <form id="longTermQuickForm" class="quick-grid" action="{{ route('fleet.index') }}" method="get" novalidate>
+            <form id="longTermQuickForm" class="quick-grid" action="{{ route('fleet.index', [], false) }}" method="get" novalidate>
                 <div id="quick_form_alert" class="form-alert" style="display:none;"></div>
                 <div class="field">
                     <label for="start_date">Start Date</label>
-                    <input id="start_date" name="start_date" type="date" required>
+                    <div class="field-control date-control">
+                        <input id="start_date" name="start_date" type="date" required>
+                    </div>
                     <small id="start_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="duration">Duration (Months)</label>
-                    <select id="duration" name="duration">
-                        @foreach($durationOptions as $duration)
-                            <option value="{{ $duration }}">{{ $duration }}</option>
-                        @endforeach
-                    </select>
+                    <div class="field-control">
+                        <select id="duration" name="duration">
+                            @foreach($durationOptions as $duration)
+                                <option value="{{ $duration }}">{{ $duration }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <small class="field-error">&nbsp;</small>
                 </div>
                 <div class="field">
                     <label for="quick_name">Name</label>
-                    <input id="quick_name" name="quick_name" type="text">
+                    <div class="field-control">
+                        <input id="quick_name" name="quick_name" type="text">
+                    </div>
                     <small class="field-error">&nbsp;</small>
                 </div>
                 <div class="field">
                     <label for="quick_phone">Phone</label>
-                    <input id="quick_phone" name="quick_phone" type="text" placeholder="+94 ...">
+                    <div class="field-control">
+                        <input id="quick_phone" name="quick_phone" type="text" placeholder="+94 ...">
+                    </div>
                     <small class="field-error">&nbsp;</small>
                 </div>
                 <input type="hidden" id="end_date" name="end_date" value="">
@@ -283,12 +302,20 @@
             };
 
             const clearError = (field, key) => {
-                if (field) field.classList.remove('input-error');
+                if (field) {
+                    field.classList.remove('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.remove('input-error');
+                }
                 if (fieldErrors[key]) fieldErrors[key].textContent = '';
             };
 
             const setError = (field, key, message) => {
-                if (field) field.classList.add('input-error');
+                if (field) {
+                    field.classList.add('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.add('input-error');
+                }
                 if (fieldErrors[key]) fieldErrors[key].textContent = message;
             };
 

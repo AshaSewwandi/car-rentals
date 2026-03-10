@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\GuestAccountCreatedMail;
 use App\Mail\BookingInvoiceStatusMail;
 use App\Models\Agreement;
+use App\Models\AppSetting;
 use App\Models\Booking;
 use App\Models\Car;
 use App\Models\Rental;
@@ -84,6 +85,7 @@ class BookingController extends Controller
             'driverMode' => $driverMode,
             'defaultDriverOption' => $defaultDriverOption,
             'prefillNote' => $prefillNote,
+            'paymentDetails' => AppSetting::paymentDetails(),
         ]);
     }
 
@@ -176,7 +178,9 @@ class BookingController extends Controller
             abort(403);
         }
 
-        return view('booking.success', compact('booking'));
+        $paymentDetails = AppSetting::paymentDetails();
+
+        return view('booking.success', compact('booking', 'paymentDetails'));
     }
 
     public function cancel(Request $request, Booking $booking): RedirectResponse

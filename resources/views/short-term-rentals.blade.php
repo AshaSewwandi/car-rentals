@@ -35,13 +35,23 @@
         .btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; border-radius:12px; padding:.85rem 1.2rem; font-weight:800; border:1px solid transparent; }
         .btn-primary { color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 12px 24px rgba(10,63,143,.24); }
         .btn-light { color:var(--text); background:#fff; border-color:#dbe6f3; }
-        .search-card { position:relative; z-index:2; width:min(1080px, calc(100% - 2rem)); margin:-3.1rem auto 0; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:1rem 1rem 1.1rem; }
+        .search-card { position:relative; z-index:2; width:min(1080px, calc(100% - 2rem)); margin:-3.1rem auto 0; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:1rem 1rem 1.1rem; overflow:hidden; }
         .search-card h2 { margin:0 0 1rem; font-size:1.35rem; }
         .search-grid { display:grid; grid-template-columns:1.15fr 1fr 1fr auto; gap:.8rem; align-items:start; }
+        .search-grid .field { min-width:0; overflow:hidden; }
         .field label { display:block; margin-bottom:.35rem; font-size:.72rem; color:#64748b; text-transform:uppercase; letter-spacing:.07em; font-weight:800; }
-        .field input, .field select { width:100%; border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; padding:.72rem .8rem; font:inherit; color:#0f172a; }
-        .field input.input-error, .field select.input-error { border-color:#dc2626; background:#fff7f7; }
-        .field-error { display:block; height:2.25rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }
+        .field-control { --control-h:46px; width:100%; height:var(--control-h); border:1px solid #c8d7ea; background:#f8fbff; border-radius:10px; overflow:hidden; }
+        .field-control input, .field-control select { width:100%; min-width:0; max-width:100%; height:100%; min-height:100%; display:block; border:0; background:transparent; padding:0 .8rem; font-family:inherit; font-size:1rem; line-height:1.2; color:#0f172a; box-sizing:border-box; border-radius:10px; }
+        .field-control.date-control { position:relative; }
+        .field-control.date-control::after { content:""; position:absolute; right:.7rem; top:50%; transform:translateY(-50%); width:18px; height:18px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-size:18px 18px; pointer-events:none; opacity:.9; }
+        .field-control input[type="date"] { width:100%; min-width:0; max-width:100%; height:100% !important; min-height:100% !important; padding:0 2.1rem 0 .8rem; line-height:1.2; text-align:left; -webkit-appearance:auto; appearance:auto; }
+        .field-control input[type="date"]::-webkit-datetime-edit { height:100%; display:flex; align-items:center; }
+        .field-control input[type="date"]::-webkit-date-and-time-value { text-align:left; height:100%; display:flex; align-items:center; }
+        .field-hint { margin-top:.22rem; font-size:.76rem; color:#64748b; }
+        .field input.input-error, .field select.input-error { background:#fff7f7; }
+        .field-control.input-error { border-color:#dc2626; background:#fff7f7; }
+        .field-error { display:block; min-height:1rem; margin-top:.3rem; color:#b91c1c; font-size:.8rem; font-weight:600; line-height:1.35; overflow:hidden; }
+        .field-error:empty { min-height:0; margin-top:.15rem; }
         .form-alert { margin:0 0 .8rem; border:1px solid #fecaca; background:#fff1f2; color:#9f1239; border-radius:10px; padding:.65rem .75rem; font-size:.85rem; font-weight:600; grid-column:1 / -1; }
         .search-btn { width:100%; height:46px; border:0; border-radius:10px; padding:0 1rem; font:inherit; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
         .search-btn .btn-spinner { display:none; width:16px; height:16px; border:2px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:999px; animation:btn-spin .7s linear infinite; }
@@ -90,7 +100,7 @@
         .footer-links { list-style:none; margin:0; padding:0; display:grid; gap:.42rem; }
         .footer-links a { color:#e7f0ff; text-decoration:none; font-size:.85rem; }
         .footer-bottom { padding-top:.9rem; text-align:center; font-size:.82rem; color:#bcd0ef; }
-        @media (max-width:980px) { .search-grid,.benefits-grid,.fleet-grid,.steps-grid,.footer-grid { grid-template-columns:1fr; } .hero-image { height:500px; } .search-card { margin-top:-2rem; } .section-row { flex-direction:column; align-items:flex-start; } }
+        @media (max-width:980px) { .search-grid,.benefits-grid,.fleet-grid,.steps-grid,.footer-grid { grid-template-columns:1fr; } .search-grid { width:100%; min-width:0; } .hero-image { height:500px; } .search-card { margin-top:-2rem; } .section-row { flex-direction:column; align-items:flex-start; } }
     </style>
 </head>
 <body>
@@ -129,21 +139,29 @@
                 <div id="short_search_alert" class="form-alert" style="display:none;"></div>
                 <div class="field">
                     <label for="start_location">Pickup Location</label>
-                    <select id="start_location" name="start_location" required>
-                        @foreach($cities as $city)
-                            <option value="{{ $city }}">{{ $city }}</option>
-                        @endforeach
-                    </select>
+                    <div class="field-control">
+                        <select id="start_location" name="start_location" required>
+                            @foreach($cities as $city)
+                                <option value="{{ $city }}">{{ $city }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <small id="start_location_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="start_date">Start Date</label>
-                    <input id="start_date" name="start_date" type="date" required>
+                    <div class="field-control date-control">
+                        <input id="start_date" name="start_date" type="date" required>
+                    </div>
+                    <small class="field-hint">Select pickup day</small>
                     <small id="start_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
                     <label for="end_date">End Date</label>
-                    <input id="end_date" name="end_date" type="date" required>
+                    <div class="field-control date-control">
+                        <input id="end_date" name="end_date" type="date" required>
+                    </div>
+                    <small class="field-hint">Select return day</small>
                     <small id="end_date_error" class="field-error"></small>
                 </div>
                 <div class="field">
@@ -253,12 +271,20 @@
             };
 
             const clearError = (field, key) => {
-                if (field) field.classList.remove('input-error');
+                if (field) {
+                    field.classList.remove('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.remove('input-error');
+                }
                 if (fieldErrors[key]) fieldErrors[key].textContent = '';
             };
 
             const setError = (field, key, message) => {
-                if (field) field.classList.add('input-error');
+                if (field) {
+                    field.classList.add('input-error');
+                    const wrapper = field.closest('.field-control');
+                    if (wrapper) wrapper.classList.add('input-error');
+                }
                 if (fieldErrors[key]) fieldErrors[key].textContent = message;
             };
 
@@ -376,4 +402,3 @@
     </script>
 </body>
 </html>
-

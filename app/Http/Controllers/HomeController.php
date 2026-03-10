@@ -22,6 +22,10 @@ class HomeController extends Controller
             ->map(function (Car $car) {
                 $pricing = VehiclePricingResolver::resolveForCar($car);
                 $dailyRate = (float) $pricing['daily_rate'];
+                $name = trim((string) $car->name);
+                $makeModel = trim((string) ($car->make ?? '') . ' ' . (string) ($car->model ?? ''));
+                $looksLikePlateAndYear = preg_match('/^[A-Za-z]{2,4}\s*\d{3,4}(\s+\d{4})?$/', $name) === 1;
+                $displayName = $looksLikePlateAndYear && $makeModel !== '' ? $makeModel : ($name !== '' ? $name : 'Vehicle');
 
                 $segment = 'Economy';
                 if (str_contains(strtolower((string) $car->name), 'largo')) {
@@ -32,7 +36,9 @@ class HomeController extends Controller
 
                 return [
                     'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
+                    'name' => $displayName,
+                    'plate_no' => $car->plate_no,
+                    'year' => $car->year,
                     'daily_rate' => $dailyRate,
                     'segment' => $segment,
                     'transmission' => $car->transmission ?: 'Auto',

@@ -4,6 +4,66 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>R&A Auto Rentals Invoice</title>
+    <style>
+        @media only screen and (max-width: 620px) {
+            .email-shell {
+                padding: 12px 8px !important;
+            }
+
+            .email-card {
+                border-radius: 10px !important;
+            }
+
+            .email-header {
+                padding: 14px 12px !important;
+            }
+
+            .email-brand {
+                font-size: 18px !important;
+                line-height: 1.3 !important;
+            }
+
+            .email-body,
+            .email-body-section {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
+
+            .email-body {
+                padding-top: 16px !important;
+                padding-bottom: 14px !important;
+            }
+
+            .email-body-section {
+                padding-bottom: 16px !important;
+            }
+
+            .email-title {
+                font-size: 24px !important;
+            }
+
+            .stack-cell {
+                display: block !important;
+                width: 100% !important;
+                padding: 0 0 12px 0 !important;
+            }
+
+            .stack-cell:last-child {
+                padding-bottom: 0 !important;
+            }
+
+            .vehicle-image {
+                width: 100% !important;
+                max-width: 220px !important;
+                height: auto !important;
+            }
+
+            .summary-total-label,
+            .summary-total-amount {
+                font-size: 18px !important;
+            }
+        }
+    </style>
 </head>
 <body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
     @php
@@ -37,20 +97,20 @@
         $vehicleFuel = $booking->car?->fuel_type ?? $booking->car?->fuel;
     @endphp
 
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7fb;padding:24px 0;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-shell" style="background:#f4f7fb;padding:24px 0;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border:1px solid #dbe6f3;border-radius:12px;overflow:hidden;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-card" style="max-width:640px;background:#ffffff;border:1px solid #dbe6f3;border-radius:12px;overflow:hidden;">
                     <tr>
-                        <td style="background:linear-gradient(135deg,#0a3f8f,#0f66c3);padding:18px 22px;">
+                        <td class="email-header" style="background:linear-gradient(135deg,#0a3f8f,#0f66c3);padding:18px 22px;">
                             <img src="{{ $logoSrc }}" alt="R&A Auto Rentals" style="width:40px;height:40px;vertical-align:middle;border-radius:8px;background:#ffffff;padding:4px;object-fit:contain;">
-                            <span style="display:inline-block;vertical-align:middle;margin-left:8px;color:#ffffff;font-size:24px;font-weight:700;">R&amp;A Auto Rentals</span>
+                            <span class="email-brand" style="display:inline-block;vertical-align:middle;margin-left:8px;color:#ffffff;font-size:24px;font-weight:700;">R&amp;A Auto Rentals</span>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:22px 24px 18px;">
+                        <td class="email-body" style="padding:22px 24px 18px;">
                             <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Invoice #{{ $booking->id }}</p>
-                            <h1 style="margin:0 0 10px;font-size:30px;line-height:1.25;color:#0f172a;">
+                            <h1 class="email-title" style="margin:0 0 10px;font-size:30px;line-height:1.25;color:#0f172a;">
                                 {{ $isCompleted ? 'Final Trip Invoice' : 'Booking Invoice' }}
                             </h1>
                             <span style="display:inline-block;padding:7px 12px;border-radius:999px;background:{{ $statusBg }};color:{{ $statusColor }};font-weight:700;font-size:12px;letter-spacing:.08em;">
@@ -59,7 +119,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding:0 24px 22px;">
+                        <td class="email-body-section" style="padding:0 24px 22px;">
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #dbe6f3;border-radius:10px;background:#ffffff;overflow:hidden;">
                                 <tr>
                                     <td style="padding:14px 16px;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:700;">Vehicle Details</td>
@@ -68,17 +128,17 @@
                                     <td style="padding:0 16px 14px;">
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td width="140" valign="top" style="padding:0 14px 0 0;">
-                                                    <img src="{{ $carImageSrc }}" alt="{{ $booking->car?->name ?: 'Vehicle image' }}" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
+                                                <td width="140" valign="top" class="stack-cell" style="padding:0 14px 0 0;">
+                                                    <img src="{{ $carImageSrc }}" alt="{{ $booking->car?->name ?: 'Vehicle image' }}" class="vehicle-image" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
                                                 </td>
-                                                <td valign="top" style="font-size:14px;color:#334155;line-height:1.8;">
+                                                <td valign="top" class="stack-cell" style="font-size:14px;color:#334155;line-height:1.8;">
                                                     <strong style="color:#0f172a;font-size:16px;">{{ $booking->car?->name ?: 'Vehicle' }}</strong><br>
                                                     <strong style="color:#0f172a;">Plate:</strong> {{ $booking->car?->plate_no ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Year:</strong> {{ $vehicleYear ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Transmission:</strong> {{ $vehicleTransmission ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Fuel:</strong> {{ $vehicleFuel ?: '-' }}
                                                 </td>
-                                                <td width="160" valign="top" style="padding:0 0 0 10px;">
+                                                <td width="160" valign="top" class="stack-cell" style="padding:0 0 0 10px;">
                                                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:2px solid #f59e0b;background:#fff7ed;border-radius:8px;">
                                                         <tr>
                                                             <td style="padding:10px 8px;text-align:center;">
@@ -136,8 +196,8 @@
                                     <td style="background:#0f66c3;color:#ffffff;padding:14px 16px;">
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td style="font-size:24px;font-weight:700;">Total Amount</td>
-                                                <td style="font-size:24px;font-weight:700;text-align:right;">LKR {{ number_format($finalAmount, 2) }}</td>
+                                                <td class="summary-total-label" style="font-size:24px;font-weight:700;">Total Amount</td>
+                                                <td class="summary-total-amount" style="font-size:24px;font-weight:700;text-align:right;">LKR {{ number_format($finalAmount, 2) }}</td>
                                             </tr>
                                         </table>
                                     </td>

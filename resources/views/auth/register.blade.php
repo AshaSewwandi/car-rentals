@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   @include('partials.seo-meta', [
-    'title' => 'Register | R&A Auto Rentals',
+    'title' => 'Sign Up | R&A Auto Rentals',
     'description' => 'Create your rental account to book vehicles online, track active trips, and manage profile details with R&A Auto Rentals.',
     'keywords' => [
       'rental registration',
@@ -65,7 +65,7 @@
 <body>
   <div class="auth-card p-4">
     <h3 class="auth-title mb-1">Create Account</h3>
-    <p class="text-muted mb-4">Register to access your rental management workspace.</p>
+    <p class="text-muted mb-4">Sign up to access your rental management workspace.</p>
 
     @if($errors->any())
       <div class="alert alert-danger">
@@ -99,7 +99,7 @@
         <label class="form-label">Confirm Password</label>
         <input type="password" name="password_confirmation" class="form-control" required>
       </div>
-      <button class="btn btn-dark w-100">Register</button>
+      <button class="btn btn-dark w-100">Sign Up</button>
     </form>
 
     <p class="mb-0 mt-3 text-center text-muted">
