@@ -613,12 +613,41 @@
         margin-bottom: .3rem;
       }
 
+      /* Global admin mobile table safety: prevent horizontal overflow */
+      .shell-wrap,
+      .app-main,
+      .app-main-col,
+      .container-fluid,
+      .card,
+      .card-body,
+      .table-responsive {
+        max-width: 100%;
+      }
+
+      .shell-wrap,
+      .app-main,
+      .app-main-col {
+        overflow-x: hidden;
+      }
+
       .card .table {
-        display: block;
+        display: table;
         width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
+        min-width: 0;
+        table-layout: fixed;
+        white-space: normal;
+      }
+
+      .card .table th,
+      .card .table td {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+
+      .card .table-responsive {
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: auto;
       }
 
       .page-toolbar form .form-control,
@@ -642,6 +671,19 @@
       td .d-flex.gap-2 .form-control,
       td .d-flex.gap-2 .btn {
         width: 100%;
+      }
+    }
+
+    /* iOS Safari global overflow guard for admin pages */
+    @supports (-webkit-touch-callout: none) {
+      @media (max-width: 991.98px) {
+        html,
+        body,
+        .shell-wrap,
+        .app-main,
+        .app-main-col {
+          overflow-x: hidden !important;
+        }
       }
     }
 

@@ -2,6 +2,124 @@
 @section('title', 'Vehicle Maintenance')
 
 @section('content')
+<style>
+  .maintenance-table-wrap {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 920px) {
+    .page-toolbar {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .page-toolbar > .d-flex.gap-2 {
+      width: 100%;
+      display: grid !important;
+      gap: .5rem !important;
+    }
+
+    .page-toolbar > .d-flex.gap-2 > form {
+      width: 100%;
+      display: grid !important;
+      gap: .5rem !important;
+    }
+
+    .page-toolbar > .d-flex.gap-2 > form > div,
+    .page-toolbar > .d-flex.gap-2 > form > select,
+    .page-toolbar > .d-flex.gap-2 > form > button,
+    .page-toolbar > .d-flex.gap-2 > a {
+      width: 100%;
+    }
+
+    .maintenance-table-wrap {
+      overflow: visible;
+    }
+
+    .maintenance-table,
+    .maintenance-table thead,
+    .maintenance-table tbody,
+    .maintenance-table th,
+    .maintenance-table td,
+    .maintenance-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .maintenance-table thead {
+      display: none;
+    }
+
+    .maintenance-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .maintenance-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 40%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      text-align: left !important;
+    }
+
+    .maintenance-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .maintenance-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(40% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .maintenance-table tbody td.maintenance-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .maintenance-table tbody td.maintenance-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .maintenance-table tbody td.maintenance-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .maintenance-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center !important;
+      border-top: 0;
+    }
+
+    .maintenance-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+</style>
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Vehicle Maintenance</h4>
@@ -44,8 +162,8 @@
     </div>
   </div>
   <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-striped mb-0">
+    <div class="table-responsive maintenance-table-wrap">
+      <table class="table table-striped mb-0 maintenance-table">
         <thead>
           <tr>
             <th>Date</th>
@@ -60,13 +178,13 @@
         <tbody>
           @forelse($records as $record)
             <tr>
-              <td>{{ $record->service_date->format('Y-m-d') }}</td>
-              <td>{{ $record->car?->name }}{{ $record->car?->plate_no ? ' (' . $record->car->plate_no . ')' : '' }}</td>
-              <td>{{ $record->part_name }}</td>
-              <td>{{ $record->mileage !== null ? number_format($record->mileage) . ' km' : '-' }}</td>
-              <td class="text-end">Rs {{ number_format((float) $record->amount, 2) }}</td>
-              <td>{{ $record->note ?: '-' }}</td>
-              <td class="text-nowrap">
+              <td data-label="Date">{{ $record->service_date->format('Y-m-d') }}</td>
+              <td data-label="Vehicle">{{ $record->car?->name }}{{ $record->car?->plate_no ? ' (' . $record->car->plate_no . ')' : '' }}</td>
+              <td data-label="Part / Work">{{ $record->part_name }}</td>
+              <td data-label="Mileage">{{ $record->mileage !== null ? number_format($record->mileage) . ' km' : '-' }}</td>
+              <td data-label="Amount" class="text-end">Rs {{ number_format((float) $record->amount, 2) }}</td>
+              <td data-label="Note">{{ $record->note ?: '-' }}</td>
+              <td data-label="Action" class="text-nowrap maintenance-actions">
                 <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editMaintenanceModal{{ $record->id }}">Update</button>
                 <button
                   type="button"
@@ -81,7 +199,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="7" class="text-center p-4 text-muted">No maintenance records found.</td></tr>
+            <tr><td colspan="7" class="text-center p-4 text-muted no-data">No maintenance records found.</td></tr>
           @endforelse
         </tbody>
       </table>

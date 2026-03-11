@@ -2,6 +2,109 @@
 @section('title', 'User Management')
 
 @section('content')
+<style>
+  .users-table-wrap {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 920px) {
+    .page-toolbar {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .page-toolbar .btn {
+      width: 100%;
+    }
+
+    .users-table-wrap {
+      overflow: visible;
+    }
+
+    .users-table,
+    .users-table thead,
+    .users-table tbody,
+    .users-table th,
+    .users-table td,
+    .users-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .users-table thead {
+      display: none;
+    }
+
+    .users-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .users-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 38%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      text-align: left !important;
+    }
+
+    .users-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .users-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(38% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .users-table tbody td.user-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .users-table tbody td.user-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .users-table tbody td.user-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .users-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center !important;
+      border-top: 0;
+    }
+
+    .users-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+</style>
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">User Management</h4>
@@ -23,8 +126,8 @@
 <div class="card list-card">
   <div class="card-header"><span class="header-title">Users</span></div>
   <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-striped mb-0 align-middle">
+    <div class="table-responsive users-table-wrap">
+      <table class="table table-striped mb-0 align-middle users-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -39,15 +142,15 @@
         <tbody>
           @forelse($users as $user)
             <tr>
-              <td>{{ $user->name }}</td>
-              <td>{{ $user->email }}</td>
-              <td>{{ $user->phone ?: '-' }}</td>
-              <td>
+              <td data-label="Name">{{ $user->name }}</td>
+              <td data-label="Email">{{ $user->email }}</td>
+              <td data-label="Phone">{{ $user->phone ?: '-' }}</td>
+              <td data-label="Role">
                 <span class="badge {{ $user->role === 'admin' ? 'bg-success' : ($user->role === 'partner' ? 'bg-primary' : 'bg-secondary') }}">
                   {{ ucfirst($user->role) }}
                 </span>
               </td>
-              <td>
+              <td data-label="Revenue Split">
                 @if($user->role === 'partner')
                   <div class="small fw-semibold">Partner {{ number_format((float) $user->partner_share_percentage, 2) }}%</div>
                   <div class="small text-muted">Admin {{ number_format((float) $user->admin_share_percentage, 2) }}%</div>
@@ -55,8 +158,8 @@
                   <span class="text-muted">-</span>
                 @endif
               </td>
-              <td>{{ $user->created_at?->format('Y-m-d') }}</td>
-              <td class="text-nowrap">
+              <td data-label="Created">{{ $user->created_at?->format('Y-m-d') }}</td>
+              <td data-label="Action" class="text-nowrap user-actions">
                 <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
                 @if(auth()->id() !== $user->id)
                   <button
@@ -73,7 +176,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="7" class="text-center p-4 text-muted">No users found.</td></tr>
+            <tr><td colspan="7" class="text-center p-4 text-muted no-data">No users found.</td></tr>
           @endforelse
         </tbody>
       </table>

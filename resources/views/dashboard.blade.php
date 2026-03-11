@@ -150,6 +150,15 @@
   }
 
   @media (max-width: 991.98px) {
+    .dashboard-page {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .app-main.app-main-col {
+      overflow-x: hidden;
+    }
+
     .dashboard-toolbar {
       align-items: flex-start;
       flex-direction: column;
@@ -162,9 +171,38 @@
     .dash-search {
       min-width: 100%;
     }
+
+    /* Override shared layout mobile rule that forces nowrap table scrolling */
+    .dashboard-page .panel-card .table {
+      display: table !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      white-space: normal !important;
+      overflow: visible !important;
+    }
+
+    .dashboard-page .panel-card .table-responsive {
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: auto;
+    }
   }
 
   @media (max-width: 767.98px) {
+    .dashboard-page {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .dashboard-page .row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .dashboard-page .row > [class*="col-"] {
+      padding-left: .35rem;
+      padding-right: .35rem;
+    }
+
     .dashboard-toolbar {
       gap: .6rem;
       margin-bottom: .8rem;
@@ -215,14 +253,101 @@
       align-items: flex-start !important;
     }
 
+    .dashboard-page .panel-card {
+      overflow: hidden;
+    }
+
     .dashboard-page .panel-card .table-responsive {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
     }
 
     .dashboard-page .panel-card .table {
-      min-width: 640px;
-      margin-bottom: 0;
+      white-space: normal !important;
+      overflow: visible !important;
+    }
+
+    .dashboard-page .dash-table,
+    .dashboard-page .dash-table thead,
+    .dashboard-page .dash-table tbody,
+    .dashboard-page .dash-table th,
+    .dashboard-page .dash-table td,
+    .dashboard-page .dash-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .dashboard-page .dash-table thead {
+      display: none;
+    }
+
+    .dashboard-page .dash-table tbody tr {
+      border-top: 1px solid var(--dash-border);
+      padding: .25rem 0;
+    }
+
+    .dashboard-page .dash-table tbody td {
+      position: relative;
+      border: 0;
+      border-top: 1px solid #edf3fb;
+      padding: .58rem .8rem .58rem 42%;
+      min-height: 42px;
+      box-sizing: border-box;
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-page .dash-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .dashboard-page .dash-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .8rem;
+      top: .58rem;
+      width: calc(42% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .dashboard-page .dash-table tbody td.text-end {
+      text-align: left !important;
+    }
+
+    .dashboard-page .dash-table tbody td.no-data {
+      padding: .95rem .85rem !important;
+      text-align: center !important;
+    }
+
+    .dashboard-page .dash-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+
+  /* iOS Safari-specific overflow guard */
+  @supports (-webkit-touch-callout: none) {
+    @media (max-width: 767.98px) {
+      .dashboard-page {
+        overflow-x: clip;
+      }
+
+      .dashboard-page .panel-card .table {
+        white-space: normal !important;
+      }
+
+      .dashboard-page .dashboard-toolbar-right form {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 991.98px) {
+      html, body {
+        overflow-x: hidden !important;
+      }
     }
   }
 </style>
@@ -307,7 +432,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-striped mb-0 align-middle">
+          <table class="table table-striped mb-0 align-middle dash-table">
             <thead>
               <tr>
                 <th>Vehicle</th>
@@ -320,17 +445,17 @@
             <tbody>
               @forelse($renewalAlerts as $alert)
                 <tr>
-                  <td>{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}</td>
-                  <td>{{ $alert['type'] }}</td>
-                  <td>{{ $alert['date']->format('Y-m-d') }}</td>
-                  <td>
+                  <td data-label="Vehicle">{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}</td>
+                  <td data-label="Renewal Type">{{ $alert['type'] }}</td>
+                  <td data-label="Renewal Date">{{ $alert['date']->format('Y-m-d') }}</td>
+                  <td data-label="Status">
                     @if($alert['days_left'] <= 7)
                       <span class="badge text-bg-danger">Due in {{ max($alert['days_left'], 0) }} day{{ max($alert['days_left'], 0) === 1 ? '' : 's' }}</span>
                     @else
                       <span class="badge text-bg-warning">Due in {{ $alert['days_left'] }} days</span>
                     @endif
                   </td>
-                  <td>
+                  <td data-label="Action">
                     @if(auth()->user()->canAccess('cars'))
                       <button
                         type="button"
@@ -348,7 +473,7 @@
                   </td>
                 </tr>
               @empty
-                <tr><td colspan="5" class="text-center p-4 text-muted">No insurance or license renewals in the selected 30-day window.</td></tr>
+                <tr><td colspan="5" class="text-center p-4 text-muted no-data">No insurance or license renewals in the selected 30-day window.</td></tr>
               @endforelse
             </tbody>
           </table>
@@ -367,7 +492,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-striped mb-0 align-middle">
+          <table class="table table-striped mb-0 align-middle dash-table">
             <thead>
               <tr>
                 <th>Due Date</th>
@@ -380,14 +505,14 @@
             <tbody>
               @forelse($upcomingPayments as $payment)
                 <tr>
-                  <td>{{ $payment->due_date->format('Y-m-d') }}</td>
-                  <td>{{ $payment->rental->car->name ?? '-' }}</td>
-                  <td>{{ $payment->rental->customer->name ?? '-' }}</td>
-                  <td>{{ $payment->month }}</td>
-                  <td class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
+                  <td data-label="Due Date">{{ $payment->due_date->format('Y-m-d') }}</td>
+                  <td data-label="Car">{{ $payment->rental->car->name ?? '-' }}</td>
+                  <td data-label="Customer">{{ $payment->rental->customer->name ?? '-' }}</td>
+                  <td data-label="Month">{{ $payment->month }}</td>
+                  <td data-label="Amount" class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
                 </tr>
               @empty
-                <tr><td colspan="5" class="text-center p-4 text-muted">No pending payments for {{ $month }}.</td></tr>
+                <tr><td colspan="5" class="text-center p-4 text-muted no-data">No pending payments for {{ $month }}.</td></tr>
               @endforelse
             </tbody>
           </table>
@@ -406,7 +531,7 @@
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-striped mb-0 align-middle">
+          <table class="table table-striped mb-0 align-middle dash-table">
             <thead>
               <tr>
                 <th>Date</th>
@@ -418,13 +543,13 @@
             <tbody>
               @forelse($upcomingExpenses as $expense)
                 <tr>
-                  <td>{{ $expense->date->format('Y-m-d') }}</td>
-                  <td>{{ $expense->car?->name ?? '-' }}</td>
-                  <td>{{ ucfirst($expense->type) }}</td>
-                  <td class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
+                  <td data-label="Date">{{ $expense->date->format('Y-m-d') }}</td>
+                  <td data-label="Car">{{ $expense->car?->name ?? '-' }}</td>
+                  <td data-label="Type">{{ ucfirst($expense->type) }}</td>
+                  <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
                 </tr>
               @empty
-                <tr><td colspan="4" class="text-center p-4 text-muted">No expenses for {{ $month }}.</td></tr>
+                <tr><td colspan="4" class="text-center p-4 text-muted no-data">No expenses for {{ $month }}.</td></tr>
               @endforelse
             </tbody>
           </table>
