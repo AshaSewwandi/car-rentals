@@ -28,8 +28,116 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .expenses-page .table {
+  .expenses-page .expenses-table {
     min-width: 680px;
+  }
+
+  @media (max-width: 920px) {
+    .expenses-page .page-toolbar {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .expenses-page .page-toolbar form {
+      width: 100%;
+      display: grid !important;
+      gap: .5rem;
+    }
+
+    .expenses-page .page-toolbar form .btn {
+      width: 100%;
+    }
+
+    .expenses-page .table-responsive {
+      overflow: visible;
+    }
+
+    .expenses-page .expenses-table {
+      min-width: 0;
+    }
+
+    .expenses-page .expenses-table,
+    .expenses-page .expenses-table thead,
+    .expenses-page .expenses-table tbody,
+    .expenses-page .expenses-table th,
+    .expenses-page .expenses-table td,
+    .expenses-page .expenses-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .expenses-page .expenses-table thead {
+      display: none;
+    }
+
+    .expenses-page .expenses-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .expenses-page .expenses-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 40%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      text-align: left !important;
+    }
+
+    .expenses-page .expenses-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .expenses-page .expenses-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(40% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .expenses-page .expenses-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center !important;
+      border-top: 0;
+    }
+
+    .expenses-page .expenses-table tbody td.no-data::before {
+      display: none;
+    }
   }
 
   @media (max-width: 767.98px) {
@@ -92,7 +200,7 @@
   </div>
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-striped mb-0">
+      <table class="table table-striped mb-0 expenses-table">
         <thead>
           <tr>
             <th>Date</th>
@@ -106,12 +214,12 @@
         <tbody>
           @forelse($expenses as $expense)
             <tr>
-              <td>{{ $expense->date->format('Y-m-d') }}</td>
-              <td>{{ $expense->car?->name }}{{ $expense->car?->plate_no ? ' (' . $expense->car->plate_no . ')' : '' }}</td>
-              <td>{{ ucfirst($expense->type) }}</td>
-              <td class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
-              <td>{{ $expense->note ?: '-' }}</td>
-              <td class="text-nowrap">
+              <td data-label="Date">{{ $expense->date->format('Y-m-d') }}</td>
+              <td data-label="Car">{{ $expense->car?->name }}{{ $expense->car?->plate_no ? ' (' . $expense->car->plate_no . ')' : '' }}</td>
+              <td data-label="Type">{{ ucfirst($expense->type) }}</td>
+              <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
+              <td data-label="Note">{{ $expense->note ?: '-' }}</td>
+              <td data-label="Action" class="text-nowrap expense-actions">
                 <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ $expense->id }}">Update</button>
                 <button
                   type="button"
@@ -126,7 +234,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="6" class="text-center p-4 text-muted">No expenses found for {{ $month }}.</td></tr>
+            <tr><td colspan="6" class="text-center p-4 text-muted no-data">No expenses found for {{ $month }}.</td></tr>
           @endforelse
         </tbody>
       </table>

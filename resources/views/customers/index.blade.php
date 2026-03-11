@@ -2,6 +2,99 @@
 @section('title', 'Customer Registration')
 
 @section('content')
+<style>
+  .customer-table-wrap {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 920px) {
+    .customer-table-wrap {
+      overflow: visible;
+    }
+
+    .customer-table,
+    .customer-table thead,
+    .customer-table tbody,
+    .customer-table th,
+    .customer-table td,
+    .customer-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .customer-table thead {
+      display: none;
+    }
+
+    .customer-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .customer-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 38%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+    }
+
+    .customer-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .customer-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(38% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .customer-table tbody td.customer-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .customer-table tbody td.customer-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .customer-table tbody td.customer-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .customer-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center;
+      border-top: 0;
+    }
+
+    .customer-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+</style>
 <div class="page-toolbar">
   <div class="mb-3">
     <h4 class="mb-1">Customers</h4>
@@ -15,8 +108,8 @@
     <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">Add Customer</button>
   </div>
   <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-striped mb-0">
+    <div class="table-responsive customer-table-wrap">
+      <table class="table table-striped mb-0 customer-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -29,11 +122,11 @@
         <tbody>
           @forelse($customers as $customer)
             <tr>
-              <td>{{ $customer->name }}</td>
-              <td>{{ $customer->phone ?: '-' }}</td>
-              <td>{{ $customer->nic ?: '-' }}</td>
-              <td>{{ $customer->address ?: '-' }}</td>
-              <td class="text-nowrap">
+              <td data-label="Name">{{ $customer->name }}</td>
+              <td data-label="Phone">{{ $customer->phone ?: '-' }}</td>
+              <td data-label="NIC">{{ $customer->nic ?: '-' }}</td>
+              <td data-label="Address">{{ $customer->address ?: '-' }}</td>
+              <td data-label="Action" class="text-nowrap customer-actions">
                 <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ $customer->id }}">Update</button>
                 <button
                   type="button"
@@ -48,7 +141,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="5" class="text-center p-4 text-muted">No customers yet.</td></tr>
+            <tr><td colspan="5" class="text-center p-4 text-muted no-data">No customers yet.</td></tr>
           @endforelse
         </tbody>
       </table>

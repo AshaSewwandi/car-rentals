@@ -23,8 +23,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
-Route::view('/terms-of-service', 'terms-of-service')->middleware('auth')->name('terms-of-service');
-Route::view('/privacy-policy', 'privacy-policy')->middleware('auth')->name('privacy-policy');
+Route::view('/terms-of-service', 'terms-of-service')->name('terms-of-service');
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
 Route::get('/fleet/{car}', [FleetController::class, 'show'])->name('fleet.show');
 Route::get('/airport-hires', [HomeController::class, 'airportHires'])->name('airport-hires.index');

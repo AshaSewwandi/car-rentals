@@ -12,6 +12,152 @@
   .car-summary-meta .badge {
     font-weight: 600;
   }
+
+  .car-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: flex-start;
+  }
+
+  .car-actions-admin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+
+  .vehicle-pricing-wrap {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 920px) {
+    .car-actions,
+    .car-actions-admin {
+      width: 100%;
+    }
+
+    .car-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .5rem;
+    }
+
+    .car-actions-admin {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .5rem;
+    }
+
+    .car-actions .btn,
+    .car-actions-admin .btn,
+    .car-actions-admin form {
+      width: 100%;
+    }
+
+    .car-actions-admin form .btn {
+      height: 100%;
+    }
+
+    .vehicle-pricing-wrap {
+      overflow: visible;
+    }
+
+    .vehicle-pricing-table,
+    .vehicle-pricing-table thead,
+    .vehicle-pricing-table tbody,
+    .vehicle-pricing-table th,
+    .vehicle-pricing-table td,
+    .vehicle-pricing-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .vehicle-pricing-table thead {
+      display: none;
+    }
+
+    .vehicle-pricing-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .65rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.3rem);
+    }
+
+    .vehicle-pricing-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 45%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+    }
+
+    .vehicle-pricing-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .vehicle-pricing-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(45% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .vehicle-pricing-table tbody td.pricing-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .vehicle-pricing-table tbody td.pricing-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .vehicle-pricing-table tbody td.pricing-actions .btn,
+    .vehicle-pricing-table tbody td.pricing-actions form,
+    .vehicle-pricing-table tbody td.pricing-actions .d-inline {
+      width: 100%;
+    }
+
+    .vehicle-pricing-table tbody td.pricing-actions form,
+    .vehicle-pricing-table tbody td.pricing-actions .d-inline {
+      display: block !important;
+      margin: 0 !important;
+    }
+
+    .vehicle-pricing-table tbody td.pricing-actions .btn {
+      margin: 0 !important;
+    }
+
+    .vehicle-pricing-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center;
+    }
+
+    .vehicle-pricing-table tbody td.no-data::before {
+      display: none;
+    }
+
+    .vehicle-pricing-table tbody td.no-data {
+      border-top: 0;
+    }
+  }
 </style>
 <div class="page-toolbar">
   <div class="mb-3">
@@ -98,13 +244,13 @@
               @endif
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="car-actions">
               <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#viewCarModal{{ $car->id }}">
                 See more details
               </button>
             @if(auth()->user()->isAdmin())
-              <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#edit-car-{{ $car->id }}" aria-expanded="false" aria-controls="edit-car-{{ $car->id }}">
+              <div class="car-actions-admin">
+                <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editCarModal{{ $car->id }}">
                   Edit details
                 </button>
                 <form method="post" action="{{ route('cars.destroy', $car) }}" onsubmit="return confirm('Delete this car?');">
@@ -118,10 +264,17 @@
           </div>
 
           @if(auth()->user()->isAdmin())
-            <div class="collapse mt-3" id="edit-car-{{ $car->id }}">
-              <form method="post" action="{{ route('cars.update', $car) }}" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+            <div class="modal fade" id="editCarModal{{ $car->id }}" tabindex="-1" aria-labelledby="editCarModalLabel{{ $car->id }}" aria-hidden="true">
+              <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editCarModalLabel{{ $car->id }}">Edit {{ $car->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form method="post" action="{{ route('cars.update', $car) }}" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
 
               <div class="row g-2">
                 <div class="col-12 col-lg-4">
@@ -294,10 +447,14 @@
                 </div>
               </div>
 
-                <div class="mt-3">
-                  <button class="btn btn-sm btn-dark">Save Changes</button>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+                      <button class="btn btn-dark">Save Changes</button>
+                    </div>
+                  </form>
                 </div>
-              </form>
+              </div>
             </div>
           @endif
         </div>
@@ -477,8 +634,8 @@
       <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addVehiclePricingModal">Add Pricing</button>
     </div>
     <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-striped mb-0 align-middle">
+      <div class="table-responsive vehicle-pricing-wrap">
+        <table class="table table-striped mb-0 align-middle vehicle-pricing-table">
           <thead>
             <tr>
               <th>Make</th>
@@ -494,14 +651,14 @@
           <tbody>
             @forelse($vehiclePricings as $vehiclePricing)
               <tr>
-                <td>{{ $vehiclePricing->make ?: '-' }}</td>
-                <td>{{ $vehiclePricing->model }}</td>
-                <td>{{ number_format((int) $vehiclePricing->per_day_km) }} km</td>
-                <td>LKR {{ number_format((float) $vehiclePricing->per_day_amount, 2) }}</td>
-                <td>LKR {{ number_format((float) $vehiclePricing->driver_cost_per_day, 2) }}</td>
-                <td>LKR {{ number_format((float) $vehiclePricing->extra_km_rate, 2) }}</td>
-                <td>{{ $vehiclePricing->note ?: '-' }}</td>
-                <td class="text-nowrap">
+                <td data-label="Make">{{ $vehiclePricing->make ?: '-' }}</td>
+                <td data-label="Model">{{ $vehiclePricing->model }}</td>
+                <td data-label="Per Day KM">{{ number_format((int) $vehiclePricing->per_day_km) }} km</td>
+                <td data-label="Per Day Amount">LKR {{ number_format((float) $vehiclePricing->per_day_amount, 2) }}</td>
+                <td data-label="Driver Cost / Day">LKR {{ number_format((float) $vehiclePricing->driver_cost_per_day, 2) }}</td>
+                <td data-label="Extra 1 KM Amount">LKR {{ number_format((float) $vehiclePricing->extra_km_rate, 2) }}</td>
+                <td data-label="Note">{{ $vehiclePricing->note ?: '-' }}</td>
+                <td data-label="Action" class="text-nowrap pricing-actions">
                   <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editVehiclePricingModal{{ $vehiclePricing->id }}">Edit</button>
                   <form method="post" action="{{ route('vehicle-pricings.destroy', $vehiclePricing) }}" class="d-inline" onsubmit="return confirm('Delete this pricing chart?');">
                     @csrf
@@ -512,7 +669,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="8" class="text-center p-4 text-muted">No pricing chart rows yet.</td>
+                <td colspan="8" class="text-center p-4 text-muted no-data">No pricing chart rows yet.</td>
               </tr>
             @endforelse
           </tbody>

@@ -2,6 +2,105 @@
 @section('title', 'Rent Requests')
 
 @section('content')
+<style>
+  .rr-table td,
+  .rr-table th {
+    vertical-align: top;
+  }
+
+  @media (max-width: 920px) {
+    .list-card .card-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: .3rem;
+    }
+
+    .rr-table,
+    .rr-table thead,
+    .rr-table tbody,
+    .rr-table th,
+    .rr-table td,
+    .rr-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .rr-table thead {
+      display: none;
+    }
+
+    .rr-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .65rem;
+      width: calc(100% - 1.3rem);
+      box-sizing: border-box;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .rr-table tbody td {
+      position: relative;
+      padding: .62rem .65rem .62rem 44%;
+      min-height: 44px;
+      border-top: 1px solid #edf3fb;
+      box-sizing: border-box;
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .rr-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .rr-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .65rem;
+      top: .62rem;
+      width: calc(44% - .95rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .rr-table tbody td.cell-actions .btn,
+    .rr-table tbody td.cell-actions form,
+    .rr-table tbody td.cell-actions .d-inline {
+      width: 100%;
+    }
+
+    .rr-table tbody td.cell-actions .btn {
+      width: 100%;
+      margin-bottom: .42rem !important;
+    }
+
+    .rr-table tbody td.cell-actions br {
+      display: none;
+    }
+
+    .rr-table tbody tr.rr-message-row td {
+      padding: .72rem .75rem;
+    }
+
+    .rr-table tbody tr.rr-message-row td::before {
+      display: none;
+    }
+
+    .rr-table tbody td.no-data {
+      padding: .95rem .85rem !important;
+      text-align: center !important;
+    }
+
+    .rr-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+</style>
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Rent Requests</h4>
@@ -16,7 +115,7 @@
   </div>
   <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table table-striped mb-0 align-middle">
+      <table class="table table-striped mb-0 align-middle rr-table">
         <thead>
           <tr>
             <th style="min-width:130px;">Received</th>
@@ -33,26 +132,26 @@
         <tbody>
           @forelse($rentRequests as $requestItem)
             <tr>
-              <td>{{ $requestItem->created_at?->format('Y-m-d H:i') }}</td>
-              <td>
+              <td data-label="Received">{{ $requestItem->created_at?->format('Y-m-d H:i') }}</td>
+              <td data-label="Customer">
                 <strong>{{ $requestItem->name }}</strong><br>
                 <span class="text-muted">{{ $requestItem->phone ?: '-' }}</span><br>
                 <span class="text-muted">{{ $requestItem->email ?: '-' }}</span>
               </td>
-              <td>
+              <td data-label="Vehicle">
                 {{ $requestItem->car_name ?: ($requestItem->car?->name ?? '-') }}<br>
                 <span class="text-muted">{{ $requestItem->plate_no ?: ($requestItem->car?->plate_no ?? '-') }}</span>
               </td>
-              <td>
+              <td data-label="Start Date">
                 {{ $requestItem->start_date?->format('Y-m-d') ?: '-' }}
               </td>
-              <td>
+              <td data-label="End Date">
                 {{ $requestItem->end_date?->format('Y-m-d') ?: '-' }}
               </td>
-              <td>
+              <td data-label="Pickup Location">
                 {{ $requestItem->start_location ?: 'N/A' }}
               </td>
-              <td>
+              <td data-label="Availability Check">
                 @if(!$requestItem->is_checkable)
                   <span class="text-muted">Set vehicle and dates to check</span>
                 @elseif($requestItem->is_available_for_period)
@@ -61,7 +160,7 @@
                   <span class="badge text-bg-danger">Not available in selected dates</span>
                 @endif
               </td>
-              <td>
+              <td data-label="Status">
                 @if($requestItem->status === 'converted')
                   <span class="badge text-bg-primary">Converted</span>
                 @elseif($requestItem->status === 'accepted')
@@ -70,7 +169,7 @@
                   <span class="badge text-bg-warning">Pending</span>
                 @endif
               </td>
-              <td>
+              <td data-label="Action" class="cell-actions">
                 <button
                   class="btn btn-sm btn-outline-dark mb-2"
                   type="button"
@@ -108,7 +207,7 @@
               </td>
             </tr>
             @if($requestItem->message)
-              <tr>
+              <tr class="rr-message-row">
                 <td colspan="9">
                   <strong>Message:</strong> {{ $requestItem->message }}
                 </td>
@@ -116,7 +215,7 @@
             @endif
           @empty
             <tr>
-              <td colspan="9" class="text-center p-4 text-muted">No rent requests yet.</td>
+              <td colspan="9" class="text-center p-4 text-muted no-data">No rent requests yet.</td>
             </tr>
           @endforelse
         </tbody>

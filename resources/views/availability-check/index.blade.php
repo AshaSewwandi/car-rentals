@@ -124,6 +124,65 @@
       grid-template-columns: 1fr;
     }
   }
+
+  @media (max-width: 920px) {
+    .availability-grid > .card {
+      padding: .75rem !important;
+      overflow: hidden;
+    }
+
+    .timeline-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: .2rem;
+    }
+
+    .timeline-table {
+      border-spacing: 3px;
+    }
+
+    .timeline-table .vehicle-col {
+      width: 132px;
+      min-width: 132px;
+      max-width: 132px;
+      box-shadow: 6px 0 8px -8px rgba(15, 23, 42, 0.2);
+    }
+
+    .timeline-table th.date-col {
+      min-width: 62px;
+      font-size: .72rem;
+    }
+
+    .timeline-cell {
+      font-size: .72rem;
+      padding: 6px 4px !important;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .timeline-table {
+      border-spacing: 2px;
+    }
+
+    .timeline-table .vehicle-col {
+      width: 118px;
+      min-width: 118px;
+      max-width: 118px;
+      padding: 6px 4px !important;
+    }
+
+    .timeline-table th.date-col {
+      min-width: 56px;
+      font-size: .68rem;
+      padding: 6px 4px !important;
+    }
+
+    .timeline-cell {
+      font-size: .66rem;
+      padding: 5px 3px !important;
+      border-radius: 6px;
+    }
+  }
 </style>
 
 <div class="page-toolbar">

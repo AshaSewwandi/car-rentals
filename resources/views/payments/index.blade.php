@@ -2,6 +2,115 @@
 @section('title', 'Payments')
 
 @section('content')
+<style>
+  .payments-table-wrap {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 920px) {
+    .page-toolbar {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .page-toolbar form {
+      width: 100%;
+      display: grid !important;
+      gap: .5rem;
+    }
+
+    .page-toolbar form .btn {
+      width: 100%;
+    }
+
+    .payments-table-wrap {
+      overflow: visible;
+    }
+
+    .payments-table,
+    .payments-table thead,
+    .payments-table tbody,
+    .payments-table th,
+    .payments-table td,
+    .payments-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .payments-table thead {
+      display: none;
+    }
+
+    .payments-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .payments-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 40%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      text-align: left !important;
+    }
+
+    .payments-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .payments-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(40% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .payments-table tbody td.payment-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .payments-table tbody td.payment-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .payments-table tbody td.payment-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .payments-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center !important;
+      border-top: 0;
+    }
+
+    .payments-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+</style>
 <div class="page-toolbar">
   <div class="mb-3">
     <h4 class="mb-1">Manage Payments</h4>
@@ -100,8 +209,8 @@
     @if($rentals->isEmpty())
       <div class="alert alert-warning m-3 mb-0">No rentals found. Create a rental first.</div>
     @endif
-    <div class="table-responsive">
-      <table class="table table-striped mb-0 align-middle">
+    <div class="table-responsive payments-table-wrap">
+      <table class="table table-striped mb-0 align-middle payments-table">
         <thead>
           <tr>
             <th>Car</th>
@@ -116,12 +225,12 @@
         <tbody>
           @forelse($payments as $payment)
             <tr>
-              <td>{{ $payment->rental->car->name }}</td>
-              <td>{{ $payment->rental->customer->name }}</td>
-              <td>{{ $payment->month }}</td>
-              <td>{{ $payment->due_date->format('Y-m-d') }}</td>
-              <td class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
-              <td>
+              <td data-label="Car">{{ $payment->rental->car->name }}</td>
+              <td data-label="Customer">{{ $payment->rental->customer->name }}</td>
+              <td data-label="Month">{{ $payment->month }}</td>
+              <td data-label="Due Date">{{ $payment->due_date->format('Y-m-d') }}</td>
+              <td data-label="Amount" class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
+              <td data-label="Status">
                 @if($payment->status === 'paid')
                   <span class="badge bg-success">Paid</span>
                 @elseif($payment->is_late)
@@ -130,7 +239,7 @@
                   <span class="badge bg-warning text-dark">Pending</span>
                 @endif
               </td>
-              <td class="text-nowrap">
+              <td data-label="Action" class="text-nowrap payment-actions">
                 @if($payment->status === 'pending')
                   <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#markPaidModal{{ $payment->id }}">Mark Paid</button>
                 @endif
@@ -149,7 +258,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="7" class="text-center p-4 text-muted">No payments found for {{ $month }}.</td>
+              <td colspan="7" class="text-center p-4 text-muted no-data">No payments found for {{ $month }}.</td>
             </tr>
           @endforelse
         </tbody>
