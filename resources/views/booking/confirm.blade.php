@@ -390,25 +390,25 @@
                                             <option value="pay_later_bank" {{ old('payment_method') === 'pay_later_bank' ? 'selected' : '' }}>Online transfer</option>
                                             <option value="pay_at_pickup_cash" {{ old('payment_method') === 'pay_at_pickup_cash' ? 'selected' : '' }}>Cash at pickup</option>
                                         </select>
-                                        <div class="help">Only online transfer or cash is available at the moment. Payment remains pending until settlement.</div>
+                                        <div class="help">{{ $paymentDetails['help_text'] }}</div>
                                         <div class="bank-details" id="bankTransferDetails">
                                             <p class="bank-details-title">Online Transfer Payment Details</p>
                                             <div class="bank-details-grid">
                                                 <div class="bank-details-row">
                                                     <span>Account Number</span>
-                                                    <strong>1234567890</strong>
+                                                    <strong>{{ $paymentDetails['account_number'] }}</strong>
                                                 </div>
                                                 <div class="bank-details-row">
                                                     <span>Account Name</span>
-                                                    <strong>R&A Auto Rentals</strong>
+                                                    <strong>{{ $paymentDetails['account_name'] }}</strong>
                                                 </div>
                                                 <div class="bank-details-row">
                                                     <span>Bank</span>
-                                                    <strong>Commercial Bank</strong>
+                                                    <strong>{{ $paymentDetails['bank_name'] }}</strong>
                                                 </div>
                                                 <div class="bank-details-row">
                                                     <span>Branch</span>
-                                                    <strong>Galle Branch</strong>
+                                                    <strong>{{ $paymentDetails['branch_name'] }}</strong>
                                                 </div>
                                             </div>
                                         </div>

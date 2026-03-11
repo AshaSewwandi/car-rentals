@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
+use App\Models\AppSetting;
 use App\Models\Payment;
 use App\Models\Rental;
 use Illuminate\Http\Request;
@@ -27,7 +28,30 @@ class PaymentController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('payments.index', compact('payments', 'month', 'rentals'));
+        $paymentDetails = AppSetting::paymentDetails();
+
+        return view('payments.index', compact('payments', 'month', 'rentals', 'paymentDetails'));
+    }
+
+    public function updateBankDetails(Request $request)
+    {
+        abort_unless($request->user()?->isAdmin(), 403);
+
+        $data = $request->validate([
+            'account_number' => ['required', 'string', 'max:120'],
+            'account_name' => ['required', 'string', 'max:180'],
+            'bank_name' => ['required', 'string', 'max:120'],
+            'branch_name' => ['required', 'string', 'max:120'],
+            'help_text' => ['required', 'string', 'max:255'],
+        ]);
+
+        AppSetting::setValue('payment.account_number', $data['account_number']);
+        AppSetting::setValue('payment.account_name', $data['account_name']);
+        AppSetting::setValue('payment.bank_name', $data['bank_name']);
+        AppSetting::setValue('payment.branch_name', $data['branch_name']);
+        AppSetting::setValue('payment.help_text', $data['help_text']);
+
+        return back()->with('success', 'Online transfer payment details updated successfully.');
     }
 
     public function store(Request $request)

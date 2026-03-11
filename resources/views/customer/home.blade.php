@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My Rentals | R&A Auto Rentals</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-rounded-64.png') }}">
+  <link rel="shortcut icon" href="{{ asset('images/logo-rounded-64.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logo-rounded-64.png') }}">
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
   <style>
@@ -226,9 +229,20 @@
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
+      .topbar-inner {
+        flex-wrap: wrap;
+      }
+      .actions,
+      .actions .btn,
+      .actions .logout-form {
+        width: 100%;
+      }
       .grid { grid-template-columns: 1fr; }
       .brand { font-size: 1.2rem; }
       .avatar-name { font-size: 1.4rem; }
+      .order-head {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>

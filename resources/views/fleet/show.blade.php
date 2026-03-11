@@ -200,6 +200,8 @@
 
         .field {
             margin-bottom: .62rem;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .field label {
@@ -212,14 +214,101 @@
             font-weight: 800;
         }
 
-        .field input {
+        .field-control {
+            --control-h: 44px;
             width: 100%;
+            height: var(--control-h);
             border: 1px solid #c7d7ec;
             border-radius: 10px;
             background: #f8fbff;
-            padding: .68rem .72rem;
+            overflow: hidden;
+        }
+
+        .field-control input {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            height: 100%;
+            min-height: 100%;
+            border: 0;
+            background: transparent;
+            padding: 0 .72rem;
             font: inherit;
             color: #0f172a;
+            box-sizing: border-box;
+        }
+
+        .field-control.input-error {
+            border-color: #dc2626;
+            background: #fff7f7;
+        }
+
+        .field-control.date-control {
+            position: relative;
+        }
+
+        .field-control.date-control::after {
+            content: "";
+            position: absolute;
+            right: .7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: 18px 18px;
+            pointer-events: none;
+            opacity: .9;
+        }
+
+        .field-control input[type="date"] {
+            padding: 0 2.15rem 0 .72rem;
+            -webkit-appearance: none;
+            appearance: none;
+            text-align: left;
+        }
+
+        .field-control input[type="date"]::-webkit-datetime-edit {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-control input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-control input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            color: transparent;
+            background: transparent;
+            display: block;
+            cursor: pointer;
+        }
+
+        .field-error {
+            display: block;
+            min-height: 1rem;
+            margin-top: .28rem;
+            color: #b91c1c;
+            font-size: .8rem;
+            font-weight: 600;
+            line-height: 1.35;
+            visibility: hidden;
+        }
+
+        .field-error.show {
+            visibility: visible;
         }
 
         .book-total {
@@ -397,6 +486,12 @@
             .vehicle-rate {
                 text-align: left;
             }
+            .book-body {
+                padding: 1rem 1rem 1.05rem;
+            }
+            .field {
+                margin-bottom: .72rem;
+            }
             .meta-grid,
             .feature-list,
             .reviews {
@@ -419,8 +514,8 @@
 
             <section class="hero">
                 <article class="panel vehicle-media">
-                    <div class="media-wrap">
-                        <span class="vehicle-badge">{{ $vehicle['driver_mode_label'] }}</span>
+            <div class="media-wrap">
+                <span class="vehicle-badge">{{ $vehicle['driver_mode_label'] }}</span>
                         <img id="primaryVehicleImage" src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';">
                     </div>
                     @if(!empty($vehicle['images']) && count($vehicle['images']) > 1)
@@ -452,19 +547,28 @@
                     <article class="panel book-panel">
                         <div class="book-head">Book This Vehicle</div>
                         <div class="book-body">
-                            <form action="{{ route('booking.confirm') }}" method="get">
+                            <form id="vehicleQuickBookingForm" action="{{ route('booking.confirm') }}" method="get" novalidate>
                                 <input type="hidden" name="car_id" value="{{ $vehicle['id'] }}">
                                 <div class="field">
                                     <label for="start_location">Pick-up Location</label>
-                                    <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address">
+                                    <div class="field-control">
+                                        <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address" aria-describedby="vehicle_start_location_error">
+                                    </div>
+                                    <small id="vehicle_start_location_error" class="field-error"></small>
                                 </div>
                                 <div class="field">
                                     <label for="start_date">Date</label>
-                                    <input id="start_date" name="start_date" type="date">
+                                    <div class="field-control date-control">
+                                        <input id="start_date" name="start_date" type="date" aria-describedby="vehicle_start_date_error">
+                                    </div>
+                                    <small id="vehicle_start_date_error" class="field-error"></small>
                                 </div>
                                 <div class="field">
                                     <label for="end_date">Return Date</label>
-                                    <input id="end_date" name="end_date" type="date">
+                                    <div class="field-control date-control">
+                                        <input id="end_date" name="end_date" type="date" aria-describedby="vehicle_end_date_error">
+                                    </div>
+                                    <small id="vehicle_end_date_error" class="field-error"></small>
                                 </div>
                                 <div class="book-total">
                                     <small>Daily base rate</small>
@@ -558,6 +662,96 @@
                     thumbs.forEach((item) => item.classList.remove('active'));
                     thumb.classList.add('active');
                 });
+            });
+        })();
+
+        (function () {
+            const form = document.getElementById('vehicleQuickBookingForm');
+            const locationInput = document.getElementById('start_location');
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            if (!form || !locationInput || !startDateInput || !endDateInput) return;
+
+            const errors = {
+                start_location: document.getElementById('vehicle_start_location_error'),
+                start_date: document.getElementById('vehicle_start_date_error'),
+                end_date: document.getElementById('vehicle_end_date_error'),
+            };
+
+            const setError = (input, key, message) => {
+                const shell = input.closest('.field-control');
+                if (shell) shell.classList.add('input-error');
+                if (errors[key]) {
+                    errors[key].textContent = message;
+                    errors[key].classList.add('show');
+                }
+            };
+
+            const clearError = (input, key) => {
+                const shell = input.closest('.field-control');
+                if (shell) shell.classList.remove('input-error');
+                if (errors[key]) {
+                    errors[key].textContent = '';
+                    errors[key].classList.remove('show');
+                }
+            };
+
+            const toISODate = (date) => {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            };
+
+            const today = new Date();
+            const minDate = toISODate(today);
+            startDateInput.min = minDate;
+            endDateInput.min = minDate;
+
+            const syncEndMin = () => {
+                endDateInput.min = startDateInput.value || minDate;
+                if (endDateInput.value && startDateInput.value && endDateInput.value < startDateInput.value) {
+                    endDateInput.value = '';
+                }
+            };
+
+            startDateInput.addEventListener('change', () => {
+                clearError(startDateInput, 'start_date');
+                syncEndMin();
+            });
+            locationInput.addEventListener('input', () => clearError(locationInput, 'start_location'));
+            endDateInput.addEventListener('change', () => clearError(endDateInput, 'end_date'));
+
+            form.addEventListener('submit', (event) => {
+                let hasError = false;
+                clearError(locationInput, 'start_location');
+                clearError(startDateInput, 'start_date');
+                clearError(endDateInput, 'end_date');
+
+                if (!locationInput.value.trim()) {
+                    setError(locationInput, 'start_location', 'Please enter pickup location.');
+                    hasError = true;
+                }
+
+                if (!startDateInput.value) {
+                    setError(startDateInput, 'start_date', 'Please select start date.');
+                    hasError = true;
+                } else if (startDateInput.value < minDate) {
+                    setError(startDateInput, 'start_date', 'Start date cannot be in the past.');
+                    hasError = true;
+                }
+
+                if (!endDateInput.value) {
+                    setError(endDateInput, 'end_date', 'Please select return date.');
+                    hasError = true;
+                } else if (startDateInput.value && endDateInput.value < startDateInput.value) {
+                    setError(endDateInput, 'end_date', 'Return date must be same day or after start date.');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    event.preventDefault();
+                }
             });
         })();
     </script>

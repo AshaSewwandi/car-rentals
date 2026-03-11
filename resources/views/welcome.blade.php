@@ -324,12 +324,19 @@
             gap: .28rem;
             width: min(740px, 100%);
             box-shadow: 0 12px 28px rgba(6, 23, 49, 0.2);
+            overflow: hidden;
         }
 
         .hero-search .search-field {
             display: flex;
             flex-direction: column;
             gap: .2rem;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .hero-search .search-field.date-field {
+            position: relative;
         }
 
         .hero-search label {
@@ -349,6 +356,50 @@
             font: inherit;
             color: #102948;
             min-height: 42px;
+            min-width: 0;
+            max-width: 100%;
+            display: block;
+            box-sizing: border-box;
+            background-clip: padding-box;
+        }
+
+        .hero-search input[type="date"] {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden;
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 10px !important;
+            -webkit-border-radius: 10px !important;
+            position: relative;
+            padding-right: 2.35rem;
+            background-color: #f8fbff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7rem center;
+            background-size: 18px 18px;
+        }
+
+        .hero-search input[type="date"]::-webkit-datetime-edit {
+            padding: 0;
+            width: 100%;
+        }
+
+        .hero-search input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
+            width: 100%;
+        }
+
+        .hero-search input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            cursor: pointer;
         }
 
         .hero-search input:focus {
@@ -1264,33 +1315,28 @@
             gap: .8rem;
         }
 
-        .modern-fleet-head .modern-fleet-nav {
+        .modern-fleet-head h2 {
+            margin: 0;
+        }
+
+        .fleet-head-link {
             margin-left: auto;
-            justify-content: flex-end;
+            text-decoration: none;
+            color: #0a3f8f;
+            font-size: .86rem;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
-        .modern-fleet-nav {
-            display: inline-flex;
-            gap: .45rem;
-        }
-
-        .modern-fleet-nav button {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            border: 1px solid #cfdff3;
-            background: #fff;
-            color: #28466b;
-            cursor: pointer;
-            font-size: 1rem;
-            line-height: 1;
+        .fleet-head-link:hover {
+            text-decoration: underline;
         }
 
         .showcase-grid {
             margin-top: 1rem;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .9rem;
+            gap: .72rem;
         }
 
         .showcase-card {
@@ -1298,10 +1344,12 @@
             border: 1px solid #d9e6f5;
             border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, .07);
         }
 
         .showcase-photo {
-            height: 190px;
+            position: relative;
+            height: 182px;
             background: #e9f2ff;
         }
 
@@ -1312,61 +1360,148 @@
             display: block;
         }
 
+        .showcase-photo-badge {
+            position: absolute;
+            right: .7rem;
+            top: .7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            background: rgba(255, 255, 255, .95);
+            border: 1px solid #dbe6f3;
+            border-radius: 999px;
+            padding: .22rem .52rem;
+            font-size: .66rem;
+            color: #0a3f8f;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
         .showcase-body {
-            padding: .88rem .9rem .92rem;
+            padding: .7rem .75rem .78rem;
         }
 
         .showcase-topline {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: .55rem;
-            margin-bottom: .52rem;
-        }
-
-        .showcase-tag {
-            font-size: .68rem;
-            color: #49658a;
-            border: 1px solid #d7e4f4;
-            border-radius: 999px;
-            padding: .18rem .5rem;
-            font-weight: 700;
+            gap: .65rem;
+            margin-bottom: .34rem;
         }
 
         .showcase-rate {
-            color: #0a49a2;
+            color: #0a3f8f;
             font-weight: 800;
-            font-size: 1.5rem;
+            font-size: 1.55rem;
             letter-spacing: -.02em;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         .showcase-rate small {
             color: #6b7f97;
-            font-size: .8rem;
+            font-size: .52em;
             font-weight: 600;
-            margin-left: .15rem;
+            margin-left: .2rem;
         }
 
         .showcase-title {
-            margin: 0 0 .48rem;
+            margin: 0;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
             font-size: 1.35rem;
+            line-height: 1.08;
             letter-spacing: -.01em;
         }
 
-        .showcase-meta {
-            margin: 0;
-            color: #64748b;
-            font-size: .82rem;
+        .showcase-info-row {
+            margin: .38rem 0 .62rem;
+            padding-bottom: .48rem;
+            border-bottom: 1px solid #e4edf8;
+            color: #8b9bb0;
+            font-size: .74rem;
             display: flex;
             flex-wrap: wrap;
-            gap: .45rem;
+            gap: .45rem .65rem;
+            font-weight: 600;
         }
 
-        .showcase-meta span {
+        .showcase-info-row span {
             display: inline-flex;
             align-items: center;
-            gap: .28rem;
+            gap: .2rem;
+        }
+
+        .showcase-spec-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .3rem .38rem;
+            margin-bottom: .85rem;
+            color: #334155;
+            font-size: .74rem;
+        }
+
+        .showcase-spec-item {
+            display: inline-flex;
+            align-items: center;
+            gap: .24rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .showcase-spec-item::before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            flex: 0 0 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 14px 14px;
+            opacity: .8;
+        }
+
+        .showcase-spec-item.spec-seats::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M5.5 21a6.5 6.5 0 0 1 13 0'/%3E%3C/svg%3E");
+        }
+
+        .showcase-spec-item.spec-bags::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='7' width='16' height='13' rx='2'/%3E%3Cpath d='M9 7V5a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E");
+        }
+
+        .showcase-spec-item.spec-transmission::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='6' r='2'/%3E%3Ccircle cx='16' cy='6' r='2'/%3E%3Ccircle cx='8' cy='12' r='2'/%3E%3Ccircle cx='16' cy='12' r='2'/%3E%3Cpath d='M8 8v2m8-2v8M8 14v4m0 0h8'/%3E%3C/svg%3E");
+        }
+
+        .showcase-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .65rem;
+            align-items: center;
+        }
+
+        .showcase-details {
+            color: #4c1d95;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .showcase-details:hover {
+            text-decoration: underline;
+        }
+
+        .showcase-book {
+            text-decoration: none;
+            text-align: center;
+            border: 0;
+            border-radius: 10px;
+            padding: .62rem .8rem;
+            color: #fff;
+            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
+            box-shadow: 0 8px 18px rgba(10, 63, 143, .23);
+            font-weight: 800;
+            font-size: .95rem;
+            line-height: 1;
         }
 
         .contact-cta {
@@ -1488,6 +1623,18 @@
             }
             .hero-search {
                 grid-template-columns: 1fr;
+                padding: .62rem;
+                gap: .52rem;
+            }
+            .hero-search label {
+                margin: 0 .12rem;
+            }
+            .hero-search input {
+                min-height: 46px;
+                padding: .72rem .78rem;
+            }
+            .hero-search .search-submit {
+                min-height: 46px;
             }
             .hero-search .search-submit {
                 width: 100%;
@@ -1503,13 +1650,18 @@
             }
             .service-grid-modern { grid-template-columns: 1fr; }
             .showcase-grid { grid-template-columns: 1fr; }
+            .showcase-photo { height: 178px; }
+            .showcase-title { font-size: 1.2rem; }
+            .showcase-rate { font-size: 1.35rem; }
+            .showcase-spec-grid { font-size: .69rem; gap: .25rem .3rem; }
+            .showcase-details { font-size: .86rem; }
+            .showcase-book { font-size: .9rem; padding: .58rem .75rem; }
             .contact-cta-card {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .modern-fleet-head .modern-fleet-nav {
+            .fleet-head-link {
                 margin-left: 0;
-                justify-content: flex-start;
             }
         }
 
@@ -1653,12 +1805,12 @@
                                 <input id="start_location" name="start_location" type="text" placeholder="Pickup location" required aria-describedby="start_location_error">
                                 <small class="field-error" id="start_location_error"></small>
                             </div>
-                            <div class="search-field">
+                            <div class="search-field date-field">
                                 <label for="start_date">Start Date</label>
                                 <input id="start_date" name="start_date" type="date" required aria-describedby="start_date_error">
                                 <small class="field-error" id="start_date_error"></small>
                             </div>
-                            <div class="search-field">
+                            <div class="search-field date-field">
                                 <label for="end_date">End Date</label>
                                 <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
                                 <small class="field-error" id="end_date_error"></small>
@@ -1716,34 +1868,36 @@
 
         <section id="fleet-section" class="section section-anchor modern-fleet">
             <div class="container">
-                <h2>Featured Fleet</h2>
-                <p class="head-note">Choose from our diverse range of high-performance and family-friendly vehicles.</p>
                 <div class="modern-fleet-head">
-
-                    <div class="modern-fleet-nav" aria-hidden="true">
-                        <!-- <button type="button">&#8249;</button>
-                        <button type="button">&#8250;</button> -->
-                        <a class="fleet-head-link" href="{{ route('fleet.index') }}">See More</a>
-                    </div>
+                    <h2>Featured Fleet</h2>
+                    <a class="fleet-head-link" href="{{ route('fleet.index') }}">See More</a>
                 </div>
+                <p class="head-note">Choose from our diverse range of high-performance and family-friendly vehicles.</p>
                 <div class="showcase-grid">
                     @forelse($featuredCars as $car)
                         <article class="showcase-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
                             <div class="showcase-photo">
                                 <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
+                                <span class="showcase-photo-badge">{{ $car['segment'] }}</span>
                             </div>
                             <div class="showcase-body">
                                 <div class="showcase-topline">
-                                    <span class="showcase-tag">{{ $car['segment'] }}</span>
-                                    <div class="showcase-rate">Rs {{ number_format($car['daily_rate'], 0) }}<small>/day</small></div>
+                                    <h3 class="showcase-title">{{ $car['name'] }}</h3>
+                                    <div class="showcase-rate">Rs {{ number_format($car['daily_rate'], 0) }} <small>/day</small></div>
                                 </div>
-                                <h3 class="showcase-title">{{ $car['name'] }}</h3>
-                                <p class="showcase-meta">
-                                    <span>{{ $car['seats'] }}</span>
-                                    <span>{{ $car['bags'] }}</span>
-                                    <span>{{ $car['transmission'] }}</span>
-                                    <span><a href="{{ route('fleet.show', $car['id']) }}">Details</a></span>
+                                <p class="showcase-info-row">
+                                    <span>Vehicle No: {{ $car['plate_no'] ?: '-' }}</span>
+                                    <span>Reg Year: {{ $car['year'] ?: '-' }}</span>
                                 </p>
+                                <div class="showcase-spec-grid">
+                                    <span class="showcase-spec-item spec-seats">{{ $car['seats'] }}</span>
+                                    <span class="showcase-spec-item spec-bags">{{ $car['bags'] }}</span>
+                                    <span class="showcase-spec-item spec-transmission">{{ $car['transmission'] }}</span>
+                                </div>
+                                <div class="showcase-actions">
+                                    <a class="showcase-details" href="{{ route('fleet.show', $car['id']) }}">Details</a>
+                                    <a class="showcase-book" href="{{ route('fleet.show', $car['id']) }}">Book Now</a>
+                                </div>
                             </div>
                         </article>
                     @empty
@@ -1773,7 +1927,7 @@
                         </div>
                         <div>
                             <strong>Email</strong>
-                            info@rnaautorentals.lk
+                            info@rnaautorentals.com.lk
                         </div>
                         <div>
                             <strong>Working Hours</strong>
@@ -1904,6 +2058,18 @@
                 }
             };
 
+            const setTodayMin = () => {
+                const today = new Date();
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                const isoToday = `${y}-${m}-${d}`;
+                startDateInput.min = isoToday;
+                if (!endDateInput.min || endDateInput.min < isoToday) {
+                    endDateInput.min = isoToday;
+                }
+            };
+
             const validateAvailabilityForm = (focusFirstInvalid = true) => {
                 let isValid = true;
                 let firstInvalidInput = null;
@@ -1970,17 +2136,21 @@
             });
 
             [pickupInput, startDateInput, endDateInput].forEach((input) => {
-                input.addEventListener('input', function () {
+                const handleFieldChange = () => {
                     if (input === startDateInput) {
                         syncEndDateMin();
                     }
-                    if (!hasTriedSubmit) {
-                        return;
+                    if (input === endDateInput && startDateInput.value && endDateInput.value < startDateInput.value) {
+                        endDateInput.value = '';
                     }
+                    if (!hasTriedSubmit) return;
                     validateAvailabilityForm(false);
-                });
+                };
+                input.addEventListener('input', handleFieldChange);
+                input.addEventListener('change', handleFieldChange);
             });
 
+            setTodayMin();
             syncEndDateMin();
             window.addEventListener('pageshow', resetAvailabilitySubmitState);
             window.addEventListener('focus', resetAvailabilitySubmitState);

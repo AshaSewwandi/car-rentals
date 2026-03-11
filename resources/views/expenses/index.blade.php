@@ -2,6 +2,65 @@
 @section('title', 'Expenses Management')
 
 @section('content')
+<style>
+  .expenses-page .expenses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+  }
+
+  .expenses-page .expenses-header-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+
+  .expenses-page .expenses-header-total {
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .expenses-page .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .expenses-page .table {
+    min-width: 680px;
+  }
+
+  @media (max-width: 767.98px) {
+    .expenses-page .page-toolbar > div:first-child h4 {
+      font-size: 1.65rem;
+    }
+
+    .expenses-page .expenses-header {
+      align-items: flex-start;
+    }
+
+    .expenses-page .expenses-header .header-title {
+      width: 100%;
+      font-size: 1.22rem;
+      line-height: 1.25;
+    }
+
+    .expenses-page .expenses-header-meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .expenses-page .expenses-header-meta .btn {
+      min-height: 38px;
+      padding-left: .7rem;
+      padding-right: .7rem;
+      white-space: nowrap;
+    }
+  }
+</style>
+<div class="expenses-page">
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Manage Expenses</h4>
@@ -24,10 +83,10 @@
 @endif
 
 <div class="card list-card">
-  <div class="card-header d-flex justify-content-between align-items-center">
+  <div class="card-header expenses-header">
     <span class="header-title">Expense List ({{ $month }})</span>
-    <div class="d-flex align-items-center gap-2">
-      <strong>Rs {{ number_format($total, 2) }}</strong>
+    <div class="expenses-header-meta">
+      <strong class="expenses-header-total">Rs {{ number_format($total, 2) }}</strong>
       <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add Expense</button>
     </div>
   </div>
@@ -220,4 +279,5 @@
     });
   });
 </script>
+</div>
 @endsection

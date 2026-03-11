@@ -337,10 +337,10 @@
                             @if($booking->payment_method === 'pay_later_bank')
                                 <div class="bank-details">
                                     <div class="bank-grid">
-                                        <div class="bank-row"><span>Account Number</span><strong>1234567890</strong></div>
-                                        <div class="bank-row"><span>Account Name</span><strong>R&A Auto Rentals</strong></div>
-                                        <div class="bank-row"><span>Bank</span><strong>Commercial Bank</strong></div>
-                                        <div class="bank-row"><span>Branch</span><strong>Galle Branch</strong></div>
+                                        <div class="bank-row"><span>Account Number</span><strong>{{ $paymentDetails['account_number'] }}</strong></div>
+                                        <div class="bank-row"><span>Account Name</span><strong>{{ $paymentDetails['account_name'] }}</strong></div>
+                                        <div class="bank-row"><span>Bank</span><strong>{{ $paymentDetails['bank_name'] }}</strong></div>
+                                        <div class="bank-row"><span>Branch</span><strong>{{ $paymentDetails['branch_name'] }}</strong></div>
                                     </div>
                                 </div>
                             @endif

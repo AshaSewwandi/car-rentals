@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'R&A Auto Rentals')</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-rounded-64.png') }}">
+  <link rel="shortcut icon" href="{{ asset('images/logo-rounded-64.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logo-rounded-64.png') }}">
 
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
@@ -29,6 +32,46 @@
       font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
       color: var(--text);
       background: var(--bg);
+    }
+
+    input[type="date"],
+    input[type="datetime-local"] {
+      position: relative;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .7rem center;
+      background-size: 18px 18px;
+      padding-right: 2.3rem !important;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      opacity: 0;
+      color: transparent;
+      background: transparent;
+      cursor: pointer;
+      display: block;
+    }
+
+    input[type="date"]::-webkit-clear-button,
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="datetime-local"]::-webkit-clear-button,
+    input[type="datetime-local"]::-webkit-inner-spin-button {
+      display: none;
+      -webkit-appearance: none;
+    }
+
+    .control-shell input[type="date"],
+    .field-control input[type="date"] {
+      background-image: none;
     }
 
     .topbar {
@@ -111,6 +154,41 @@
     .nav-link:hover {
       color: var(--text) !important;
       background: rgba(241, 245, 249, 0.95);
+    }
+
+    .mobile-admin-menu {
+      margin-top: .6rem;
+      border-top: 1px solid var(--line);
+      padding-top: .6rem;
+      display: grid;
+      gap: .35rem;
+    }
+
+    .mobile-admin-title {
+      margin: .35rem 0 .15rem;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 0 .1rem;
+    }
+
+    .mobile-admin-link {
+      display: block;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: 700;
+      border: 1px solid #dbe6f3;
+      border-radius: .7rem;
+      background: #f8fbff;
+      padding: .55rem .7rem;
+    }
+
+    .mobile-admin-link:hover {
+      color: #0a3f8f;
+      border-color: #bfd5f3;
+      background: #f0f7ff;
     }
 
     .shell-wrap {
@@ -469,6 +547,15 @@
         font-size: 1.42rem;
       }
 
+      .navbar-collapse {
+        margin-top: .55rem;
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+        padding: .55rem .65rem;
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.07);
+      }
+
       .navbar-brand {
         max-width: calc(100vw - 110px);
       }
@@ -524,6 +611,56 @@
 
       .table .btn {
         margin-bottom: .3rem;
+      }
+
+      .card .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .page-toolbar form .form-control,
+      .page-toolbar form .form-select,
+      .page-toolbar form .btn {
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+
+      .form-control[style*="min-width"],
+      .form-select[style*="min-width"],
+      .btn[style*="min-width"] {
+        min-width: 0 !important;
+        width: 100% !important;
+      }
+
+      td .d-flex.gap-2 {
+        flex-wrap: wrap;
+      }
+
+      td .d-flex.gap-2 .form-control,
+      td .d-flex.gap-2 .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .container-fluid {
+        padding-left: .7rem;
+        padding-right: .7rem;
+      }
+
+      .page-toolbar h4 {
+        font-size: 1.2rem;
+      }
+
+      .modal-dialog {
+        margin: .55rem;
+      }
+
+      .modal-content {
+        max-height: calc(100vh - 1.1rem);
       }
     }
 
@@ -744,6 +881,68 @@
           <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
         @endauth
       </ul>
+      @auth
+        <div class="mobile-admin-menu d-lg-none">
+          <div class="mobile-admin-title">Core</div>
+          @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+            <a class="mobile-admin-link" href="{{ route('dashboard') }}">Dashboard</a>
+          @endif
+          @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+            <a class="mobile-admin-link" href="{{ route('gps-logs.index') }}">DAGPS KM Logs</a>
+          @endif
+
+          @if(auth()->user()->isAdmin() || auth()->user()->canAccess('rental_trips'))
+            <div class="mobile-admin-title">Trips</div>
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
+              <a class="mobile-admin-link" href="{{ route('rent-requests.index') }}">Rent Requests</a>
+            @endif
+            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
+              <a class="mobile-admin-link" href="{{ route('availability-check.index') }}">Availability Check</a>
+            @endif
+            @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
+              <a class="mobile-admin-link" href="{{ route('rental-trips.index') }}">Rental Trips</a>
+            @endif
+          @endif
+
+          <div class="mobile-admin-title">Operations</div>
+          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('cars.index'))
+            <a class="mobile-admin-link" href="{{ route('cars.index') }}">Cars</a>
+          @endif
+          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
+            <a class="mobile-admin-link" href="{{ route('vehicle-pricings.index') }}">Pricing</a>
+          @endif
+          @if(auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
+            <a class="mobile-admin-link" href="{{ route('customers.index') }}">Customers</a>
+          @endif
+          @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('rentals.index'))
+            <a class="mobile-admin-link" href="{{ route('rentals.index') }}">Rentals</a>
+          @endif
+          @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('payments.index'))
+            <a class="mobile-admin-link" href="{{ route('payments.index') }}">Payments</a>
+          @endif
+          @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
+            <a class="mobile-admin-link" href="{{ route('expenses.index') }}">Expenses</a>
+          @endif
+          @if(auth()->user()->canAccess('agreements') && \Illuminate\Support\Facades\Route::has('agreements.index'))
+            <a class="mobile-admin-link" href="{{ route('agreements.index') }}">Agreements</a>
+          @endif
+          @if(auth()->user()->canAccess('vehicle_maintenance') && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
+            <a class="mobile-admin-link" href="{{ route('vehicle-maintenance.index') }}">Maintenance</a>
+          @endif
+
+          <div class="mobile-admin-title">Administration</div>
+          <a class="mobile-admin-link" href="{{ route('profile.edit') }}">My Profile</a>
+          @if(auth()->user()->canAccess('users_manage') && \Illuminate\Support\Facades\Route::has('users.index'))
+            <a class="mobile-admin-link" href="{{ route('users.index') }}">Users & Roles</a>
+          @endif
+          @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
+            <a class="mobile-admin-link" href="{{ route('permissions.index') }}">Permissions</a>
+          @endif
+          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('support-requests.index'))
+            <a class="mobile-admin-link" href="{{ route('support-requests.index') }}">Support Requests</a>
+          @endif
+        </div>
+      @endauth
     </div>
   </div>
 </nav>
@@ -845,7 +1044,110 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  function initLinkedDateInputs(root) {
+    const containers = [root, ...root.querySelectorAll('form')];
+    const normalize = (value) => (value || '').toLowerCase().replace(/[\s_\-\[\]]/g, '');
+    const isStartLike = (input) => {
+      const key = normalize((input.name || '') + ' ' + (input.id || ''));
+      return key.includes('startdate') || key.includes('datefrom') || key.includes('fromdate') || key.includes('datefrom') || key.includes('tripdatefrom') || key.includes('availabilitystartdate') || key.includes('requeststartdate');
+    };
+    const isEndLike = (input) => {
+      const key = normalize((input.name || '') + ' ' + (input.id || ''));
+      return key.includes('enddate') || key.includes('dateto') || key.includes('todate') || key.includes('tripdateto') || key.includes('availabilityenddate') || key.includes('requestenddate') || key.includes('returndate');
+    };
+
+    const findByNameOrId = (container, value) => {
+      if (!value) return null;
+      return container.querySelector(`input[type="date"][name="${value}"], input[type="datetime-local"][name="${value}"], #${value}`);
+    };
+
+    const findStartMatch = (container, endInput) => {
+      const endName = endInput.getAttribute('name') || '';
+      const endId = endInput.getAttribute('id') || '';
+      const directPairs = [
+        [endName, endName.replace('end_date', 'start_date')],
+        [endName, endName.replace('date_to', 'date_from')],
+        [endName, endName.replace('to_date', 'from_date')],
+        [endId, endId.replace('end_date', 'start_date')],
+        [endId, endId.replace('date_to', 'date_from')],
+        [endId, endId.replace('To', 'From')],
+        [endId, endId.replace('End', 'Start')],
+      ];
+
+      for (const [, candidate] of directPairs) {
+        if (!candidate || candidate === endName || candidate === endId) continue;
+        const match = findByNameOrId(container, candidate);
+        if (match && match !== endInput) return match;
+      }
+
+      const allInputs = Array.from(container.querySelectorAll('input[type="date"], input[type="datetime-local"]'));
+      const endIndex = allInputs.indexOf(endInput);
+      for (let i = endIndex - 1; i >= 0; i -= 1) {
+        if (isStartLike(allInputs[i])) return allInputs[i];
+      }
+
+      return findByNameOrId(container, 'start_date')
+        || findByNameOrId(container, 'date_from')
+        || findByNameOrId(container, 'from_date');
+    };
+
+    const applyMin = (startInput, endInput, shouldPromptEnd = false) => {
+      if (!endInput.dataset.baseMin) {
+        endInput.dataset.baseMin = endInput.getAttribute('min') || '';
+      }
+
+      const baseMin = endInput.dataset.baseMin;
+      const startValue = startInput.value || '';
+      const nextMin = [baseMin, startValue].filter(Boolean).sort().pop() || '';
+
+      if (nextMin) {
+        endInput.setAttribute('min', nextMin);
+      } else {
+        endInput.removeAttribute('min');
+      }
+
+      if (endInput.value && nextMin && endInput.value < nextMin) {
+        endInput.value = '';
+      }
+
+      const isMobile = window.matchMedia('(max-width: 920px)').matches;
+      if (
+        shouldPromptEnd &&
+        isMobile &&
+        startValue &&
+        !endInput.value &&
+        typeof endInput.showPicker === 'function'
+      ) {
+        setTimeout(() => {
+          try {
+            endInput.showPicker();
+          } catch (_) {
+            endInput.focus();
+          }
+        }, 120);
+      }
+    };
+
+    containers.forEach((container) => {
+      const inputs = Array.from(container.querySelectorAll('input[type="date"], input[type="datetime-local"]'));
+      const endInputs = inputs.filter((input) => isEndLike(input));
+
+      endInputs.forEach((endInput) => {
+        const startInput = findStartMatch(container, endInput);
+        if (!startInput || startInput === endInput) return;
+
+        const sync = () => applyMin(startInput, endInput, false);
+        const syncAndPrompt = () => applyMin(startInput, endInput, true);
+        startInput.addEventListener('input', sync);
+        startInput.addEventListener('change', syncAndPrompt);
+        sync();
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    initLinkedDateInputs(document);
+
     const toggleButton = document.getElementById('sidebarToggle');
     const toggleIcon = document.getElementById('sidebarToggleIcon');
     if (!toggleButton) return;

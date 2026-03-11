@@ -13,6 +13,74 @@
   </form>
 </div>
 
+@if(auth()->user()->isAdmin())
+  <div class="card list-card mb-3">
+    <div class="card-header">
+      <span class="header-title">Online Transfer Payment Details</span>
+    </div>
+    <div class="card-body">
+      <form method="post" action="{{ route('payments.bank-details.update') }}">
+        @csrf
+        <div class="row g-2">
+          <div class="col-12 col-md-6">
+            <label class="form-label">Account Number</label>
+            <input
+              type="text"
+              name="account_number"
+              class="form-control"
+              value="{{ old('account_number', $paymentDetails['account_number']) }}"
+              required
+            >
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">Account Name</label>
+            <input
+              type="text"
+              name="account_name"
+              class="form-control"
+              value="{{ old('account_name', $paymentDetails['account_name']) }}"
+              required
+            >
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">Bank</label>
+            <input
+              type="text"
+              name="bank_name"
+              class="form-control"
+              value="{{ old('bank_name', $paymentDetails['bank_name']) }}"
+              required
+            >
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">Branch</label>
+            <input
+              type="text"
+              name="branch_name"
+              class="form-control"
+              value="{{ old('branch_name', $paymentDetails['branch_name']) }}"
+              required
+            >
+          </div>
+          <div class="col-12">
+            <label class="form-label">Customer Help Text</label>
+            <input
+              type="text"
+              name="help_text"
+              class="form-control"
+              value="{{ old('help_text', $paymentDetails['help_text']) }}"
+              required
+            >
+          </div>
+        </div>
+        <div class="mt-3 d-flex justify-content-end">
+          <button class="btn btn-dark">Save Payment Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+@endif
+
 @if($errors->any())
   <div class="alert alert-danger">
     <ul class="mb-0">
