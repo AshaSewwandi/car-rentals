@@ -2,6 +2,9 @@
 @section('title', 'DAGPS KM Tracking')
 
 @section('content')
+@php
+  $canManageGps = auth()->user()->isSuperAdmin();
+@endphp
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
   .sheet-scroll-wrap {
@@ -230,14 +233,78 @@
     @if(empty($carId))
       <div class="text-muted">Choose a specific car from the filter above to load the sheet.</div>
     @else
-      <form method="post" action="{{ route('gps-logs.sheet') }}">
-        @csrf
-        <input type="hidden" name="car_id" value="{{ $carId }}">
-        <input type="hidden" name="month" value="{{ $month }}">
-        <input type="hidden" name="start_date" value="{{ $usingCustomRange ? $startDate : '' }}">
-        <input type="hidden" name="end_date" value="{{ $usingCustomRange ? $endDate : '' }}">
-        <input type="hidden" name="cycle_day" value="{{ $cycleDay }}">
+      @if($canManageGps)
+        <form method="post" action="{{ route('gps-logs.sheet') }}">
+          @csrf
+          <input type="hidden" name="car_id" value="{{ $carId }}">
+          <input type="hidden" name="month" value="{{ $month }}">
+          <input type="hidden" name="start_date" value="{{ $usingCustomRange ? $startDate : '' }}">
+          <input type="hidden" name="end_date" value="{{ $usingCustomRange ? $endDate : '' }}">
+          <input type="hidden" name="cycle_day" value="{{ $cycleDay }}">
 
+          <div class="sheet-scroll-wrap">
+            <div class="sheet-grid">
+              @foreach($sheetPeriods as $idx => $period)
+                <div class="sheet-block border rounded overflow-hidden sheet-palette-{{ $idx % 4 }}">
+                  <div class="sheet-header">{{ $period['title'] }}</div>
+                  <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th class="ps-2">Date</th>
+                          <th class="text-end pe-2 sheet-km-cell">Km</th>
+                          <th class="text-center pe-2" style="width:78px;">Service</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach($period['rows'] as $row)
+                          <tr class="{{ $row['is_service'] ? 'sheet-service' : '' }}">
+                            <td class="ps-2 sheet-date-cell">
+                              {{ $row['label'] }}
+                              @if($row['is_service'])
+                                <span class="fa fa-cogs service-icon" title="Service marked"></span>
+                              @endif
+                            </td>
+                            <td class="text-end pe-2 sheet-km-cell">
+                              <input
+                                type="number"
+                                min="0"
+                                step="any"
+                                class="form-control form-control-sm d-inline-block sheet-km-input"
+                                name="distances[{{ $row['date'] }}]"
+                                value="{{ $row['km'] }}"
+                              >
+                            </td>
+                            <td class="text-center pe-2">
+                              <button
+                                type="button"
+                                class="btn btn-outline-dark service-action-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#serviceModal"
+                                data-service-date="{{ $row['date'] }}"
+                                data-service-type="{{ $row['service_type'] }}"
+                                data-service-cost="{{ $row['service_cost'] }}"
+                                data-service-mileage="{{ $row['service_mileage'] }}"
+                                data-service-note="{{ $row['service_note'] }}"
+                              >
+                                {{ $row['is_service'] ? 'Edit' : 'Mark' }}
+                              </button>
+                            </td>
+                          </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button class="btn btn-dark">Save Daily KM Sheet</button>
+          </div>
+        </form>
+      @else
         <div class="sheet-scroll-wrap">
           <div class="sheet-grid">
             @foreach($sheetPeriods as $idx => $period)
@@ -262,29 +329,10 @@
                             @endif
                           </td>
                           <td class="text-end pe-2 sheet-km-cell">
-                            <input
-                              type="number"
-                              min="0"
-                              step="any"
-                              class="form-control form-control-sm d-inline-block sheet-km-input"
-                              name="distances[{{ $row['date'] }}]"
-                              value="{{ $row['km'] }}"
-                            >
+                            {{ $row['km'] !== null ? number_format((float) $row['km'], 2) : '-' }}
                           </td>
                           <td class="text-center pe-2">
-                            <button
-                              type="button"
-                              class="btn btn-outline-dark service-action-btn"
-                              data-bs-toggle="modal"
-                              data-bs-target="#serviceModal"
-                              data-service-date="{{ $row['date'] }}"
-                              data-service-type="{{ $row['service_type'] }}"
-                              data-service-cost="{{ $row['service_cost'] }}"
-                              data-service-mileage="{{ $row['service_mileage'] }}"
-                              data-service-note="{{ $row['service_note'] }}"
-                            >
-                              {{ $row['is_service'] ? 'Edit' : 'Mark' }}
-                            </button>
+                            {{ $row['is_service'] ? 'Service' : '-' }}
                           </td>
                         </tr>
                       @endforeach
@@ -295,15 +343,12 @@
             @endforeach
           </div>
         </div>
-
-        <div class="mt-3">
-          <button class="btn btn-dark">Save Daily KM Sheet</button>
-        </div>
-      </form>
+      @endif
     @endif
   </div>
 </div>
 
+@if($canManageGps)
 <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -376,5 +421,6 @@
     });
   });
 </script>
+@endif
 
 @endsection

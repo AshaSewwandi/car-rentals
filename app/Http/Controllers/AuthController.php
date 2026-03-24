@@ -34,6 +34,8 @@ class AuthController extends Controller
 
         if ($user?->isCustomer()) {
             $targetRoute = 'customer.dashboard';
+        } elseif ($user?->isCustomerPortal()) {
+            $targetRoute = 'dashboard';
         } elseif ($user?->isPartner()) {
             $targetRoute = 'rental-trips.index';
         } elseif ($user?->canAccess('dashboard')) {

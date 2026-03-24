@@ -58,6 +58,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'mail_image_base_url' => env('MAIL_IMAGE_BASE_URL', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

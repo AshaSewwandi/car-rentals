@@ -368,7 +368,7 @@
       <input type="month" class="form-control" name="month" value="{{ $month }}">
       <button class="btn btn-dark">Filter</button>
     </form>
-    @if(auth()->user()->canAccess('payments'))
+    @if(auth()->user()->canManageData() && auth()->user()->canAccess('payments'))
       <a class="btn btn-dark" href="{{ route('payments.index') }}">+ Add Payment</a>
     @endif
   </div>
@@ -439,7 +439,9 @@
                 <th>Renewal Type</th>
                 <th>Renewal Date</th>
                 <th>Status</th>
-                <th>Action</th>
+                @if(auth()->user()->canManageData())
+                  <th>Action</th>
+                @endif
               </tr>
             </thead>
             <tbody>
@@ -455,25 +457,27 @@
                       <span class="badge text-bg-warning">Due in {{ $alert['days_left'] }} days</span>
                     @endif
                   </td>
-                  <td data-label="Action">
-                    @if(auth()->user()->canAccess('cars'))
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-outline-dark"
-                        data-bs-toggle="modal"
-                        data-bs-target="#renewalUpdateModal"
-                        data-renewal-url="{{ route('cars.renewal.update', $alert['car']) }}"
-                        data-renewal-car="{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}"
-                        data-renewal-type="{{ strtolower($alert['type']) }}"
-                        data-renewal-date="{{ $alert['date']->format('Y-m-d') }}"
-                      >
-                        Renew
-                      </button>
-                    @endif
-                  </td>
+                  @if(auth()->user()->canManageData())
+                    <td data-label="Action">
+                      @if(auth()->user()->canAccess('cars'))
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-dark"
+                          data-bs-toggle="modal"
+                          data-bs-target="#renewalUpdateModal"
+                          data-renewal-url="{{ route('cars.renewal.update', $alert['car']) }}"
+                          data-renewal-car="{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}"
+                          data-renewal-type="{{ strtolower($alert['type']) }}"
+                          data-renewal-date="{{ $alert['date']->format('Y-m-d') }}"
+                        >
+                          Renew
+                        </button>
+                      @endif
+                    </td>
+                  @endif
                 </tr>
               @empty
-                <tr><td colspan="5" class="text-center p-4 text-muted no-data">No insurance or license renewals in the selected 30-day window.</td></tr>
+                <tr><td colspan="{{ auth()->user()->canManageData() ? 5 : 4 }}" class="text-center p-4 text-muted no-data">No insurance or license renewals in the selected 30-day window.</td></tr>
               @endforelse
             </tbody>
           </table>
@@ -559,6 +563,7 @@
   </div>
 </div>
 
+@if(auth()->user()->canManageData())
 <div class="modal fade" id="renewalUpdateModal" tabindex="-1" aria-labelledby="renewalUpdateModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -592,7 +597,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if(auth()->user()->canManageData())
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const renewalModal = document.getElementById('renewalUpdateModal');
@@ -621,6 +628,7 @@
     });
   });
 </script>
+@endif
 
 </div>
 @endsection

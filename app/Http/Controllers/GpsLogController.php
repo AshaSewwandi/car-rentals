@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Agreement;
 use App\Models\Car;
 use App\Models\GpsLog;
 use Carbon\Carbon;
@@ -13,17 +14,43 @@ class GpsLogController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
         $month = $this->sanitizeMonth($request->get('month'));
         $carId = $request->get('car_id');
         $cycleDay = (int) $request->get('cycle_day', 2);
         $cycleDay = max(1, min(28, $cycleDay));
         [$startDate, $endDate, $usingCustomRange, $periodLabel] = $this->resolveRange($request, $month);
-        $cars = Car::query()->orderBy('name')->get();
+        $allowedCarIds = null;
+
+        if ($user?->isCustomerPortal()) {
+            $customerId = $user->customer_id;
+            $allowedCarIds = Agreement::query()
+                ->where('customer_id', $customerId)
+                ->pluck('car_id')
+                ->unique()
+                ->filter()
+                ->values();
+
+            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
+            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+                abort(403, 'You do not have permission to access this vehicle.');
+            }
+
+            $cars = $allowedCarIds->isEmpty()
+                ? collect()
+                : Car::query()->whereIn('id', $allowedCarIds)->orderBy('name')->get();
+        } else {
+            $cars = Car::query()->orderBy('name')->get();
+        }
 
         $logsQuery = GpsLog::query()
             ->with('car')
             ->whereBetween('log_date', [$startDate, $endDate])
             ->orderByDesc('log_date');
+
+        if ($allowedCarIds !== null) {
+            $logsQuery->whereIn('car_id', $allowedCarIds);
+        }
 
         if (!empty($carId)) {
             $logsQuery->where('car_id', $carId);
@@ -151,15 +178,36 @@ class GpsLogController extends Controller
 
     public function monthlyReport(Request $request): Response
     {
+        $user = $request->user();
         $month = $this->sanitizeMonth($request->get('month'));
         $carId = $request->get('car_id');
         [$startDate, $endDate] = $this->resolveRange($request, $month);
+
+        $allowedCarIds = null;
+        if ($user?->isCustomerPortal()) {
+            $customerId = $user->customer_id;
+            $allowedCarIds = Agreement::query()
+                ->where('customer_id', $customerId)
+                ->pluck('car_id')
+                ->unique()
+                ->filter()
+                ->values();
+
+            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
+            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+                abort(403, 'You do not have permission to access this vehicle.');
+            }
+        }
 
         $logsQuery = GpsLog::query()
             ->with('car')
             ->whereBetween('log_date', [$startDate, $endDate])
             ->orderBy('log_date')
             ->orderBy('car_id');
+
+        if ($allowedCarIds !== null) {
+            $logsQuery->whereIn('car_id', $allowedCarIds);
+        }
 
         if (!empty($carId)) {
             $logsQuery->where('car_id', $carId);

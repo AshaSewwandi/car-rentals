@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'failover'),
+    'default' => env('MAIL_MAILER', env('MAIL_DRIVER', 'failover')),
 
     /*
     |--------------------------------------------------------------------------
@@ -93,6 +93,26 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    'reply_to' => [
+        'address' => env('MAIL_REPLYTO'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    'to' => [
+        'address' => env('MAIL_DELIVERY'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    'cc' => [
+        'address' => env('MAIL_CC'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    'bcc' => [
+        'address' => env('MAIL_BCC'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 

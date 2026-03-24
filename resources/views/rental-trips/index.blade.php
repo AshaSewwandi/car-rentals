@@ -2,6 +2,9 @@
 @section('title', 'Rental Trips')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .trip-table td,
   .trip-table th {
@@ -186,7 +189,7 @@
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Rental Trips</h4>
     <div class="text-muted">
-      {{ auth()->user()->isAdmin() ? 'Record start and end mileage, then auto-calculate extra km and final amount.' : 'View only the rental trips linked to your partner account.' }}
+      {{ $canManageData ? 'Record start and end mileage, then auto-calculate extra km and final amount.' : 'View only the rental trips linked to your partner account.' }}
     </div>
   </div>
   <form method="get" action="{{ route('rental-trips.index') }}" class="d-flex flex-wrap align-items-end gap-2">
@@ -277,7 +280,9 @@
             <th>Base Details</th>
             <th>Additional Details</th>
             <th>Revenue Split</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -338,7 +343,7 @@
                   $partnerSharePercentage = (float) ($booking->partner_share_percentage ?? 0);
                   $adminSharePercentage = (float) ($booking->admin_share_percentage ?? 100);
                 @endphp
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isDashboardAdmin())
                   <div>Partner: <strong>{{ number_format($partnerSharePercentage, 2) }}%</strong></div>
                   <div class="text-muted small">LKR {{ number_format($partnerShareAmount, 2) }}</div>
                   <div class="mt-1">Admin: <strong>{{ number_format($adminSharePercentage, 2) }}%</strong></div>
@@ -348,8 +353,8 @@
                   <div class="text-muted small">LKR {{ number_format($partnerShareAmount, 2) }}</div>
                 @endif
               </td>
-              <td data-label="Action" class="cell-actions {{ $booking->status === 'cancelled' ? 'is-cancelled' : '' }}" style="min-width: 240px;">
-                @if(auth()->user()->isAdmin())
+              @if($canManageData)
+                <td data-label="Action" class="cell-actions {{ $booking->status === 'cancelled' ? 'is-cancelled' : '' }}" style="min-width: 240px;">
                   @if($booking->status === 'cancelled')
                     {{-- Handled below with invoice button in one row --}}
                   @elseif($booking->start_mileage === null)
@@ -367,48 +372,46 @@
                   @else
                     <span class="text-muted small">Completed by {{ $booking->returnedBy?->name ?: 'Admin' }}<br>{{ $booking->returned_at?->format('Y-m-d H:i') }}</span>
                   @endif
-                @else
-                  <span class="text-muted small">Read only</span>
-                @endif
 
-                @if(auth()->user()->isAdmin() && $booking->status !== 'cancelled' && $booking->payment_status !== 'paid')
-                  <form method="post" action="{{ route('rental-trips.payment.base.paid', $booking) }}" class="mt-2">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Base Paid</button>
-                  </form>
-                @endif
+                  @if($booking->status !== 'cancelled' && $booking->payment_status !== 'paid')
+                    <form method="post" action="{{ route('rental-trips.payment.base.paid', $booking) }}" class="mt-2">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Base Paid</button>
+                    </form>
+                  @endif
 
-                @if(auth()->user()->isAdmin() && $booking->status !== 'cancelled' && $booking->additional_payment_status === 'pending')
-                  <form method="post" action="{{ route('rental-trips.payment.additional.paid', $booking) }}" class="mt-2">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Additional Paid</button>
-                  </form>
-                @endif
+                  @if($booking->status !== 'cancelled' && $booking->additional_payment_status === 'pending')
+                    <form method="post" action="{{ route('rental-trips.payment.additional.paid', $booking) }}" class="mt-2">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-outline-dark w-100">Mark Additional Paid</button>
+                    </form>
+                  @endif
 
-                @if(auth()->user()->isAdmin() && in_array($booking->status, ['pending', 'confirmed'], true) && !$booking->handover_at && $booking->start_mileage === null)
-                  <form method="post" action="{{ route('rental-trips.cancel', $booking) }}" class="mt-2" onsubmit="return confirm('Cancel this rental trip?');">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Cancel Trip</button>
-                  </form>
-                @endif
+                  @if(in_array($booking->status, ['pending', 'confirmed'], true) && !$booking->handover_at && $booking->start_mileage === null)
+                    <form method="post" action="{{ route('rental-trips.cancel', $booking) }}" class="mt-2" onsubmit="return confirm('Cancel this rental trip?');">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-outline-danger w-100">Cancel Trip</button>
+                    </form>
+                  @endif
 
-                @if($booking->status === 'cancelled')
-                  <div class="cancelled-action-row mt-2">
-                    <span class="text-muted small trip-note">Trip cancelled</span>
-                    <a href="{{ route('rental-trips.invoice-pdf', $booking) }}" class="btn btn-sm btn-outline-dark invoice-btn">
+                  @if($booking->status === 'cancelled')
+                    <div class="cancelled-action-row mt-2">
+                      <span class="text-muted small trip-note">Trip cancelled</span>
+                      <a href="{{ route('rental-trips.invoice-pdf', $booking) }}" class="btn btn-sm btn-outline-dark invoice-btn">
+                        Invoice PDF
+                      </a>
+                    </div>
+                  @else
+                    <a href="{{ route('rental-trips.invoice-pdf', $booking) }}" class="btn btn-sm btn-outline-dark w-100 mt-2">
                       Invoice PDF
                     </a>
-                  </div>
-                @else
-                  <a href="{{ route('rental-trips.invoice-pdf', $booking) }}" class="btn btn-sm btn-outline-dark w-100 mt-2">
-                    Invoice PDF
-                  </a>
-                @endif
-              </td>
+                  @endif
+                </td>
+              @endif
             </tr>
           @empty
             <tr>
-              <td colspan="11" class="text-center p-4 text-muted no-data">No bookings found yet.</td>
+              <td colspan="{{ $canManageData ? 11 : 10 }}" class="text-center p-4 text-muted no-data">No bookings found yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -422,3 +425,5 @@
   @endif
 </div>
 @endsection
+
+

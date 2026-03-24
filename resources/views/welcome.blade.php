@@ -1726,7 +1726,7 @@
                 <a href="{{ route('group-packages.index') }}">Special Events</a>
                 <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
                 @auth
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->isDashboardAdmin())
                         @if(auth()->user()->canAccess('dashboard'))
                             <a class="nav-mobile-only" href="{{ route('dashboard') }}">Admin Dashboard</a>
                         @endif
@@ -1750,7 +1750,7 @@
                             <span class="account-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                         </button>
                         <div class="account-menu" id="accountMenu">
-                            @if(auth()->user()->isAdmin())
+                            @if(auth()->user()->isDashboardAdmin())
                                 @if(auth()->user()->canAccess('dashboard'))
                                     <a href="{{ route('dashboard') }}">Admin Dashboard</a>
                                 @endif

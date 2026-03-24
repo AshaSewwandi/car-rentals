@@ -2,6 +2,9 @@
 @section('title', 'User Management')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .users-table-wrap {
     overflow-x: auto;
@@ -110,7 +113,9 @@
     <h4 class="mb-1">User Management</h4>
     <div class="text-muted">Create team accounts and control access by assigning user roles.</div>
   </div>
-  <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addUserModal">Add User</button>
+  @if($canManageData)
+    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addUserModal">Add User</button>
+  @endif
 </div>
 
 @if($errors->any())
@@ -136,7 +141,9 @@
             <th>Role</th>
             <th>Revenue Split</th>
             <th>Created</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -146,8 +153,8 @@
               <td data-label="Email">{{ $user->email }}</td>
               <td data-label="Phone">{{ $user->phone ?: '-' }}</td>
               <td data-label="Role">
-                <span class="badge {{ $user->role === 'admin' ? 'bg-success' : ($user->role === 'partner' ? 'bg-primary' : 'bg-secondary') }}">
-                  {{ ucfirst($user->role) }}
+                <span class="badge {{ $user->role === 'super_admin' ? 'bg-dark' : ($user->role === 'admin' ? 'bg-success' : ($user->role === 'partner' ? 'bg-primary' : ($user->role === 'partner_applicant' ? 'bg-warning text-dark' : ($user->role === 'customer_portal' ? 'bg-info' : 'bg-secondary')))) }}">
+                  {{ str_replace('_', ' ', ucfirst($user->role)) }}
                 </span>
               </td>
               <td data-label="Revenue Split">
@@ -159,24 +166,28 @@
                 @endif
               </td>
               <td data-label="Created">{{ $user->created_at?->format('Y-m-d') }}</td>
+              @if($canManageData)
               <td data-label="Action" class="text-nowrap user-actions">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
-                @if(auth()->id() !== $user->id)
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteUserModal"
-                    data-delete-url="{{ route('users.destroy', $user) }}"
-                    data-user-name="{{ $user->name }}"
-                  >
-                    Delete
-                  </button>
+                @if($canManageData)
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
+                  @if(auth()->id() !== $user->id)
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteUserModal"
+                      data-delete-url="{{ route('users.destroy', $user) }}"
+                      data-user-name="{{ $user->name }}"
+                    >
+                      Delete
+                    </button>
+                  @endif
                 @endif
               </td>
+              @endif
             </tr>
           @empty
-            <tr><td colspan="7" class="text-center p-4 text-muted no-data">No users found.</td></tr>
+            <tr><td colspan="{{ $canManageData ? 7 : 6 }}" class="text-center p-4 text-muted no-data">No users found.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -184,6 +195,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -207,11 +219,23 @@
             <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
           </div>
           <div class="mb-2">
-            <label class="form-label">Role</label>
-            <select name="role" class="form-select" required>
+              <label class="form-label">Role</label>
+              <select name="role" class="form-select" required>
+              <option value="super_admin" @selected(old('role') === 'super_admin')>Super Admin</option>
               <option value="customer" @selected(old('role') === 'customer')>Customer</option>
+              <option value="customer_portal" @selected(old('role') === 'customer_portal')>Customer Portal</option>
               <option value="partner" @selected(old('role') === 'partner')>Partner</option>
+              <option value="partner_applicant" @selected(old('role') === 'partner_applicant')>Partner Applicant</option>
               <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Linked Customer (for Customer Portal role)</label>
+            <select name="customer_id" class="form-select">
+              <option value="">No linked customer</option>
+              @foreach($customers as $customer)
+                <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>{{ $customer->name }}{{ $customer->phone ? ' - '.$customer->phone : '' }}</option>
+              @endforeach
             </select>
           </div>
           <div class="row g-2 mb-2">
@@ -272,13 +296,25 @@
             <div class="mb-2">
               <label class="form-label">Role</label>
               <select name="role" class="form-select" required>
+                <option value="super_admin" @selected($user->role === 'super_admin')>Super Admin</option>
                 <option value="customer" @selected($user->role === 'customer')>Customer</option>
+                <option value="customer_portal" @selected($user->role === 'customer_portal')>Customer Portal</option>
                 <option value="partner" @selected($user->role === 'partner')>Partner</option>
+                <option value="partner_applicant" @selected($user->role === 'partner_applicant')>Partner Applicant</option>
                 <option value="admin" @selected($user->role === 'admin')>Admin</option>
               </select>
               @if(auth()->id() === $user->id)
-                <small class="text-muted">Your own role cannot be changed from admin to customer.</small>
+                <small class="text-muted">Your own role cannot be changed from admin access to customer, partner, or customer portal.</small>
               @endif
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Linked Customer (for Customer Portal role)</label>
+              <select name="customer_id" class="form-select">
+                <option value="">No linked customer</option>
+                @foreach($customers as $customer)
+                  <option value="{{ $customer->id }}" @selected((string) old('customer_id', $user->customer_id) === (string) $customer->id)>{{ $customer->name }}{{ $customer->phone ? ' - '.$customer->phone : '' }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="row g-2 mb-2">
               <div class="col-md-6">
@@ -333,7 +369,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteUserModal');
@@ -357,4 +395,7 @@
     });
   });
 </script>
+@endif
 @endsection
+
+

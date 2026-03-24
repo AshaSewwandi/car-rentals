@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -65,6 +66,15 @@ class Car extends Model
     public function bookings(): HasMany { return $this->hasMany(Booking::class); }
     public function images(): HasMany { return $this->hasMany(CarImage::class)->orderBy('sort_order')->orderBy('id'); }
     public function partner(): BelongsTo { return $this->belongsTo(User::class, 'partner_user_id'); }
+
+    public function scopeVisibleOnPublic(Builder $query): Builder
+    {
+        return $query->where(function (Builder $builder) {
+            $builder
+                ->whereNull('partner_user_id')
+                ->orWhereHas('partner', fn (Builder $partnerQuery) => $partnerQuery->where('role', 'partner'));
+        });
+    }
 
     public function primaryImageUrl(): string
     {

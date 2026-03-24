@@ -107,26 +107,29 @@
     }
 
     .brand-logo-wrap {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      background: transparent;
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      border: 1px solid #d8e5f5;
+      background: #f8fbff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 1px;
+      padding: 3px;
       flex-shrink: 0;
+      overflow: hidden;
     }
 
     .brand-logo {
-      width: 88%;
-      height: 88%;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
+      border-radius: 9px;
       border: 0;
       background: transparent;
       padding: 0;
       box-shadow: none;
-      filter: contrast(1.14) saturate(1.14) drop-shadow(0 1px 1px rgba(15, 23, 42, 0.18));
+      filter: none;
       flex-shrink: 0;
     }
 
@@ -561,13 +564,15 @@
       }
 
       .brand-logo {
-        width: 88%;
-        height: 88%;
+        width: 100%;
+        height: 100%;
       }
 
       .brand-logo-wrap {
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        padding: 3px;
       }
 
       .brand-name {
@@ -911,7 +916,7 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto">
         @auth
-          <li class="nav-item"><span class="nav-link">{{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})</span></li>
+          <li class="nav-item"><span class="nav-link">{{ auth()->user()->name }} ({{ str_replace('_', ' ', ucfirst(auth()->user()->role)) }})</span></li>
           <li class="nav-item">
             <form method="post" action="{{ route('logout') }}">
               @csrf
@@ -925,20 +930,25 @@
       </ul>
       @auth
         <div class="mobile-admin-menu d-lg-none">
-          <div class="mobile-admin-title">Core</div>
-          @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
-            <a class="mobile-admin-link" href="{{ route('dashboard') }}">Dashboard</a>
-          @endif
-          @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
-            <a class="mobile-admin-link" href="{{ route('gps-logs.index') }}">DAGPS KM Logs</a>
+          @if(
+            (auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+            || (auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+          )
+            <div class="mobile-admin-title">Core</div>
+            @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+              <a class="mobile-admin-link" href="{{ route('dashboard') }}">Dashboard</a>
+            @endif
+            @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+              <a class="mobile-admin-link" href="{{ route('gps-logs.index') }}">DAGPS KM Logs</a>
+            @endif
           @endif
 
-          @if(auth()->user()->isAdmin() || auth()->user()->canAccess('rental_trips'))
+          @if(auth()->user()->isDashboardAdmin() || auth()->user()->canAccess('rental_trips'))
             <div class="mobile-admin-title">Trips</div>
-            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
               <a class="mobile-admin-link" href="{{ route('rent-requests.index') }}">Rent Requests</a>
             @endif
-            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
               <a class="mobile-admin-link" href="{{ route('availability-check.index') }}">Availability Check</a>
             @endif
             @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
@@ -953,7 +963,7 @@
           @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
             <a class="mobile-admin-link" href="{{ route('vehicle-pricings.index') }}">Pricing</a>
           @endif
-          @if(auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
+          @if(!auth()->user()->isPartner() && auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
             <a class="mobile-admin-link" href="{{ route('customers.index') }}">Customers</a>
           @endif
           @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('rentals.index'))
@@ -968,7 +978,7 @@
           @if(auth()->user()->canAccess('agreements') && \Illuminate\Support\Facades\Route::has('agreements.index'))
             <a class="mobile-admin-link" href="{{ route('agreements.index') }}">Agreements</a>
           @endif
-          @if(auth()->user()->canAccess('vehicle_maintenance') && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
+          @if((auth()->user()->canAccess('vehicle_maintenance') || auth()->user()->isPartner()) && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
             <a class="mobile-admin-link" href="{{ route('vehicle-maintenance.index') }}">Maintenance</a>
           @endif
 
@@ -980,7 +990,7 @@
           @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
             <a class="mobile-admin-link" href="{{ route('permissions.index') }}">Permissions</a>
           @endif
-          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('support-requests.index'))
+          @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('support-requests.index'))
             <a class="mobile-admin-link" href="{{ route('support-requests.index') }}">Support Requests</a>
           @endif
         </div>
@@ -993,23 +1003,28 @@
   <div class="row">
     <aside class="sidebar d-none d-lg-block">
       <div class="sidebar-card">
-        <div class="menu-section">
-          <div class="menu-title">Core</div>
-          @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
-            <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="menu-dot"></span>Dashboard</a>
-          @endif
-          @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
-            <a class="menu-link {{ request()->routeIs('gps-logs.*') ? 'active' : '' }}" href="{{ route('gps-logs.index') }}"><span class="menu-dot"></span>DAGPS KM Logs</a>
-          @endif
-        </div>
+        @if(
+          (auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+          || (auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+        )
+          <div class="menu-section">
+            <div class="menu-title">Core</div>
+            @if(auth()->user()->canAccess('dashboard') && \Illuminate\Support\Facades\Route::has('dashboard'))
+              <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="menu-dot"></span>Dashboard</a>
+            @endif
+            @if(auth()->user()->canAccess('gps_logs') && \Illuminate\Support\Facades\Route::has('gps-logs.index'))
+              <a class="menu-link {{ request()->routeIs('gps-logs.*') ? 'active' : '' }}" href="{{ route('gps-logs.index') }}"><span class="menu-dot"></span>DAGPS KM Logs</a>
+            @endif
+          </div>
+        @endif
 
-        @if(auth()->user()->isAdmin() || auth()->user()->canAccess('rental_trips'))
+        @if(auth()->user()->isDashboardAdmin() || auth()->user()->canAccess('rental_trips'))
           <div class="menu-section">
             <div class="menu-title">Trips</div>
-            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
               <a class="menu-link {{ request()->routeIs('rent-requests.*') ? 'active' : '' }}" href="{{ route('rent-requests.index') }}"><span class="menu-dot"></span>Rent Requests</a>
             @endif
-            @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
               <a class="menu-link {{ request()->routeIs('availability-check.*') ? 'active' : '' }}" href="{{ route('availability-check.index') }}"><span class="menu-dot"></span>Availability Check</a>
             @endif
             @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
@@ -1026,7 +1041,7 @@
           @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
             <a class="menu-link {{ request()->routeIs('vehicle-pricings.*') ? 'active' : '' }}" href="{{ route('vehicle-pricings.index') }}"><span class="menu-dot"></span>Pricing</a>
           @endif
-          @if(auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
+          @if(!auth()->user()->isPartner() && auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
             <a class="menu-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" href="{{ route('customers.index') }}"><span class="menu-dot"></span>Customers</a>
           @endif
           @if(auth()->user()->canAccess('payments') && \Illuminate\Support\Facades\Route::has('rentals.index'))
@@ -1041,7 +1056,7 @@
           @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
             <a class="menu-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><span class="menu-dot"></span>Expenses</a>
           @endif
-          @if(auth()->user()->canAccess('vehicle_maintenance') && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
+          @if((auth()->user()->canAccess('vehicle_maintenance') || auth()->user()->isPartner()) && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
             <a class="menu-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}" href="{{ route('vehicle-maintenance.index') }}"><span class="menu-dot"></span>Maintenance</a>
           @endif
         </div>
@@ -1055,7 +1070,7 @@
           @if(auth()->user()->canAccess('permissions_manage') && \Illuminate\Support\Facades\Route::has('permissions.index'))
             <a class="menu-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}" href="{{ route('permissions.index') }}"><span class="menu-dot"></span>Permissions</a>
           @endif
-          @if(auth()->user()->role === 'admin' && \Illuminate\Support\Facades\Route::has('support-requests.index'))
+          @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('support-requests.index'))
             <a class="menu-link {{ request()->routeIs('support-requests.*') ? 'active' : '' }}" href="{{ route('support-requests.index') }}"><span class="menu-dot"></span>Support Requests</a>
           @endif
         </div>

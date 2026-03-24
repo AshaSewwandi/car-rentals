@@ -2,6 +2,9 @@
 @section('title', 'Vehicle Pricing')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .pricing-table-wrap {
     overflow-x: auto;
@@ -120,7 +123,9 @@
     <h4 class="mb-1">Vehicle Pricing</h4>
     <div class="text-muted">Manage pricing by vehicle make and model, including per day KM and extra KM charge.</div>
   </div>
-  <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addVehiclePricingModal">Add Pricing</button>
+  @if($canManageData)
+    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addVehiclePricingModal">Add Pricing</button>
+  @endif
 </div>
 
 <div class="card list-card">
@@ -142,7 +147,9 @@
             <th>Driver Cost / Month</th>
             <th>Extra 1 KM Amount</th>
             <th>Note</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -158,18 +165,20 @@
               <td data-label="Driver Cost / Month">LKR {{ number_format((float) ($vehiclePricing->driver_cost_per_month ?? 0), 2) }}</td>
               <td data-label="Extra 1 KM Amount">LKR {{ number_format((float) $vehiclePricing->extra_km_rate, 2) }}</td>
               <td data-label="Note">{{ $vehiclePricing->note ?: '-' }}</td>
-              <td data-label="Action" class="text-nowrap pricing-actions">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editVehiclePricingModal{{ $vehiclePricing->id }}">Edit</button>
-                <form method="post" action="{{ route('vehicle-pricings.destroy', $vehiclePricing) }}" class="d-inline" onsubmit="return confirm('Delete this pricing row?');">
-                  @csrf
-                  @method('DELETE')
-                  <button class="btn btn-sm btn-outline-danger">Delete</button>
-                </form>
-              </td>
+              @if($canManageData)
+                <td data-label="Action" class="text-nowrap pricing-actions">
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editVehiclePricingModal{{ $vehiclePricing->id }}">Edit</button>
+                  <form method="post" action="{{ route('vehicle-pricings.destroy', $vehiclePricing) }}" class="d-inline" onsubmit="return confirm('Delete this pricing row?');">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </td>
+              @endif
             </tr>
           @empty
             <tr>
-              <td colspan="11" class="text-center p-4 text-muted no-data">No pricing rows added yet.</td>
+              <td colspan="{{ $canManageData ? 11 : 10 }}" class="text-center p-4 text-muted no-data">No pricing rows added yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -178,6 +187,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addVehiclePricingModal" tabindex="-1" aria-labelledby="addVehiclePricingModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -300,4 +310,7 @@
     </div>
   </div>
 @endforeach
+@endif
 @endsection
+
+

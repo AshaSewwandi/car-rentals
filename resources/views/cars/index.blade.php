@@ -162,7 +162,7 @@
 <div class="page-toolbar">
   <div class="mb-3">
     <h4 class="mb-1">Cars</h4>
-    <div class="text-muted">{{ auth()->user()->isAdmin() ? 'Manage fleet information, tracker details, and current rental status.' : 'View only the vehicles assigned to your partner account.' }}</div>
+    <div class="text-muted">{{ auth()->user()->canManageData() ? 'Manage fleet information, tracker details, and current rental status.' : 'View only the vehicles assigned to your partner account.' }}</div>
   </div>
 </div>
 @if(session('success'))
@@ -181,7 +181,7 @@
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="header-title">Car List</span>
-    @if(auth()->user()->isAdmin())
+    @if(auth()->user()->canManageData())
       <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCarModal">Add Car Details</button>
     @endif
   </div>
@@ -248,7 +248,7 @@
               <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#viewCarModal{{ $car->id }}">
                 See more details
               </button>
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->canManageData())
               <div class="car-actions-admin">
                 <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editCarModal{{ $car->id }}">
                   Edit details
@@ -263,7 +263,7 @@
             </div>
           </div>
 
-          @if(auth()->user()->isAdmin())
+          @if(auth()->user()->canManageData())
             <div class="modal fade" id="editCarModal{{ $car->id }}" tabindex="-1" aria-labelledby="editCarModalLabel{{ $car->id }}" aria-hidden="true">
               <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
@@ -622,12 +622,12 @@
         </div>
       </div>
     @empty
-      <div class="text-center p-4 text-muted">{{ auth()->user()->isAdmin() ? 'No cars yet. Add your first car.' : 'No vehicles are assigned to your partner account yet.' }}</div>
+      <div class="text-center p-4 text-muted">{{ auth()->user()->canManageData() ? 'No cars yet. Add your first car.' : 'No vehicles are assigned to your partner account yet.' }}</div>
     @endforelse
   </div>
 </div>
 
-@if(auth()->user()->isAdmin())
+@if(auth()->user()->canManageData())
   <div class="card list-card mt-3">
     <div class="card-header d-flex justify-content-between align-items-center">
       <span class="header-title">Vehicle Pricing Chart</span>
@@ -679,7 +679,7 @@
   </div>
 @endif
 
-@if(auth()->user()->isAdmin())
+@if(auth()->user()->canManageData())
   <div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
@@ -863,7 +863,7 @@
   </div>
 @endif
 
-@if(auth()->user()->isAdmin())
+@if(auth()->user()->canManageData())
   <div class="modal fade" id="addVehiclePricingModal" tabindex="-1" aria-labelledby="addVehiclePricingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

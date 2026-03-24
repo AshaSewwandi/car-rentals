@@ -47,7 +47,7 @@ class CarController extends Controller
 
     public function store(Request $request)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $this->validateCar($request);
         $car = Car::create($data);
@@ -58,7 +58,7 @@ class CarController extends Controller
 
     public function update(Request $request, Car $car)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $this->validateCar($request, $car->id);
         $car->update($data);
@@ -70,7 +70,7 @@ class CarController extends Controller
 
     public function updateRenewal(Request $request, Car $car)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $request->validate([
             'renewal_type' => ['required', 'in:insurance,license'],
@@ -90,7 +90,7 @@ class CarController extends Controller
 
     public function destroy(Request $request, Car $car)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $car->delete();
 
@@ -99,7 +99,7 @@ class CarController extends Controller
 
     public function storePricing(Request $request)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $this->validateVehiclePricing($request);
         VehiclePricing::create($data);
@@ -109,7 +109,7 @@ class CarController extends Controller
 
     public function updatePricing(Request $request, VehiclePricing $vehiclePricing)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $this->validateVehiclePricing($request, $vehiclePricing->id);
         $vehiclePricing->update($data);
@@ -119,7 +119,7 @@ class CarController extends Controller
 
     public function destroyPricing(Request $request, VehiclePricing $vehiclePricing)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $vehiclePricing->delete();
 

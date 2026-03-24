@@ -2,6 +2,9 @@
 @section('title', 'Payments')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .payments-table-wrap {
     overflow-x: auto;
@@ -122,7 +125,7 @@
   </form>
 </div>
 
-@if(auth()->user()->isAdmin())
+@if($canManageData)
   <div class="card list-card mb-3">
     <div class="card-header">
       <span class="header-title">Online Transfer Payment Details</span>
@@ -203,7 +206,9 @@
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="header-title">Payment List</span>
-    <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">Add Payment</button>
+    @if($canManageData)
+      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">Add Payment</button>
+    @endif
   </div>
   <div class="card-body p-0">
     @if($rentals->isEmpty())
@@ -219,7 +224,9 @@
             <th>Due Date</th>
             <th class="text-end">Amount</th>
             <th>Status</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -239,6 +246,7 @@
                   <span class="badge bg-warning text-dark">Pending</span>
                 @endif
               </td>
+              @if($canManageData)
               <td data-label="Action" class="text-nowrap payment-actions">
                 @if($payment->status === 'pending')
                   <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#markPaidModal{{ $payment->id }}">Mark Paid</button>
@@ -255,10 +263,11 @@
                   Delete
                 </button>
               </td>
+              @endif
             </tr>
           @empty
             <tr>
-              <td colspan="7" class="text-center p-4 text-muted no-data">No payments found for {{ $month }}.</td>
+              <td colspan="{{ $canManageData ? 7 : 6 }}" class="text-center p-4 text-muted no-data">No payments found for {{ $month }}.</td>
             </tr>
           @endforelse
         </tbody>
@@ -267,6 +276,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
@@ -336,7 +346,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 @foreach($payments as $payment)
   <div class="modal fade" id="editPaymentModal{{ $payment->id }}" tabindex="-1" aria-labelledby="editPaymentModalLabel{{ $payment->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -435,7 +447,9 @@
     </div>
   @endif
 @endforeach
+@endif
 
+@if($canManageData)
 <div class="modal fade" id="deletePaymentModal" tabindex="-1" aria-labelledby="deletePaymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -457,7 +471,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deletePaymentModal');
@@ -481,4 +497,7 @@
     });
   });
 </script>
+@endif
 @endsection
+
+

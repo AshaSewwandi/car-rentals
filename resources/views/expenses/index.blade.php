@@ -2,6 +2,9 @@
 @section('title', 'Expenses Management')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .expenses-page .expenses-header {
     display: flex;
@@ -195,7 +198,9 @@
     <span class="header-title">Expense List ({{ $month }})</span>
     <div class="expenses-header-meta">
       <strong class="expenses-header-total">Rs {{ number_format($total, 2) }}</strong>
-      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add Expense</button>
+      @if($canManageData)
+        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add Expense</button>
+      @endif
     </div>
   </div>
   <div class="card-body p-0">
@@ -208,7 +213,9 @@
             <th>Type</th>
             <th class="text-end">Amount</th>
             <th>Note</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -219,22 +226,24 @@
               <td data-label="Type">{{ ucfirst($expense->type) }}</td>
               <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
               <td data-label="Note">{{ $expense->note ?: '-' }}</td>
-              <td data-label="Action" class="text-nowrap expense-actions">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ $expense->id }}">Update</button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteExpenseModal"
-                  data-delete-url="{{ route('expenses.destroy', $expense) }}"
-                  data-expense-text="{{ $expense->date->format('Y-m-d') }} | {{ $expense->car?->name }} | Rs {{ number_format($expense->amount, 2) }}"
-                >
-                  Delete
-                </button>
-              </td>
+              @if($canManageData)
+                <td data-label="Action" class="text-nowrap expense-actions">
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ $expense->id }}">Update</button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteExpenseModal"
+                    data-delete-url="{{ route('expenses.destroy', $expense) }}"
+                    data-expense-text="{{ $expense->date->format('Y-m-d') }} | {{ $expense->car?->name }} | Rs {{ number_format($expense->amount, 2) }}"
+                  >
+                    Delete
+                  </button>
+                </td>
+              @endif
             </tr>
           @empty
-            <tr><td colspan="6" class="text-center p-4 text-muted no-data">No expenses found for {{ $month }}.</td></tr>
+            <tr><td colspan="{{ $canManageData ? 6 : 5 }}" class="text-center p-4 text-muted no-data">No expenses found for {{ $month }}.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -242,6 +251,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -363,7 +373,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteExpenseModal');
@@ -387,5 +399,8 @@
     });
   });
 </script>
+@endif
 </div>
 @endsection
+
+

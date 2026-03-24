@@ -10,7 +10,7 @@ class PermissionManagementController extends Controller
 {
     public function index()
     {
-        $roles = ['admin', 'partner', 'customer'];
+        $roles = ['super_admin', 'admin', 'partner', 'partner_applicant', 'customer', 'customer_portal'];
         $modules = config('permissions.modules', []);
 
         $matrix = [];
@@ -25,7 +25,7 @@ class PermissionManagementController extends Controller
 
     public function update(Request $request, string $role)
     {
-        $allowedRoles = ['admin', 'partner', 'customer'];
+        $allowedRoles = ['super_admin', 'admin', 'partner', 'partner_applicant', 'customer', 'customer_portal'];
         abort_unless(in_array($role, $allowedRoles, true), 404);
 
         $modules = array_keys(config('permissions.modules', []));
@@ -44,6 +44,6 @@ class PermissionManagementController extends Controller
             );
         }
 
-        return back()->with('success', ucfirst($role) . ' permissions updated successfully.');
+        return back()->with('success', ucfirst(str_replace('_', ' ', $role)) . ' permissions updated successfully.');
     }
 }

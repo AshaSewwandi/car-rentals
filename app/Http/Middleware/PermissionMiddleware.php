@@ -16,6 +16,10 @@ class PermissionMiddleware
             return redirect()->route('login');
         }
 
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
         if (!RolePermission::allowed($user->role, $permission)) {
             abort(403, 'You do not have permission to access this section.');
         }
