@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\PartnerApplicationSubmittedMail;
+use App\Mail\PartnerApplicationReceivedMail;
 use App\Models\Car;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -120,6 +121,14 @@ class PartnerRecruitmentController extends Controller
                         report($e);
                     }
                 });
+
+            if (!empty($partner->email)) {
+                try {
+                    Mail::to($partner->email)->queue(new PartnerApplicationReceivedMail($partner, $car));
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            }
         })->afterResponse();
     }
 }
