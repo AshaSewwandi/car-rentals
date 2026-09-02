@@ -66,6 +66,10 @@
     <h3 class="auth-title mb-1">Welcome Back</h3>
     <p class="text-muted mb-4">Sign in to continue to your dashboard.</p>
 
+    @if(session('success'))
+      <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
     @if($errors->any())
       <div class="alert alert-danger">
         <ul class="mb-0">
@@ -96,6 +100,10 @@
     <p class="mb-0 mt-3 text-center text-muted">
       No account?
       <a href="{{ route('register') }}">Sign up</a>
+    </p>
+    <p class="mb-0 mt-2 text-center text-muted">
+      Want to list your vehicle?
+      <a href="{{ route('partner-recruitment.create') }}">Become a Partner</a>
     </p>
   </div>
 </body>

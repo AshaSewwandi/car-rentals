@@ -255,13 +255,18 @@
             <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
             <a href="{{ route('group-packages.index') }}">Special Events</a>
             <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
+            <a href="{{ route('partner-recruitment.create') }}">Become a Partner</a>
             @auth
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isDashboardAdmin())
                     @if(auth()->user()->canAccess('dashboard'))
                         <a class="mobile-auth" href="{{ route('dashboard') }}">Admin Dashboard</a>
                     @endif
-                @else
+                @elseif(auth()->user()->isCustomer())
                     <a class="mobile-auth" href="{{ route('customer.dashboard') }}">My Dashboard</a>
+                @elseif(auth()->user()->canAccess('rental_trips'))
+                    <a class="mobile-auth" href="{{ route('rental-trips.index') }}">My Trips</a>
+                @else
+                    <a class="mobile-auth" href="{{ route('profile.edit') }}">My Profile</a>
                 @endif
                 <form class="mobile-auth" method="post" action="{{ route('logout') }}">
                     @csrf
@@ -280,12 +285,16 @@
                         <span class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                     </button>
                     <div class="account-menu">
-                        @if(auth()->user()->isAdmin())
+                        @if(auth()->user()->isDashboardAdmin())
                             @if(auth()->user()->canAccess('dashboard'))
                                 <a href="{{ route('dashboard') }}">Admin Dashboard</a>
                             @endif
-                        @else
+                        @elseif(auth()->user()->isCustomer())
                             <a href="{{ route('customer.dashboard') }}">My Dashboard</a>
+                        @elseif(auth()->user()->canAccess('rental_trips'))
+                            <a href="{{ route('rental-trips.index') }}">My Trips</a>
+                        @else
+                            <a href="{{ route('profile.edit') }}">My Profile</a>
                         @endif
                         <a href="{{ route('fleet.index') }}">Our Fleet</a>
                         <a href="{{ route('home') }}#contact-section">Contact Us</a>

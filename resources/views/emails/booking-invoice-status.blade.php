@@ -67,8 +67,17 @@
 </head>
 <body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
     @php
+        $imageBaseUrl = rtrim((string) config('app.mail_image_base_url'), '/');
+        $useRemoteImages = $imageBaseUrl !== '';
         $logoPath = public_path('images/logo.png');
-        $logoSrc = file_exists($logoPath) ? $message->embed($logoPath) : url('/images/logo.png');
+        $logoSrc = null;
+        if ($useRemoteImages) {
+            $logoSrc = $imageBaseUrl . '/images/logo.png';
+        } elseif (isset($message) && file_exists($logoPath)) {
+            $logoSrc = $message->embed($logoPath);
+        } elseif (file_exists($logoPath)) {
+            $logoSrc = url('/images/logo.png');
+        }
         $carImageSrc = $logoSrc;
         $plate = strtolower((string) ($booking->car?->plate_no ?? ''));
         $plateKey = str_replace([' ', '-'], '_', $plate);
@@ -79,7 +88,13 @@
         ];
         foreach ($carImageCandidates as $candidatePath) {
             if (file_exists($candidatePath)) {
-                $carImageSrc = $message->embed($candidatePath);
+                if ($useRemoteImages) {
+                    $carImageSrc = $imageBaseUrl . '/images/' . basename($candidatePath);
+                } elseif (isset($message)) {
+                    $carImageSrc = $message->embed($candidatePath);
+                } else {
+                    $carImageSrc = url('/images/' . basename($candidatePath));
+                }
                 break;
             }
         }
@@ -103,7 +118,9 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-card" style="max-width:640px;background:#ffffff;border:1px solid #dbe6f3;border-radius:12px;overflow:hidden;">
                     <tr>
                         <td class="email-header" style="background:linear-gradient(135deg,#0a3f8f,#0f66c3);padding:18px 22px;">
-                            <img src="{{ $logoSrc }}" alt="R&A Auto Rentals" style="width:40px;height:40px;vertical-align:middle;border-radius:8px;background:#ffffff;padding:4px;object-fit:contain;">
+                            @if($logoSrc)
+                                <img src="{{ $logoSrc }}" alt="R&A Auto Rentals" style="width:40px;height:40px;vertical-align:middle;border-radius:8px;background:#ffffff;padding:4px;object-fit:contain;">
+                            @endif
                             <span class="email-brand" style="display:inline-block;vertical-align:middle;margin-left:8px;color:#ffffff;font-size:24px;font-weight:700;">R&amp;A Auto Rentals</span>
                         </td>
                     </tr>
@@ -129,7 +146,9 @@
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
                                                 <td width="140" valign="top" class="stack-cell" style="padding:0 14px 0 0;">
-                                                    <img src="{{ $carImageSrc }}" alt="{{ $booking->car?->name ?: 'Vehicle image' }}" class="vehicle-image" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
+                                                    @if($carImageSrc)
+                                                        <img src="{{ $carImageSrc }}" alt="{{ $booking->car?->name ?: 'Vehicle image' }}" class="vehicle-image" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
+                                                    @endif
                                                 </td>
                                                 <td valign="top" class="stack-cell" style="font-size:14px;color:#334155;line-height:1.8;">
                                                     <strong style="color:#0f172a;font-size:16px;">{{ $booking->car?->name ?: 'Vehicle' }}</strong><br>

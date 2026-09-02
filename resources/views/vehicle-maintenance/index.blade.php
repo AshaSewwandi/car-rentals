@@ -2,6 +2,10 @@
 @section('title', 'Vehicle Maintenance')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+  $canExportPdf = !auth()->user()->isCustomerPortal();
+@endphp
 <style>
   .maintenance-table-wrap {
     overflow-x: auto;
@@ -139,7 +143,9 @@
       </select>
       <button class="btn btn-dark">Filter</button>
     </form>
-    <a class="btn btn-outline-dark" href="{{ route('vehicle-maintenance.export-pdf', ['month' => $month, 'car_id' => $carId]) }}">Export PDF</a>
+    @if($canExportPdf)
+      <a class="btn btn-outline-dark" href="{{ route('vehicle-maintenance.export-pdf', ['month' => $month, 'car_id' => $carId]) }}">Export PDF</a>
+    @endif
   </div>
 </div>
 
@@ -158,7 +164,9 @@
     <span class="header-title">Maintenance Records</span>
     <div class="d-flex align-items-center gap-2">
       <strong>Rs {{ number_format($total, 2) }}</strong>
-      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">Add Record</button>
+      @if($canManageData)
+        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">Add Record</button>
+      @endif
     </div>
   </div>
   <div class="card-body p-0">
@@ -172,7 +180,9 @@
             <th>Mileage</th>
             <th class="text-end">Amount</th>
             <th>Note</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -184,22 +194,24 @@
               <td data-label="Mileage">{{ $record->mileage !== null ? number_format($record->mileage) . ' km' : '-' }}</td>
               <td data-label="Amount" class="text-end">Rs {{ number_format((float) $record->amount, 2) }}</td>
               <td data-label="Note">{{ $record->note ?: '-' }}</td>
-              <td data-label="Action" class="text-nowrap maintenance-actions">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editMaintenanceModal{{ $record->id }}">Update</button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteMaintenanceModal"
-                  data-delete-url="{{ route('vehicle-maintenance.destroy', $record) }}"
-                  data-record-text="{{ $record->service_date->format('Y-m-d') }} | {{ $record->car?->name }} | {{ $record->part_name }}"
-                >
-                  Delete
-                </button>
-              </td>
+              @if($canManageData)
+                <td data-label="Action" class="text-nowrap maintenance-actions">
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editMaintenanceModal{{ $record->id }}">Update</button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteMaintenanceModal"
+                    data-delete-url="{{ route('vehicle-maintenance.destroy', $record) }}"
+                    data-record-text="{{ $record->service_date->format('Y-m-d') }} | {{ $record->car?->name }} | {{ $record->part_name }}"
+                  >
+                    Delete
+                  </button>
+                </td>
+              @endif
             </tr>
           @empty
-            <tr><td colspan="7" class="text-center p-4 text-muted no-data">No maintenance records found.</td></tr>
+            <tr><td colspan="{{ $canManageData ? 7 : 6 }}" class="text-center p-4 text-muted no-data">No maintenance records found.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -207,6 +219,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addMaintenanceModal" tabindex="-1" aria-labelledby="addMaintenanceModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -332,7 +345,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteMaintenanceModal');
@@ -356,4 +371,7 @@
     });
   });
 </script>
+@endif
 @endsection
+
+

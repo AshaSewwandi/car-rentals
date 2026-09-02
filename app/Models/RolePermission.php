@@ -14,6 +14,10 @@ class RolePermission extends Model
 
     public static function allowed(string $role, string $permission): bool
     {
+        if (in_array($role, ['admin', 'super_admin'], true)) {
+            return true;
+        }
+
         $override = static::query()
             ->where('role', $role)
             ->where('permission', $permission)

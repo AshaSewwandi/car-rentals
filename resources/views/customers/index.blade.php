@@ -2,6 +2,9 @@
 @section('title', 'Customer Registration')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .customer-table-wrap {
     overflow-x: auto;
@@ -105,7 +108,9 @@
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="header-title">Customer List</span>
-    <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">Add Customer</button>
+    @if($canManageData)
+      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">Add Customer</button>
+    @endif
   </div>
   <div class="card-body p-0">
     <div class="table-responsive customer-table-wrap">
@@ -116,7 +121,9 @@
             <th>Phone</th>
             <th>NIC</th>
             <th>Address</th>
-            <th>Action</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -126,22 +133,24 @@
               <td data-label="Phone">{{ $customer->phone ?: '-' }}</td>
               <td data-label="NIC">{{ $customer->nic ?: '-' }}</td>
               <td data-label="Address">{{ $customer->address ?: '-' }}</td>
-              <td data-label="Action" class="text-nowrap customer-actions">
-                <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ $customer->id }}">Update</button>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteCustomerModal"
-                  data-delete-url="{{ route('customers.destroy', $customer) }}"
-                  data-customer-name="{{ $customer->name }}"
-                >
-                  Delete
-                </button>
-              </td>
+              @if($canManageData)
+                <td data-label="Action" class="text-nowrap customer-actions">
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ $customer->id }}">Update</button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteCustomerModal"
+                    data-delete-url="{{ route('customers.destroy', $customer) }}"
+                    data-customer-name="{{ $customer->name }}"
+                  >
+                    Delete
+                  </button>
+                </td>
+              @endif
             </tr>
           @empty
-            <tr><td colspan="5" class="text-center p-4 text-muted no-data">No customers yet.</td></tr>
+            <tr><td colspan="{{ $canManageData ? 5 : 4 }}" class="text-center p-4 text-muted no-data">No customers yet.</td></tr>
           @endforelse
         </tbody>
       </table>
@@ -149,6 +158,7 @@
   </div>
 </div>
 
+@if($canManageData)
 @foreach($customers as $customer)
   <div class="modal fade" id="editCustomerModal{{ $customer->id }}" tabindex="-1" aria-labelledby="editCustomerModalLabel{{ $customer->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -245,7 +255,9 @@
     </div>
   </div>
 </div>
+@endif
 
+@if($canManageData)
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteCustomerModal');
@@ -269,4 +281,7 @@
     });
   });
 </script>
+@endif
 @endsection
+
+

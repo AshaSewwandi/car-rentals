@@ -35,7 +35,7 @@ class PaymentController extends Controller
 
     public function updateBankDetails(Request $request)
     {
-        abort_unless($request->user()?->isAdmin(), 403);
+        abort_unless($request->user()?->canManageData(), 403);
 
         $data = $request->validate([
             'account_number' => ['required', 'string', 'max:120'],

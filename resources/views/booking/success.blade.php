@@ -350,7 +350,7 @@
 
                 <div class="actions">
                     @auth
-                        @if(!auth()->user()->isAdmin())
+                        @if(!auth()->user()->isDashboardAdmin())
                             <a class="btn btn-primary" href="{{ route('customer.dashboard') }}">Go to My Dashboard</a>
                         @else
                             @if(auth()->user()->canAccess('dashboard'))

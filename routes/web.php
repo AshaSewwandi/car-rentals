@@ -12,6 +12,7 @@ use App\Http\Controllers\FleetController;
 use App\Http\Controllers\GpsLogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PartnerRecruitmentController;
 use App\Http\Controllers\PermissionManagementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RentRequestController;
@@ -47,6 +48,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+    Route::get('/partner-recruitment', [PartnerRecruitmentController::class, 'create'])->name('partner-recruitment.create');
+    Route::post('/partner-recruitment', [PartnerRecruitmentController::class, 'store'])->name('partner-recruitment.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -64,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:cars')->group(function () {
         Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
         Route::get('/vehicle-pricings', [CarController::class, 'pricingIndex'])->name('vehicle-pricings.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:cars'])->group(function () {
         Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
         Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
         Route::patch('/cars/{car}/renewal', [CarController::class, 'updateRenewal'])->name('cars.renewal.update');
@@ -75,6 +80,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:payments')->group(function () {
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:payments'])->group(function () {
         Route::post('/payments/bank-details', [PaymentController::class, 'updateBankDetails'])->name('payments.bank-details.update');
         Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
         Route::post('/payments/{payment}/paid', [PaymentController::class, 'markPaid'])->name('payments.paid');
@@ -84,6 +91,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:customers')->group(function () {
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:customers'])->group(function () {
         Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
         Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
         Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
@@ -91,6 +100,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:expenses')->group(function () {
         Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:expenses'])->group(function () {
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
@@ -99,6 +110,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:vehicle_maintenance')->group(function () {
         Route::get('/vehicle-maintenance', [VehicleMaintenanceController::class, 'index'])->name('vehicle-maintenance.index');
         Route::get('/vehicle-maintenance/export/pdf', [VehicleMaintenanceController::class, 'exportPdf'])->name('vehicle-maintenance.export-pdf');
+    });
+    Route::middleware(['role:super_admin', 'permission:vehicle_maintenance'])->group(function () {
         Route::post('/vehicle-maintenance', [VehicleMaintenanceController::class, 'store'])->name('vehicle-maintenance.store');
         Route::put('/vehicle-maintenance/{vehicleMaintenance}', [VehicleMaintenanceController::class, 'update'])->name('vehicle-maintenance.update');
         Route::delete('/vehicle-maintenance/{vehicleMaintenance}', [VehicleMaintenanceController::class, 'destroy'])->name('vehicle-maintenance.destroy');
@@ -106,6 +119,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:agreements')->group(function () {
         Route::get('/agreements', [AgreementController::class, 'index'])->name('agreements.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:agreements'])->group(function () {
         Route::post('/agreements', [AgreementController::class, 'store'])->name('agreements.store');
         Route::put('/agreements/{agreement}', [AgreementController::class, 'update'])->name('agreements.update');
         Route::delete('/agreements/{agreement}', [AgreementController::class, 'destroy'])->name('agreements.destroy');
@@ -114,6 +129,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:gps_logs')->group(function () {
         Route::get('/gps-logs', [GpsLogController::class, 'index'])->name('gps-logs.index');
         Route::get('/gps-logs/report', [GpsLogController::class, 'monthlyReport'])->name('gps-logs.report');
+    });
+    Route::middleware(['role:super_admin', 'permission:gps_logs'])->group(function () {
         Route::post('/gps-logs/sheet', [GpsLogController::class, 'saveSheet'])->name('gps-logs.sheet');
         Route::post('/gps-logs/service', [GpsLogController::class, 'saveService'])->name('gps-logs.service');
         Route::post('/gps-logs', [GpsLogController::class, 'store'])->name('gps-logs.store');
@@ -123,6 +140,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['role:admin', 'permission:users_manage'])->group(function () {
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:users_manage'])->group(function () {
         Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
         Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
@@ -130,6 +149,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['role:admin', 'permission:permissions_manage'])->group(function () {
         Route::get('/permissions', [PermissionManagementController::class, 'index'])->name('permissions.index');
+    });
+    Route::middleware(['role:super_admin', 'permission:permissions_manage'])->group(function () {
         Route::put('/permissions/{role}', [PermissionManagementController::class, 'update'])->name('permissions.update');
     });
 
@@ -142,10 +163,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/support-requests', [CustomerSupportRequestController::class, 'index'])->name('support-requests.index');
         Route::get('/rent-requests', [RentRequestController::class, 'index'])->name('rent-requests.index');
+        Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
+    });
+    Route::middleware('role:super_admin')->group(function () {
         Route::put('/rent-requests/{rentRequest}', [RentRequestController::class, 'update'])->name('rent-requests.update');
         Route::post('/rent-requests/{rentRequest}/accept', [RentRequestController::class, 'accept'])->name('rent-requests.accept');
         Route::delete('/rent-requests/{rentRequest}', [RentRequestController::class, 'destroy'])->name('rent-requests.destroy');
-        Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
         Route::post('/rental-trips/{booking}/cancel', [RentalTripController::class, 'cancel'])->name('rental-trips.cancel');
         Route::post('/rental-trips/{booking}/handover', [RentalTripController::class, 'handover'])->name('rental-trips.handover');
         Route::post('/rental-trips/{booking}/return', [RentalTripController::class, 'returnTrip'])->name('rental-trips.return');

@@ -236,7 +236,7 @@ class RentalTripController extends Controller
             ->with('car.partner')
             ->orderByDesc('id');
 
-        if ($user && !$user->isAdmin()) {
+        if ($user && !$user->isDashboardAdmin()) {
             $query->whereHas('car', function ($carQuery) use ($user) {
                 $carQuery->where('partner_user_id', $user->id);
             });
@@ -272,7 +272,7 @@ class RentalTripController extends Controller
             return false;
         }
 
-        if ($user->isAdmin()) {
+        if ($user->isDashboardAdmin()) {
             return true;
         }
 
@@ -312,7 +312,7 @@ class RentalTripController extends Controller
             }
 
             User::query()
-                ->where('role', 'admin')
+                ->whereIn('role', ['admin', 'super_admin'])
                 ->whereNotNull('email')
                 ->pluck('email')
                 ->each(fn ($email) => $recipients->push((string) $email));
@@ -346,7 +346,7 @@ class RentalTripController extends Controller
         }
 
         User::query()
-            ->where('role', 'admin')
+            ->whereIn('role', ['admin', 'super_admin'])
             ->whereNotNull('email')
             ->pluck('email')
             ->each(fn ($email) => $recipients->push((string) $email));

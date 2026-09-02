@@ -100,7 +100,7 @@ class ProfileController extends Controller
         $belongsToUser = ($booking->user_id && $booking->user_id === $user->id)
             || (!$booking->user_id && $booking->customer_email && strcasecmp((string) $booking->customer_email, (string) $user->email) === 0);
 
-        if (!$belongsToUser && !$user->isAdmin()) {
+        if (!$belongsToUser && !$user->isDashboardAdmin()) {
             abort(403);
         }
 
@@ -115,7 +115,7 @@ class ProfileController extends Controller
         $booking->update([
             'status' => 'cancelled',
         ]);
-        $this->sendCancellationEmails($booking, $user->name ?: ucfirst($user->role), $user->isAdmin() ? 'admin' : 'customer');
+        $this->sendCancellationEmails($booking, $user->name ?: ucfirst($user->role), $user->isDashboardAdmin() ? 'admin' : 'customer');
 
         return back()->with('success', 'Rental trip canceled successfully.');
     }
@@ -128,7 +128,7 @@ class ProfileController extends Controller
             || (!$booking->user_id && $booking->customer_phone && $user->phone && (string) $booking->customer_phone === (string) $user->phone)
             || (!$booking->user_id && $booking->customer_name && (string) $booking->customer_name === (string) $user->name);
 
-        if (!$belongsToUser && !$user->isAdmin()) {
+        if (!$belongsToUser && !$user->isDashboardAdmin()) {
             abort(403);
         }
 
@@ -192,7 +192,7 @@ class ProfileController extends Controller
         }
 
         User::query()
-            ->where('role', 'admin')
+            ->whereIn('role', ['admin', 'super_admin'])
             ->whereNotNull('email')
             ->pluck('email')
             ->each(fn ($email) => $recipients->push((string) $email));

@@ -64,8 +64,17 @@
 </head>
 <body style="margin:0;padding:0;background:#eef2f7;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
     @php
+        $imageBaseUrl = rtrim((string) config('app.mail_image_base_url'), '/');
+        $useRemoteImages = $imageBaseUrl !== '';
         $logoPath = public_path('images/logo.png');
-        $logoSrc = file_exists($logoPath) ? $message->embed($logoPath) : url('/images/logo.png');
+        $logoSrc = null;
+        if ($useRemoteImages) {
+            $logoSrc = $imageBaseUrl . '/images/logo.png';
+        } elseif (isset($message) && file_exists($logoPath)) {
+            $logoSrc = $message->embed($logoPath);
+        } elseif (file_exists($logoPath)) {
+            $logoSrc = url('/images/logo.png');
+        }
     @endphp
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-shell" style="background:#eef2f7;padding:24px 0;">
@@ -74,7 +83,9 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-card" style="max-width:640px;background:#ffffff;border:1px solid #d8e0ec;border-radius:12px;overflow:hidden;">
                     <tr>
                         <td class="email-header" style="background:#1f6aa9;padding:18px 18px;text-align:center;">
-                            <img src="{{ $logoSrc }}" alt="R&A Auto Rentals" width="44" height="44" style="width:44px;height:44px;display:inline-block;vertical-align:middle;border-radius:8px;background:#ffffff;padding:5px;object-fit:contain;">
+                            @if($logoSrc)
+                                <img src="{{ $logoSrc }}" alt="R&A Auto Rentals" width="44" height="44" style="width:44px;height:44px;display:inline-block;vertical-align:middle;border-radius:8px;background:#ffffff;padding:5px;object-fit:contain;">
+                            @endif
                             <span class="email-brand" style="display:inline-block;vertical-align:middle;margin-left:8px;color:#ffffff;font-size:28px;line-height:1.2;font-weight:700;">R&amp;A Auto Rentals</span>
                         </td>
                     </tr>

@@ -2,6 +2,9 @@
 @section('title', 'Agreement Management')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .agreement-meta {
     display: flex;
@@ -24,7 +27,9 @@
     <div class="card list-card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span class="header-title">Agreement List</span>
-        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addAgreementModal">Add Agreement</button>
+        @if($canManageData)
+          <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addAgreementModal">Add Agreement</button>
+        @endif
       </div>
       <div class="card-body p-3">
         @forelse($agreements as $agreement)
@@ -54,17 +59,20 @@
                   @if($agreement->file_path)
                     <a href="{{ asset('storage/'.$agreement->file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary">View File</a>
                   @endif
-                  <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editAgreementModal{{ $agreement->id }}">
-                    Edit details
-                  </button>
-                  <form method="post" action="{{ route('agreements.destroy', $agreement) }}" onsubmit="return confirm('Delete this agreement?');">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                  </form>
+                  @if($canManageData)
+                    <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editAgreementModal{{ $agreement->id }}">
+                      Edit details
+                    </button>
+                    <form method="post" action="{{ route('agreements.destroy', $agreement) }}" onsubmit="return confirm('Delete this agreement?');">
+                      @csrf
+                      @method('DELETE')
+                      <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                  @endif
                 </div>
               </div>
 
+              @if($canManageData)
               <div class="modal fade" id="editAgreementModal{{ $agreement->id }}" tabindex="-1" aria-labelledby="editAgreementModalLabel{{ $agreement->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-scrollable">
                   <div class="modal-content">
@@ -140,6 +148,7 @@
                   </div>
                 </div>
               </div>
+              @endif
             </div>
           </div>
         @empty
@@ -150,6 +159,7 @@
   </div>
 </div>
 
+@if($canManageData)
 <div class="modal fade" id="addAgreementModal" tabindex="-1" aria-labelledby="addAgreementModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -226,8 +236,9 @@
     </div>
   </div>
 </div>
+@endif
 
-@if ($errors->any() && old('car_id'))
+@if($canManageData && $errors->any() && old('car_id'))
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const modalEl = document.getElementById('addAgreementModal');
@@ -237,3 +248,5 @@
 </script>
 @endif
 @endsection
+
+

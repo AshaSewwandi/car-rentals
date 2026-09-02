@@ -14,6 +14,7 @@ class HomeController extends Controller
     public function home(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -54,6 +55,7 @@ class HomeController extends Controller
     public function airportHires(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -102,6 +104,7 @@ class HomeController extends Controller
     public function shortTermRentals(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
@@ -139,6 +142,7 @@ class HomeController extends Controller
     public function longTermRentals(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->where('allow_long_term', true)
@@ -185,6 +189,7 @@ class HomeController extends Controller
     public function medicalTransport(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
@@ -237,6 +242,7 @@ class HomeController extends Controller
     public function groupPackages(): View
     {
         $featuredCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN LOWER(name) LIKE '%largo%' THEN 0 ELSE 1 END")
@@ -393,6 +399,7 @@ class HomeController extends Controller
             ->get();
 
         $recommendedCars = Car::query()
+            ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')

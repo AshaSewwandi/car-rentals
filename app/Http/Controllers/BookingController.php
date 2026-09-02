@@ -36,7 +36,12 @@ class BookingController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $car = Car::findOrFail($validated['car_id']);
+        $car = Car::query()->visibleOnPublic()->find($validated['car_id']);
+        if (!$car) {
+            return redirect()
+                ->route('fleet.index')
+                ->with('error', 'Selected car is not available for booking.');
+        }
         $startDate = $validated['start_date'];
         $endDate = $validated['end_date'];
 
@@ -104,7 +109,10 @@ class BookingController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $car = Car::findOrFail($validated['car_id']);
+        $car = Car::query()->visibleOnPublic()->find($validated['car_id']);
+        if (!$car) {
+            return back()->withInput()->with('error', 'Selected car is not available for booking.');
+        }
         $driverMode = (string) ($car->driver_mode ?: 'both');
 
         if (!$this->isCarAvailable($car->id, $validated['start_date'], $validated['end_date'])) {
@@ -301,7 +309,7 @@ class BookingController extends Controller
             return in_array($booking->id, $guestBookingIds, true);
         }
 
-        if ($user->isAdmin()) {
+        if ($user->isDashboardAdmin()) {
             return true;
         }
 
@@ -344,7 +352,7 @@ class BookingController extends Controller
             }
 
             User::query()
-                ->where('role', 'admin')
+                ->whereIn('role', ['admin', 'super_admin'])
                 ->whereNotNull('email')
                 ->pluck('email')
                 ->each(fn ($email) => $recipients->push((string) $email));
@@ -390,7 +398,7 @@ class BookingController extends Controller
             if (empty($existingUser->name) && $name !== '') {
                 $updates['name'] = $name;
             }
-            if (($existingUser->role ?? '') !== 'admin' && empty($existingUser->role)) {
+            if (!in_array(($existingUser->role ?? ''), ['admin', 'super_admin'], true) && empty($existingUser->role)) {
                 $updates['role'] = 'customer';
             }
             if (!empty($updates)) {

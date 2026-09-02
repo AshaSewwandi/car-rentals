@@ -14,7 +14,7 @@
     <div class="col-12 col-xl-6">
       <div class="card list-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span class="header-title">{{ ucfirst($role) }} Permissions</span>
+          <span class="header-title">{{ ucfirst(str_replace('_', ' ', $role)) }} Permissions</span>
         </div>
         <form method="post" action="{{ route('permissions.update', $role) }}">
           @csrf
@@ -24,7 +24,7 @@
               @foreach($modules as $key => $label)
                 <div class="col-12 col-md-6">
                   <label class="form-check d-flex align-items-center gap-2">
-                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $key }}" @checked($matrix[$role][$key] ?? false)>
+                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $key }}" @checked($matrix[$role][$key] ?? false) @disabled(!auth()->user()->canManageData())>
                     <span>{{ $label }}</span>
                   </label>
                 </div>
@@ -32,7 +32,9 @@
             </div>
           </div>
           <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
-            <button class="btn btn-dark w-100">Save {{ ucfirst($role) }} Permissions</button>
+            @if(auth()->user()->canManageData())
+              <button class="btn btn-dark w-100">Save {{ ucfirst(str_replace('_', ' ', $role)) }} Permissions</button>
+            @endif
           </div>
         </form>
       </div>

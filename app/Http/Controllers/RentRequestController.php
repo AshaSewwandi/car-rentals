@@ -13,6 +13,7 @@ use App\Support\RevenueShareResolver;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Throwable;
@@ -55,7 +56,14 @@ class RentRequestController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'car_id' => [
+                'required',
+                Rule::exists('cars', 'id')->where(function ($query) {
+                    $query
+                        ->whereNull('partner_user_id')
+                        ->orWhereIn('partner_user_id', User::query()->where('role', 'partner')->select('id'));
+                }),
+            ],
             'car_name' => ['nullable', 'string', 'max:180'],
             'plate_no' => ['nullable', 'string', 'max:100'],
             'name' => ['required', 'string', 'max:120'],
@@ -232,7 +240,7 @@ class RentRequestController extends Controller
             }
 
             User::query()
-                ->where('role', 'admin')
+                ->whereIn('role', ['admin', 'super_admin'])
                 ->whereNotNull('email')
                 ->pluck('email')
                 ->each(fn ($email) => $recipients->push((string) $email));

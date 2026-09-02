@@ -19,7 +19,7 @@ class FleetController extends Controller
         $startDate = $validated['start_date'] ?? null;
         $endDate = $validated['end_date'] ?? null;
 
-        $allCars = Car::query()->with('images')->orderBy('name')->get();
+        $allCars = Car::query()->visibleOnPublic()->with('images')->orderBy('name')->get();
         $availabilityRows = collect();
         $availableCarIds = null;
 
@@ -101,7 +101,7 @@ class FleetController extends Controller
                 ->values();
         }
 
-        $carsQuery = Car::query();
+        $carsQuery = Car::query()->visibleOnPublic();
         if (is_array($availableCarIds) || $availableCarIds instanceof \Illuminate\Support\Collection) {
             $carsQuery->whereIn('id', $availableCarIds);
         }
@@ -144,6 +144,10 @@ class FleetController extends Controller
 
     public function show(Car $car)
     {
+        if (!Car::query()->visibleOnPublic()->whereKey($car->id)->exists()) {
+            abort(404);
+        }
+
         $car->loadMissing('images');
         $pricing = VehiclePricingResolver::resolveForCar($car);
         $driverMode = $car->driver_mode ?: 'both';

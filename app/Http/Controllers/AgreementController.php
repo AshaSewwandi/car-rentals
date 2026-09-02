@@ -12,12 +12,36 @@ class AgreementController extends Controller
 {
     public function index()
     {
-        $cars = Car::query()->orderBy('name')->get();
-        $customers = Customer::query()->orderBy('name')->get();
-        $agreements = Agreement::query()
+        $user = auth()->user();
+
+        $agreementsQuery = Agreement::query()
             ->with(['car', 'customer'])
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($user?->isCustomerPortal()) {
+            $customerId = $user->customer_id;
+            if (!$customerId) {
+                return view('agreements.index', [
+                    'cars' => collect(),
+                    'customers' => collect(),
+                    'agreements' => collect(),
+                ]);
+            }
+            $agreementsQuery->where('customer_id', $customerId);
+        }
+
+        $agreements = $agreementsQuery->get();
+
+        if ($user?->isCustomerPortal()) {
+            $carIds = $agreements->pluck('car_id')->unique()->filter()->values();
+            $cars = $carIds->isEmpty()
+                ? collect()
+                : Car::query()->whereIn('id', $carIds)->orderBy('name')->get();
+            $customers = Customer::query()->where('id', $user->customer_id)->orderBy('name')->get();
+        } else {
+            $cars = Car::query()->orderBy('name')->get();
+            $customers = Customer::query()->orderBy('name')->get();
+        }
 
         return view('agreements.index', compact('cars', 'customers', 'agreements'));
     }

@@ -2,6 +2,9 @@
 @section('title', 'Rent Requests')
 
 @section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
 <style>
   .rr-table td,
   .rr-table th {
@@ -126,7 +129,9 @@
             <th style="min-width:190px;">Pickup Location</th>
             <th style="min-width:190px;">Availability Check</th>
             <th style="min-width:120px;">Status</th>
-            <th style="min-width:240px;">Action</th>
+            @if($canManageData)
+              <th style="min-width:240px;">Action</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -169,53 +174,55 @@
                   <span class="badge text-bg-warning">Pending</span>
                 @endif
               </td>
-              <td data-label="Action" class="cell-actions">
-                <button
-                  class="btn btn-sm btn-outline-dark mb-2"
-                  type="button"
-                  data-bs-toggle="modal"
-                  data-bs-target="#editRentRequestModal{{ $requestItem->id }}"
-                >
-                  Edit
-                </button>
-                <br>
-                @if(!in_array($requestItem->status, ['accepted', 'converted']))
-                  <form method="post" action="{{ route('rent-requests.accept', $requestItem) }}" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-dark" {{ $requestItem->is_checkable && !$requestItem->is_available_for_period ? 'disabled' : '' }}>
-                      Accept & Convert
-                    </button>
-                  </form>
-                  @if($requestItem->is_checkable && !$requestItem->is_available_for_period)
-                    <div class="small text-danger mt-1">Cannot accept until dates/vehicle are available.</div>
+              @if($canManageData)
+                <td data-label="Action" class="cell-actions">
+                  <button
+                    class="btn btn-sm btn-outline-dark mb-2"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editRentRequestModal{{ $requestItem->id }}"
+                  >
+                    Edit
+                  </button>
+                  <br>
+                  @if(!in_array($requestItem->status, ['accepted', 'converted']))
+                    <form method="post" action="{{ route('rent-requests.accept', $requestItem) }}" class="d-inline">
+                      @csrf
+                      <button type="submit" class="btn btn-sm btn-dark" {{ $requestItem->is_checkable && !$requestItem->is_available_for_period ? 'disabled' : '' }}>
+                        Accept & Convert
+                      </button>
+                    </form>
+                    @if($requestItem->is_checkable && !$requestItem->is_available_for_period)
+                      <div class="small text-danger mt-1">Cannot accept until dates/vehicle are available.</div>
+                    @endif
+                  @else
+                    <span class="text-muted small">
+                      {{ $requestItem->status === 'converted' ? 'Converted' : 'Accepted' }} by {{ $requestItem->acceptedBy?->name ?: 'Admin' }}<br>
+                      {{ $requestItem->accepted_at?->format('Y-m-d H:i') }}
+                    </span>
                   @endif
-                @else
-                  <span class="text-muted small">
-                    {{ $requestItem->status === 'converted' ? 'Converted' : 'Accepted' }} by {{ $requestItem->acceptedBy?->name ?: 'Admin' }}<br>
-                    {{ $requestItem->accepted_at?->format('Y-m-d H:i') }}
-                  </span>
-                @endif
-                <div class="mt-2">
-                  <form method="post" action="{{ route('rent-requests.destroy', $requestItem) }}" class="d-inline" onsubmit="return confirm('Cancel this rent request?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                      Cancel Request
-                    </button>
-                  </form>
-                </div>
-              </td>
+                  <div class="mt-2">
+                    <form method="post" action="{{ route('rent-requests.destroy', $requestItem) }}" class="d-inline" onsubmit="return confirm('Cancel this rent request?');">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                        Cancel Request
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              @endif
             </tr>
             @if($requestItem->message)
               <tr class="rr-message-row">
-                <td colspan="9">
+                <td colspan="{{ $canManageData ? 9 : 8 }}">
                   <strong>Message:</strong> {{ $requestItem->message }}
                 </td>
               </tr>
             @endif
           @empty
             <tr>
-              <td colspan="9" class="text-center p-4 text-muted no-data">No rent requests yet.</td>
+              <td colspan="{{ $canManageData ? 9 : 8 }}" class="text-center p-4 text-muted no-data">No rent requests yet.</td>
             </tr>
           @endforelse
         </tbody>
@@ -229,6 +236,7 @@
   @endif
 </div>
 
+@if($canManageData)
 @foreach($rentRequests as $requestItem)
   <div class="modal fade" id="editRentRequestModal{{ $requestItem->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -278,4 +286,7 @@
     </div>
   </div>
 @endforeach
+@endif
 @endsection
+
+

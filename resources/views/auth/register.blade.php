@@ -106,6 +106,10 @@
       Already have an account?
       <a href="{{ route('login') }}">Login</a>
     </p>
+    <p class="mb-0 mt-2 text-center text-muted">
+      Want to join as a vehicle partner?
+      <a href="{{ route('partner-recruitment.create') }}">Apply Here</a>
+    </p>
   </div>
 </body>
 </html>
