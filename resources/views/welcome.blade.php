@@ -53,489 +53,240 @@
             margin: 0 auto;
         }
 
-        .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #dbe6f3;
-        }
-
-        .topbar-inner {
-            min-height: 72px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 1rem;
-            position: relative;
-        }
-
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: .6rem;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .brand-logo-wrap {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .brand img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .brand-name {
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: 1.55rem;
-            letter-spacing: -.02em;
-            font-weight: 700;
-            color: #0b2f61;
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: .2rem;
-            flex-wrap: wrap;
-        }
-
-        .nav form {
-            margin: 0;
-        }
-
-        .menu-toggle {
-            display: none;
-            width: 42px;
-            height: 42px;
-            border: 1px solid #c9d9ef;
-            background: #f7fbff;
-            color: #2b4f7d;
-            border-radius: 10px;
-            font-size: 1.25rem;
-            line-height: 1;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: #233851;
-            font-weight: 600;
-            font-size: .9rem;
-            padding: .45rem .62rem;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-
-        .nav a:hover {
-            background: #edf4ff;
-            color: #0d3f85;
-        }
-
-        .nav-mobile-only {
-            display: none;
-        }
-
-        .nav-mobile-action {
-            width: 100%;
-            border: 1px solid #cbdcf0;
-            background: #f7fbff;
-            color: #113e7d;
-            border-radius: 10px;
-            padding: .58rem .7rem;
-            font: inherit;
-            font-weight: 700;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .header-right {
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-end;
-            min-width: 170px;
-            gap: .55rem;
-            position: relative;
-        }
-
-        .header-auth-link {
-            text-decoration: none;
-            color: #fff;
-            background: linear-gradient(135deg, var(--primary), var(--primary-2));
-            box-shadow: 0 10px 20px rgba(10, 63, 143, 0.24);
-            font-weight: 700;
-            font-size: .9rem;
-            border-radius: 10px;
-            padding: .52rem .95rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 0;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .account-toggle {
-            border: 1px solid #d5e2f3;
-            background: #fff;
-            color: #0f2f59;
-            border-radius: 999px;
-            padding: .32rem .46rem .32rem .7rem;
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: inherit;
-        }
-
-        .account-avatar {
-            width: 26px;
-            height: 26px;
-            border-radius: 999px;
-            background: #e9f2ff;
-            color: #0f4ea1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .8rem;
-            font-weight: 800;
-            border: 1px solid #cbe0fb;
-        }
-
-        .account-menu {
-            position: absolute;
-            top: calc(100% + .55rem);
-            right: 0;
-            width: 220px;
-            background: #fff;
-            border: 1px solid #dbe6f3;
-            border-radius: 12px;
-            box-shadow: 0 18px 40px rgba(15, 35, 68, 0.14);
-            overflow: hidden;
-            display: none;
-            z-index: 35;
-        }
-
-        .account-menu a,
-        .account-menu button {
-            width: 100%;
-            text-align: left;
-            border: 0;
-            background: transparent;
-            display: block;
-            padding: .68rem .85rem;
-            color: #243a56;
-            text-decoration: none;
-            font-size: .9rem;
-            border-bottom: 1px solid #edf3fb;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        .account-menu a:hover,
-        .account-menu button:hover {
-            background: #f5f9ff;
-        }
-
-        .account-menu .danger {
-            color: #b91c1c;
-            border-bottom: 0;
-        }
-
-        .account-open .account-menu {
-            display: block;
-        }
-
         .home-hero {
-            padding: 1.3rem 0 1.6rem;
+            padding: 3rem 0 1rem;
         }
 
-        .hero-banner {
-            min-height: 500px;
-            border-radius: 18px;
-            border: 1px solid #cddff5;
-            overflow: hidden;
-            position: relative;
-            background: #0f294f;
+        .hero-plain {
             display: flex;
-            align-items: flex-end;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 780px;
+            margin: 0 auto;
         }
 
-        .hero-banner img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .hero-plain h1 {
+            margin: .9rem 0 .9rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: clamp(2.1rem, 5vw, 3.4rem);
+            line-height: 1.08;
+            letter-spacing: -.02em;
+            color: var(--text);
         }
 
-        .hero-banner::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(95deg, rgba(4, 22, 52, 0.92) 0%, rgba(7, 31, 68, 0.82) 38%, rgba(13, 58, 120, 0.25) 68%, rgba(15, 69, 138, 0.08) 100%);
+        .hero-plain h1 .accent {
+            display: block;
+            color: var(--primary-2);
+            font-size: 3.08rem;
         }
 
-        .hero-overlay {
-            position: relative;
-            z-index: 1;
-            color: #fff;
-            width: min(760px, 100%);
-            padding: 2.2rem 2.2rem 2.1rem;
+        .hero-plain > p {
+            margin: 0 0 1.6rem;
+            color: var(--muted);
+            font-size: 1.08rem;
+            max-width: 56ch;
         }
 
-        .hero-overlay h1 {
-            margin: 0 0 .8rem;
-            max-width: 10ch;
-            font-size: clamp(2.2rem, 5.8vw, 4.15rem);
-            line-height: .94;
-            color: #fff;
-        }
-
-        .hero-overlay p {
-            margin: 0 0 1.1rem;
-            color: #dbeafe;
-            font-size: 1.18rem;
-            max-width: 46ch;
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .35rem .75rem;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            border: 1px solid #c7daf4;
+            color: var(--primary-2);
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .03em;
         }
 
         .hero-search {
             background: #fff;
             border: 1px solid #d5e2f3;
-            border-radius: 14px;
-            padding: .36rem;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr auto;
-            gap: .28rem;
-            width: min(740px, 100%);
-            box-shadow: 0 12px 28px rgba(6, 23, 49, 0.2);
-            overflow: hidden;
+            border-radius: 16px;
+            padding: 1.1rem;
+            width: min(1140px, 100%);
+            margin: 0 auto;
+            box-shadow: 0 16px 34px rgba(6, 23, 49, 0.1);
         }
 
-        .hero-search .search-field {
-            display: flex;
-            flex-direction: column;
-            gap: .2rem;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .hero-search .search-field.date-field {
-            position: relative;
-        }
-
-        .hero-search label {
-            color: #607793;
-            font-size: .7rem;
-            font-weight: 800;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            margin: 0 .45rem;
-        }
-
-        .hero-search input {
-            width: 100%;
-            border: 1px solid #cfddf0;
-            border-radius: 10px;
-            padding: .65rem .75rem;
-            font: inherit;
-            color: #102948;
-            min-height: 42px;
-            min-width: 0;
-            max-width: 100%;
-            display: block;
-            box-sizing: border-box;
-            background-clip: padding-box;
-        }
-
-        .hero-search input[type="date"] {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            overflow: hidden;
-            -webkit-appearance: none;
-            appearance: none;
-            border-radius: 10px !important;
-            -webkit-border-radius: 10px !important;
-            position: relative;
-            padding-right: 2.35rem;
-            background-color: #f8fbff;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7f9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right .7rem center;
-            background-size: 18px 18px;
-        }
-
-        .hero-search input[type="date"]::-webkit-datetime-edit {
-            padding: 0;
-            width: 100%;
-        }
-
-        .hero-search input[type="date"]::-webkit-date-and-time-value {
-            text-align: left;
-            width: 100%;
-        }
-
-        .hero-search input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .hero-search input:focus {
-            outline: 2px solid #b6d5ff;
-            border-color: #7eb0ec;
-        }
-
-        .hero-search .search-submit {
-            width: 100%;
-            min-height: 42px;
-            border: 0;
-            border-radius: 10px;
-            padding: .65rem 1rem;
-            color: #fff;
-            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
-            font: inherit;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .hero-search .field-error {
-            display: block;
-            height: 1.35rem;
-            margin: .25rem .45rem 0;
-            color: #b91c1c;
-            font-size: .8rem;
-            font-weight: 600;
-            line-height: 1.25;
-            visibility: hidden;
-            overflow: hidden;
-        }
-
-        .hero-search .field-error.show {
-            visibility: visible;
-        }
-
-        .hero {
-            padding: 2rem 0 1rem;
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1.06fr .94fr;
-            gap: 1.3rem;
-            align-items: stretch;
-        }
-
-        .hero-copy {
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 1.5rem 1.5rem 1.1rem;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            padding: .35rem .62rem;
-            border: 1px solid #c7daf4;
-            border-radius: 999px;
-            font-size: .72rem;
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: .08em;
-            color: var(--primary-2);
-            background: var(--primary-soft);
-        }
-
-        h1 {
-            margin: .9rem 0 .8rem;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: clamp(2rem, 4.8vw, 3.55rem);
-            line-height: .96;
-            letter-spacing: -.03em;
-            max-width: 12ch;
-        }
-
-        .brand-highlight {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .hero-copy p {
-            color: var(--muted);
-            line-height: 1.7;
-            margin: 0 0 1.25rem;
-            max-width: 54ch;
-        }
-
-        .hero-highlights {
+        .hero-search-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: .6rem;
-            margin-top: .35rem;
         }
 
-        .hero-highlight-card {
-            border: 1px solid #d7e4f4;
+        .hero-field {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
             background: #f8fbff;
+            border: 1px solid #dfe9f7;
             border-radius: 12px;
-            padding: .62rem .65rem;
+            padding: .6rem .7rem;
+            min-width: 0;
         }
 
-        .hero-highlight-title {
-            margin: 0 0 .15rem;
-            font-size: .83rem;
+        .hero-field:focus-within {
+            border-color: #7eb0ec;
+            background: #fff;
+        }
+
+        .hero-field label {
+            color: #607793;
+            font-size: .68rem;
             font-weight: 800;
-            color: #0a3f8f;
-            letter-spacing: .02em;
+            letter-spacing: .05em;
             text-transform: uppercase;
         }
 
-        .hero-highlight-text {
-            margin: 0;
-            color: #475569;
-            font-size: .86rem;
-            line-height: 1.35;
-        }
-
-        .hero-copy-image {
-            margin: .85rem -1.5rem 0;
-            height: 230px;
-            border-top: 1px solid #dbe6f3;
-            overflow: hidden;
-            background: #edf4ff;
-        }
-
-        .hero-copy-image img {
+        .hero-field input,
+        .hero-field select {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center 58%;
-            display: block;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            font-weight: 700;
+            color: #102948;
+            min-width: 0;
+        }
+
+        .hero-field input:focus,
+        .hero-field select:focus {
+            outline: none;
+        }
+
+        .hero-stops {
+            margin-top: .6rem;
+        }
+
+        .hero-stops-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .6rem;
+            margin-bottom: .4rem;
+        }
+
+        .hero-stops-head label {
+            color: #607793;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .hero-stops-head label .optional {
+            text-transform: none;
+            font-weight: 500;
+            letter-spacing: 0;
+            color: #94a3b8;
+        }
+
+        .hero-add-stop-btn {
+            border: 1px solid #dfe9f7;
+            background: #f8fbff;
+            color: var(--primary-2);
+            font-weight: 700;
+            font-size: .78rem;
+            padding: .32rem .7rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .hero-add-stop-btn:hover {
+            background: #eaf2ff;
+        }
+
+        .hero-stop-row {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: .45rem;
+        }
+
+        .hero-stop-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            color: var(--primary-2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .74rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .hero-stop-row input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #dfe9f7;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: .55rem .7rem;
+            font: inherit;
+            color: #102948;
+        }
+
+        .hero-stop-row input:focus {
+            outline: none;
+            border-color: #7eb0ec;
+            background: #fff;
+        }
+
+        .hero-stop-remove {
+            border: 0;
+            background: #fef2f2;
+            color: #b91c1c;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .hero-search-actions {
+            margin-top: .85rem;
+            padding-top: .8rem;
+            border-top: 1px solid #eef2f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-search-note {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .4rem;
+            color: #64748b;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .hero-search-note strong {
+            color: #15803d;
+        }
+
+        .hero-search-buttons {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-whatsapp {
+            background: #e9f9f0;
+            color: #15803d;
+            border-color: #bfe8cf;
         }
 
         .btn {
@@ -551,248 +302,10 @@
             font-size: .95rem;
         }
 
-        .btn .btn-spinner {
-            display: none;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.45);
-            border-top-color: #ffffff;
-            border-radius: 999px;
-            animation: btn-spin .7s linear infinite;
-        }
-
-        .btn.is-loading .btn-spinner {
-            display: inline-block;
-        }
-
-        .btn.is-loading .btn-label {
-            opacity: .95;
-        }
-
-        .btn.is-loading {
-            pointer-events: none;
-        }
-
-        @keyframes btn-spin {
-            to { transform: rotate(360deg); }
-        }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-2));
             color: #fff;
             box-shadow: 0 8px 18px rgba(10, 63, 143, 0.26);
-        }
-
-        .btn-secondary {
-            background: var(--surface-soft);
-            color: #1e293b;
-            border-color: var(--line);
-        }
-
-        .hero-side-card {
-            position: relative;
-            border-radius: var(--radius);
-            border: 1px solid #c3d8f2;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            height: 100%;
-            min-height: 100%;
-        }
-
-        .hero-side-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            filter: saturate(1.06) contrast(1.03);
-        }
-
-        .hero-side-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(10, 63, 143, 0.25) 0%, rgba(10, 63, 143, 0.06) 38%, rgba(10, 63, 143, 0.35) 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .hero-side-overlay {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            right: 1.5rem;
-            z-index: 3;
-            color: #f8fbff;
-        }
-
-        .hero-side-title {
-            margin: 0 0 .55rem;
-            color: #f8fbff;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: clamp(2rem, 3.4vw, 3rem);
-            line-height: .95;
-            letter-spacing: -.02em;
-            max-width: 11ch;
-        }
-
-        .hero-side-sub {
-            margin: 0 0 .95rem;
-            color: rgba(248, 251, 255, 0.95);
-            font-size: 1.03rem;
-            line-height: 1.45;
-            max-width: 24ch;
-        }
-
-        .availability-wrap {
-            margin-top: 1rem;
-            display: grid;
-            grid-template-columns: 1.35fr .95fr;
-            gap: .9rem;
-            align-items: stretch;
-        }
-
-        .availability {
-            margin-top: 0;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
-            padding: 1rem;
-        }
-
-        .availability-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin: 0 0 .75rem;
-        }
-
-        .availability-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: .65rem;
-        }
-
-        .availability-grid .full {
-            grid-column: 1 / -1;
-        }
-
-        .control label {
-            display: block;
-            margin-bottom: .35rem;
-            font-size: .72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: #64748b;
-        }
-
-        .control input {
-            width: 100%;
-            border: 1px solid #c8d7ea;
-            background: #f8fbff;
-            border-radius: 10px;
-            padding: .72rem .8rem;
-            font: inherit;
-            color: var(--text);
-        }
-
-        .control input.input-error {
-            border-color: #dc2626;
-            background: #fff7f7;
-        }
-
-        .field-error {
-            display: none;
-            margin-top: .35rem;
-            color: #b91c1c;
-            font-size: .8rem;
-            font-weight: 600;
-        }
-
-        .field-error.show {
-            display: block;
-        }
-
-        .control .btn {
-            width: 100%;
-            white-space: nowrap;
-        }
-
-        .benefits-card {
-            margin-top: 0;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .benefits-body {
-            padding: 1rem;
-        }
-
-        .benefits-title {
-            margin: 0 0 .8rem;
-            font-size: 1.05rem;
-            font-weight: 700;
-        }
-
-        .benefit-item {
-            display: grid;
-            grid-template-columns: 26px 1fr;
-            gap: .55rem;
-            margin-bottom: .65rem;
-        }
-
-        .benefit-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 7px;
-            background: #edf3ff;
-            border: 1px solid #d2e2f8;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f66c3;
-            font-size: .82rem;
-            font-weight: 700;
-        }
-
-        .benefit-name {
-            margin: 0;
-            font-size: .9rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .benefit-note {
-            margin: 0;
-            color: #64748b;
-            font-size: .75rem;
-            line-height: 1.35;
-        }
-
-        .benefits-footer {
-            margin-top: auto;
-            padding: .85rem 1rem 1rem;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fbff;
-        }
-
-        .support-line {
-            margin: 0 0 .55rem;
-            font-size: .84rem;
-            font-weight: 700;
-            color: #334155;
-        }
-
-        .support-sub {
-            margin: 0;
-            color: #64748b;
-            font-size: .75rem;
         }
 
         .section {
@@ -827,200 +340,137 @@
             line-height: 1.7;
         }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .9rem;
+        .contact-card {
             margin-top: 1rem;
-        }
-
-        .feature {
-            background: var(--surface);
+            background: #ffffff;
             border: 1px solid var(--line);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+            border-radius: var(--radius);
+            padding: 1.6rem;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 2rem;
+            align-items: start;
         }
 
-        .feature .icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: .7rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .contact-info-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
             background: var(--primary-soft);
+            color: var(--primary-2);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: .55rem;
-            color: #0f66c3;
+            font-size: .95rem;
+            flex-shrink: 0;
         }
 
-        .feature .icon svg {
-            width: 18px;
-            height: 18px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .contact-info-text {
+            display: flex;
+            flex-direction: column;
+            gap: .1rem;
         }
 
-        .feature h3 {
-            margin: 0 0 .35rem;
-            font-size: 1.05rem;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+        .contact-info-label {
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: #94a3b8;
         }
 
-        .feature p { margin: 0; color: var(--muted); line-height: 1.62; font-size: .93rem; }
+        .contact-info-value {
+            font-weight: 700;
+            color: #0f172a;
+        }
 
-        .fleet-head {
-            margin-top: 1rem;
+        .contact-info-value a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .contact-info-value a:hover {
+            color: var(--primary-2);
+        }
+
+        .whatsapp-cta-box {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: .7rem;
-        }
-
-        .fleet-head-link {
-            color: var(--primary-2);
             text-decoration: none;
-            font-weight: 700;
-            font-size: .86rem;
+            background: #e9f9f0;
+            border: 1px solid #bfe8cf;
+            border-radius: 12px;
+            padding: .85rem 1rem;
+            margin-top: .4rem;
+            transition: background .15s ease;
         }
 
-        .fleet-grid {
-            margin-top: .7rem;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .9rem;
+        .whatsapp-cta-box:hover {
+            background: #ddf3e6;
         }
 
-        .fleet-card {
-            display: block;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--line);
-            overflow: hidden;
-            background: var(--surface);
-            box-shadow: 0 8px 18px rgba(15, 23, 42, .05);
-        }
-
-        .fleet-photo {
-            position: relative;
-            min-height: 170px;
-            overflow: hidden;
-            background: transparent;
-        }
-
-        .fleet-photo img {
-            width: 100%;
-            height: 100%;
-            max-height: 170px;
-            object-fit: cover;
-            object-position: center;
-            filter: saturate(1.05) contrast(1.02);
-            display: block;
-        }
-
-        .fleet-tag {
-            position: absolute;
-            top: .45rem;
-            left: .45rem;
-            background: #eaf2ff;
-            border: 1px solid #c8d9f2;
-            color: #0a3f8f;
-            font-size: .62rem;
-            font-weight: 800;
-            letter-spacing: .04em;
-            text-transform: uppercase;
-            border-radius: 999px;
-            padding: .1rem .4rem;
-        }
-
-        .fleet-body { padding: .68rem .75rem .7rem; }
-        .fleet-title-row {
+        .whatsapp-cta-left {
             display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: .45rem;
-            margin-bottom: .2rem;
+            align-items: center;
+            gap: .7rem;
         }
 
-        .fleet-title-row h3 {
-            margin: 0;
-            font-size: .98rem;
-        }
-
-        .fleet-price { color: var(--primary-2); font-weight: 800; }
-        .fleet-rate-unit {
-            color: #64748b;
-            font-size: .74rem;
-            font-weight: 600;
-            margin-left: .12rem;
-        }
-
-        .fleet-sub {
-            color: #64748b;
-            font-size: .76rem;
-            margin-bottom: .32rem;
-        }
-
-        .fleet-policy {
-            color: #1e3a8a;
-            font-size: .73rem;
-            line-height: 1.35;
-            margin-bottom: .35rem;
-            font-weight: 600;
-        }
-
-        .fleet-meta {
-            color: var(--muted);
-            font-size: .75rem;
-            margin: .28rem 0 .05rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: .35rem;
-        }
-
-        .fleet-meta span {
+        .whatsapp-cta-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: #16a34a;
+            color: #fff;
             display: inline-flex;
             align-items: center;
-            gap: .2rem;
+            justify-content: center;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .whatsapp-cta-title {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: .92rem;
+        }
+
+        .whatsapp-cta-sub {
             color: #64748b;
-            border-right: 1px solid #dbe6f3;
-            padding-right: .35rem;
+            font-size: .76rem;
         }
 
-        .fleet-meta span:last-child {
-            border-right: 0;
-            padding-right: 0;
+        .whatsapp-cta-arrow {
+            color: #15803d;
+            font-size: 1.1rem;
         }
-
-        .contact-card {
-            margin-top: 1rem;
-            background: linear-gradient(145deg, #eef6ff, #f7fbff);
-            border: 1px solid #cfdef1;
-            border-radius: var(--radius);
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: 1fr 1.3fr;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .contact-lines div { margin-bottom: .8rem; color: #334155; }
-        .contact-lines strong { display: block; margin-bottom: .2rem; color: #0f172a; }
 
         .contact-form {
             border-radius: 14px;
-            border: 1px solid #d5e4f5;
-            background: #ffffff;
-            padding: .95rem;
+            border: 1px solid var(--line);
+            background: var(--surface-soft);
+            padding: 1.3rem;
         }
 
         .contact-form-title {
-            margin: 0 0 .7rem;
-            font-size: 1.05rem;
-            font-weight: 700;
+            margin: 0 0 .3rem;
+            font-size: 1.15rem;
+            font-weight: 800;
             color: #0f172a;
+        }
+
+        .contact-form-sub {
+            margin: 0 0 1rem;
+            color: var(--muted);
+            font-size: .84rem;
         }
 
         .contact-grid {
@@ -1039,11 +489,16 @@
             letter-spacing: .04em;
         }
 
+        .contact-field label .required {
+            color: #dc2626;
+        }
+
         .contact-field input,
+        .contact-field select,
         .contact-field textarea {
             width: 100%;
             border: 1px solid #c8d7ea;
-            background: #f8fbff;
+            background: #ffffff;
             border-radius: 10px;
             padding: .68rem .75rem;
             font: inherit;
@@ -1059,197 +514,100 @@
             grid-column: 1 / -1;
         }
 
+        .contact-hint {
+            grid-column: 1 / -1;
+            margin: -.3rem 0 0;
+            color: #94a3b8;
+            font-size: .76rem;
+        }
+
+        .contact-submit-row {
+            margin-top: .9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-submit-note {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            color: #64748b;
+            font-size: .78rem;
+        }
+
         .contact-submit {
-            margin-top: .6rem;
-            width: 100%;
             border: 0;
             border-radius: 10px;
-            padding: .7rem .9rem;
+            padding: .7rem 1.3rem;
             font-weight: 700;
             color: #fff;
             background: linear-gradient(135deg, #0a3f8f, #0f66c3);
             box-shadow: 0 8px 16px rgba(10, 63, 143, 0.24);
             cursor: pointer;
-        }
-
-        footer {
-            margin-top: 2.6rem;
-            border-top: 1px solid #215fb2;
-            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
-        }
-
-        .footer-inner {
-            padding: 1.35rem 0 1.1rem;
-            color: #d9e8ff;
-            font-size: .9rem;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-            gap: 1.2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(219, 232, 255, 0.28);
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: flex-start;
-            gap: .6rem;
-        }
-
-        .footer-logo {
-            width: 36px;
-            height: 24px;
-            object-fit: contain;
-            margin-top: .15rem;
-        }
-
-        .footer-title {
-            margin: 0 0 .45rem;
-            font-size: .75rem;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-            color: #bfdbff;
-            font-weight: 800;
-        }
-
-        .footer-brand-name {
-            margin: 0 0 .35rem;
-            font-size: .97rem;
-            font-weight: 700;
-            color: #f8fbff;
-        }
-
-        .footer-copy {
-            margin: 0;
-            color: #d9e8ff;
-            font-size: .83rem;
-            line-height: 1.5;
-            max-width: 28ch;
-        }
-
-        .footer-links {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: grid;
-            gap: .35rem;
-        }
-
-        .footer-links a {
-            color: #e7f0ff;
-            text-decoration: none;
-            font-size: .85rem;
-        }
-
-        .footer-links a:hover {
-            color: #ffffff;
-        }
-
-        .newsletter-note {
-            margin: 0 0 .55rem;
-            font-size: .82rem;
-            color: #d9e8ff;
-        }
-
-        .newsletter-form {
-            display: flex;
-            gap: .4rem;
-        }
-
-        .newsletter-form input {
-            flex: 1 1 auto;
-            min-width: 0;
-            border: 1px solid #ffffff;
-            background: #ffffff;
-            border-radius: 8px;
-            padding: .52rem .62rem;
-            font: inherit;
-            color: #0f172a;
-        }
-
-        .newsletter-form input::placeholder {
-            color: #64748b;
-        }
-
-        .newsletter-btn {
-            border: 0;
-            border-radius: 8px;
-            width: 36px;
-            height: 36px;
-            color: #fff;
-            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
-            font-size: 1rem;
-            line-height: 1;
-            cursor: pointer;
-        }
-
-        .footer-bottom {
-            padding-top: .8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: .6rem;
-            flex-wrap: wrap;
-            font-size: .82rem;
-        }
-
-        .footer-social {
-            display: inline-flex;
-            gap: .75rem;
-        }
-
-        .footer-social a {
-            color: #d9e8ff;
-            text-decoration: none;
-            font-size: .76rem;
-            letter-spacing: .04em;
-            text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .trust-strip {
-            margin-top: .9rem;
+            margin-top: 1.5rem;
             padding: 0 .5rem;
         }
 
         .trust-grid {
-            width: min(1180px, calc(100% - 1rem));
+            max-width: 780px;
             margin: 0 auto;
-            min-height: 64px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .7rem;
-            align-items: center;
-            padding: .45rem .85rem;
-            background: #ffffff;
-            border: 1px solid #dbe6f3;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(15, 35, 68, 0.06);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: .6rem;
         }
 
         .trust-item {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: .5rem;
+            justify-content: flex-start;
+            gap: .6rem;
             color: #0f2b52;
-            font-weight: 700;
-            font-size: .95rem;
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: .55rem .85rem;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, .04);
         }
 
         .trust-item .dot {
-            width: 26px;
-            height: 26px;
+            width: 30px;
+            height: 30px;
             border-radius: 999px;
             border: 1px solid #cde0f7;
-            background: #edf5ff;
+            background: linear-gradient(135deg, var(--primary-soft), #ffffff);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #0d4ea8;
-            font-size: .8rem;
+            color: var(--primary-2);
+            font-size: .78rem;
             font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .trust-item-text {
+            display: flex;
+            flex-direction: column;
+            gap: .1rem;
+            min-width: 0;
+        }
+
+        .trust-item-title {
+            font-weight: 800;
+            font-size: .92rem;
+        }
+
+        .trust-item-sub {
+            color: #64748b;
+            font-size: .76rem;
+            font-weight: 500;
         }
 
         .home-services {
@@ -1259,7 +617,7 @@
         }
 
         .home-services.section {
-            padding-top: 1.2rem;
+            padding-top: 2.6rem;
         }
 
         .service-grid-modern {
@@ -1275,6 +633,13 @@
             border-radius: 12px;
             padding: 1rem;
             min-height: 172px;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+
+        .service-card-modern:hover {
+            transform: translateY(-4px);
+            border-color: #c3d8f2;
+            box-shadow: 0 16px 30px rgba(10, 63, 143, 0.12);
         }
 
         .service-card-modern h3 {
@@ -1303,474 +668,453 @@
             font-size: 1rem;
         }
 
-        .modern-fleet {
+        .vehicle-type-grid {
+            margin-top: 1.2rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: .9rem;
+        }
+
+        .vehicle-type-card {
+            background: #ffffff;
+            border: 1px solid #dbe6f3;
+            border-radius: 14px;
+            padding: 1.6rem 1.2rem;
+            text-align: center;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+
+        .vehicle-type-card:hover {
+            transform: translateY(-4px);
+            border-color: #c3d8f2;
+            box-shadow: 0 16px 30px rgba(10, 63, 143, 0.12);
+        }
+
+        .vehicle-type-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            font-size: 2rem;
+            margin-bottom: .8rem;
+        }
+
+        .vehicle-type-card h3 {
+            margin: 0 0 .4rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: 1.15rem;
+        }
+
+        .vehicle-type-card p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.55;
+            font-size: .9rem;
+        }
+
+        .how-it-works {
             padding-bottom: .6rem;
         }
 
-        .modern-fleet-head {
-            margin-top: 1.1rem;
+        .steps-grid {
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.1rem;
+        }
+
+        .step-card {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #dbe6f3;
+            border-radius: 14px;
+            padding: 1.4rem 1.2rem 1.2rem;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .05);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 30px rgba(10, 63, 143, 0.12);
+        }
+
+        .step-card.is-featured {
+            border-color: var(--primary-2);
+            box-shadow: 0 12px 26px rgba(10, 63, 143, 0.14);
+        }
+
+        .step-card.is-featured .step-number {
+            background: linear-gradient(135deg, var(--primary-2), #2f8ce0);
+        }
+
+        .step-number {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: .85rem;
+            box-shadow: 0 8px 16px rgba(10, 63, 143, 0.22);
+        }
+
+        .step-card h3 {
+            margin: 0 0 .4rem;
+            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
+            font-size: 1.12rem;
+        }
+
+        .step-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.58;
+            font-size: .9rem;
+        }
+
+        .how-it-works-cta {
+            margin-top: 1.6rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: .8rem;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .modern-fleet-head h2 {
+        .how-it-works-cta-note {
             margin: 0;
+            color: var(--muted);
+            font-size: .88rem;
         }
 
-        .fleet-head-link {
-            margin-left: auto;
+        .how-it-works-cta-note a {
+            color: var(--primary-2);
+            font-weight: 700;
             text-decoration: none;
-            color: #0a3f8f;
-            font-size: .86rem;
-            font-weight: 800;
-            white-space: nowrap;
         }
 
-        .fleet-head-link:hover {
+        .how-it-works-cta-note a:hover {
             text-decoration: underline;
         }
 
-        .showcase-grid {
-            margin-top: 1rem;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .72rem;
+        .journeys-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: .8rem;
+            flex-wrap: wrap;
         }
 
-        .showcase-card {
-            background: #fff;
-            border: 1px solid #d9e6f5;
-            border-radius: 12px;
+        .journeys-head-link {
+            text-decoration: none;
+            color: var(--primary-2);
+            font-weight: 800;
+            font-size: .86rem;
+            white-space: nowrap;
+        }
+
+        .journeys-head-link:hover {
+            text-decoration: underline;
+        }
+
+        .journey-card {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 8px 18px rgba(15, 23, 42, .07);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .05);
+            display: flex;
+            flex-direction: column;
+            transition: transform .18s ease, box-shadow .18s ease;
         }
 
-        .showcase-photo {
+        .journey-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 30px rgba(10, 63, 143, 0.12);
+        }
+
+        .journey-media {
             position: relative;
-            height: 182px;
-            background: #e9f2ff;
+            height: 176px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            overflow: hidden;
         }
 
-        .showcase-photo img {
+        .journey-media img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform .35s ease;
         }
 
-        .showcase-photo-badge {
+        .journey-card:hover .journey-media img {
+            transform: scale(1.05);
+        }
+
+        .journey-media-badge {
             position: absolute;
-            right: .7rem;
+            left: .7rem;
             top: .7rem;
-            display: inline-flex;
-            align-items: center;
-            gap: .3rem;
             background: rgba(255, 255, 255, .95);
-            border: 1px solid #dbe6f3;
-            border-radius: 999px;
-            padding: .22rem .52rem;
+            color: var(--primary);
             font-size: .66rem;
-            color: #0a3f8f;
             font-weight: 800;
-            letter-spacing: .06em;
+            letter-spacing: .04em;
             text-transform: uppercase;
+            padding: .22rem .55rem;
+            border-radius: 999px;
         }
 
-        .showcase-body {
-            padding: .7rem .75rem .78rem;
-        }
-
-        .showcase-topline {
+        .journey-body {
+            padding: 1.1rem 1.1rem 1.2rem;
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: .65rem;
-            margin-bottom: .34rem;
+            flex-direction: column;
+            flex: 1;
+            gap: .7rem;
         }
 
-        .showcase-rate {
-            color: #0a3f8f;
-            font-weight: 800;
-            font-size: 1.55rem;
-            letter-spacing: -.02em;
-            line-height: 1;
-            white-space: nowrap;
-        }
-
-        .showcase-rate small {
-            color: #6b7f97;
-            font-size: .52em;
-            font-weight: 600;
-            margin-left: .2rem;
-        }
-
-        .showcase-title {
+        .journey-title {
             margin: 0;
             font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: 1.35rem;
-            line-height: 1.08;
-            letter-spacing: -.01em;
+            font-size: 1.1rem;
         }
 
-        .showcase-info-row {
-            margin: .38rem 0 .62rem;
-            padding-bottom: .48rem;
-            border-bottom: 1px solid #e4edf8;
-            color: #8b9bb0;
-            font-size: .74rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: .45rem .65rem;
-            font-weight: 600;
-        }
-
-        .showcase-info-row span {
-            display: inline-flex;
-            align-items: center;
-            gap: .2rem;
-        }
-
-        .showcase-spec-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .3rem .38rem;
-            margin-bottom: .85rem;
-            color: #334155;
-            font-size: .74rem;
-        }
-
-        .showcase-spec-item {
-            display: inline-flex;
-            align-items: center;
-            gap: .24rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .showcase-spec-item::before {
-            content: "";
-            width: 14px;
-            height: 14px;
-            flex: 0 0 14px;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 14px 14px;
-            opacity: .8;
-        }
-
-        .showcase-spec-item.spec-seats::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3Cpath d='M5.5 21a6.5 6.5 0 0 1 13 0'/%3E%3C/svg%3E");
-        }
-
-        .showcase-spec-item.spec-bags::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='7' width='16' height='13' rx='2'/%3E%3Cpath d='M9 7V5a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E");
-        }
-
-        .showcase-spec-item.spec-transmission::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b728e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='6' r='2'/%3E%3Ccircle cx='16' cy='6' r='2'/%3E%3Ccircle cx='8' cy='12' r='2'/%3E%3Ccircle cx='16' cy='12' r='2'/%3E%3Cpath d='M8 8v2m8-2v8M8 14v4m0 0h8'/%3E%3C/svg%3E");
-        }
-
-        .showcase-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: .65rem;
-            align-items: center;
-        }
-
-        .showcase-details {
-            color: #4c1d95;
-            text-decoration: none;
+        .journey-route {
+            color: var(--primary-2);
             font-weight: 700;
-            font-size: .9rem;
+            font-size: .8rem;
         }
 
-        .showcase-details:hover {
-            text-decoration: underline;
+        .journey-desc {
+            margin: 0;
+            color: #475569;
+            font-size: .87rem;
+            line-height: 1.55;
+            flex: 1;
         }
 
-        .showcase-book {
-            text-decoration: none;
-            text-align: center;
-            border: 0;
-            border-radius: 10px;
-            padding: .62rem .8rem;
-            color: #fff;
-            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
-            box-shadow: 0 8px 18px rgba(10, 63, 143, .23);
-            font-weight: 800;
-            font-size: .95rem;
-            line-height: 1;
-        }
-
-        .contact-cta {
-            padding: 2.1rem 0 .3rem;
-        }
-
-        .contact-cta-card {
-            border: 1px solid #dbe6f3;
-            background: linear-gradient(135deg, #f6faff, #edf4ff);
-            border-radius: 16px;
-            padding: 1.2rem 1.15rem;
+        .journey-footer {
+            margin-top: .3rem;
+            padding-top: .7rem;
+            border-top: 1px solid #edf3fb;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: .9rem;
+            gap: .6rem;
         }
 
-        .contact-cta-card h3 {
-            margin: 0 0 .25rem;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-            font-size: 1.28rem;
+        .journey-price-note {
+            display: flex;
+            flex-direction: column;
+            gap: .05rem;
         }
 
-        .contact-cta-card p {
-            margin: 0;
-            color: #5f738d;
+        .journey-price-label {
+            font-size: .66rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: #94a3b8;
         }
 
-        .contact-cta-action {
-            display: inline-flex;
+        .journey-price-value {
+            font-size: .84rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .journey-cta {
+            text-decoration: none;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: .78rem;
+            padding: .5rem .75rem;
+            border-radius: 9px;
+            white-space: nowrap;
+        }
+
+        .journey-cta:hover {
+            background: #dbe9ff;
+        }
+
+        .our-fleet {
+            padding-bottom: .6rem;
+        }
+
+        .carousel {
+            position: relative;
+            margin-top: 1.3rem;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: .2rem;
+        }
+
+        .carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-slide {
+            scroll-snap-align: start;
+            flex: 0 0 calc((100% - 2rem) / 3);
+            min-width: 0;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 88px;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid var(--line);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .14);
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
+            font-size: 1.2rem;
+            color: var(--primary);
+            transition: background .15s ease;
+        }
+
+        .carousel-arrow:hover {
+            background: var(--primary-soft);
+        }
+
+        .carousel-arrow.prev {
+            left: -18px;
+        }
+
+        .carousel-arrow.next {
+            right: -18px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: .4rem;
+            margin-top: 1rem;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #cbd8ec;
             border: 0;
-            border-radius: 10px;
-            padding: .66rem 1.1rem;
-            color: #fff;
-            background: linear-gradient(135deg, #0a3f8f, #0f66c3);
-            box-shadow: 0 10px 18px rgba(10, 63, 143, .24);
-            font-weight: 700;
-            white-space: nowrap;
+            padding: 0;
+            cursor: pointer;
+            transition: width .2s ease, background .2s ease;
         }
 
-        .modern-footer {
-            margin-top: 2.5rem;
-            background: #081a3b;
-            border-top: 1px solid #18386e;
+        .carousel-dot.active {
+            background: var(--primary-2);
+            width: 22px;
         }
 
-        .modern-footer .footer-inner {
-            padding-top: 1.5rem;
-            color: #d2e3ff;
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .6s ease, transform .6s ease;
         }
 
-        .modern-footer .footer-grid {
-            grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-            border-bottom: 1px solid rgba(151, 182, 230, .2);
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .modern-footer .newsletter-form input {
-            background: #102956;
-            border-color: #2a4f88;
-            color: #e8f1ff;
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
         }
 
-        .modern-footer .newsletter-btn {
-            background: linear-gradient(135deg, #165ec3, #1a74dd);
-        }
+        .trust-grid .reveal:nth-child(1) { transition-delay: 0ms; }
+        .trust-grid .reveal:nth-child(2) { transition-delay: 90ms; }
+        .trust-grid .reveal:nth-child(3) { transition-delay: 180ms; }
+
+        .service-grid-modern .reveal:nth-child(1) { transition-delay: 0ms; }
+        .service-grid-modern .reveal:nth-child(2) { transition-delay: 80ms; }
+        .service-grid-modern .reveal:nth-child(3) { transition-delay: 160ms; }
+        .service-grid-modern .reveal:nth-child(4) { transition-delay: 240ms; }
+
+        .steps-grid .reveal:nth-child(1) { transition-delay: 0ms; }
+        .steps-grid .reveal:nth-child(2) { transition-delay: 100ms; }
+        .steps-grid .reveal:nth-child(3) { transition-delay: 200ms; }
 
         @media (max-width: 1024px) {
-            .hero-grid { grid-template-columns: 1fr; }
-            .hero-side-card { height: auto; min-height: 340px; }
-            .availability-wrap { grid-template-columns: 1fr; }
-            .availability-grid { grid-template-columns: 1fr 1fr; }
-            .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .fleet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .carousel-slide {
+                flex: 0 0 calc((100% - 1rem) / 2);
+            }
             .contact-card { grid-template-columns: 1fr; }
             .service-grid-modern { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         @media (max-width: 700px) {
             .container { width: min(1180px, calc(100% - 1.2rem)); }
-            .topbar-inner {
-                min-height: 64px;
-                grid-template-columns: auto auto;
-            }
-            .brand-name { font-size: 1.2rem; }
-            .availability-grid { grid-template-columns: 1fr; }
-            .feature-grid { grid-template-columns: 1fr; }
-            .fleet-grid { grid-template-columns: 1fr; }
-            .hero-copy { padding: 1rem; }
-            .hero-copy-image {
-                margin-left: -1rem;
-                margin-right: -1rem;
-                height: 190px;
-            }
-            .hero-highlights { grid-template-columns: 1fr; }
-            .hero-side-card { min-height: 280px; }
-            .hero-side-overlay {
-                top: 1rem;
-                left: 1rem;
-                right: 1rem;
-            }
-            .hero-side-sub {
-                font-size: .95rem;
-                max-width: 30ch;
-            }
             .contact-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; align-items: flex-start; }
-            .home-hero { padding-top: 1rem; }
-            .hero-banner { min-height: 440px; }
-            .hero-overlay {
-                padding: 1.2rem 1rem 1.2rem;
-            }
-            .hero-overlay p {
+            .home-hero { padding-top: 1.5rem; }
+            .hero-plain > p {
                 font-size: 1rem;
             }
             .hero-search {
+                padding: .8rem;
+            }
+            .hero-search-grid {
                 grid-template-columns: 1fr;
-                padding: .62rem;
-                gap: .52rem;
             }
-            .hero-search label {
-                margin: 0 .12rem;
+            .hero-search-actions {
+                flex-direction: column;
+                align-items: stretch;
             }
-            .hero-search input {
-                min-height: 46px;
-                padding: .72rem .78rem;
+            .hero-search-buttons {
+                flex-direction: column;
             }
-            .hero-search .search-submit {
-                min-height: 46px;
-            }
-            .hero-search .search-submit {
+            .hero-search-buttons .btn {
                 width: 100%;
             }
             .trust-grid {
-                grid-template-columns: 1fr;
-                gap: .3rem;
-                padding: .65rem .7rem;
-                width: min(1180px, calc(100% - 1.2rem));
-            }
-            .trust-item {
-                justify-content: flex-start;
+                flex-direction: column;
+                align-items: stretch;
             }
             .service-grid-modern { grid-template-columns: 1fr; }
-            .showcase-grid { grid-template-columns: 1fr; }
-            .showcase-photo { height: 178px; }
-            .showcase-title { font-size: 1.2rem; }
-            .showcase-rate { font-size: 1.35rem; }
-            .showcase-spec-grid { font-size: .69rem; gap: .25rem .3rem; }
-            .showcase-details { font-size: .86rem; }
-            .showcase-book { font-size: .9rem; padding: .58rem .75rem; }
-            .contact-cta-card {
-                flex-direction: column;
-                align-items: flex-start;
+            .steps-grid { grid-template-columns: 1fr; }
+            .vehicle-type-grid { grid-template-columns: 1fr; }
+            .carousel-slide {
+                flex: 0 0 88%;
             }
-            .fleet-head-link {
-                margin-left: 0;
+            .carousel-arrow {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
             }
-        }
-
-        @media (max-width: 900px) {
-            .menu-toggle {
-                display: inline-flex;
-            }
-
-            .nav {
-                display: none;
-                position: absolute;
-                top: calc(100% + .5rem);
-                left: 0;
-                right: 0;
-                background: #ffffff;
-                border: 1px solid var(--line);
-                border-radius: 12px;
-                padding: .5rem;
-                box-shadow: 0 14px 28px rgba(10, 63, 143, 0.14);
-                z-index: 30;
-                gap: .3rem;
-                max-height: calc(100vh - 120px);
-                overflow-y: auto;
-            }
-
-            .nav a {
-                width: 100%;
-                text-align: left;
-                padding: .62rem .7rem;
-            }
-
-            .nav-mobile-only {
-                display: block;
-            }
-
-            .header-right {
-                display: none;
-            }
-
-            body.nav-open .nav {
-                display: flex;
-                flex-direction: column;
-            }
+            .carousel-arrow.prev { left: 4px; }
+            .carousel-arrow.next { right: 4px; }
         }
     </style>
 </head>
 <body>
     @include('partials.public-header')
-    <header class="topbar">
-        <div class="container topbar-inner">
-            <a class="brand" href="{{ route('home') }}">
-                <span class="brand-logo-wrap">
-                    <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals logo">
-                </span>
-                <span class="brand-name">R&A Auto Rentals</span>
-            </a>
-            <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" id="menuToggle">&#9776;</button>
-            <nav class="nav">
-                <a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a>
-                <a href="{{ route('long-term-rentals.index') }}">Long-Term Rentals</a>
-                <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
-                <a href="{{ route('group-packages.index') }}">Special Events</a>
-                <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
-                @auth
-                    @if(auth()->user()->isDashboardAdmin())
-                        @if(auth()->user()->canAccess('dashboard'))
-                            <a class="nav-mobile-only" href="{{ route('dashboard') }}">Admin Dashboard</a>
-                        @endif
-                    @else
-                        <a class="nav-mobile-only" href="{{ route('customer.dashboard') }}">My Dashboard</a>
-                    @endif
-                    <form class="nav-mobile-only" method="post" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="nav-mobile-action">Log out</button>
-                    </form>
-                @else
-                    <a class="nav-mobile-only" href="{{ route('login') }}">Sign In</a>
-                    <a class="nav-mobile-only" href="{{ route('register') }}">Register</a>
-                @endauth
-            </nav>
-            <div class="header-right">
-                @auth
-                    <div class="account-wrap" id="accountWrap">
-                        <button type="button" class="account-toggle" id="accountToggle" aria-haspopup="true" aria-expanded="false">
-                            <span>Hi, {{ strtok(auth()->user()->name, ' ') }}</span>
-                            <span class="account-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                        </button>
-                        <div class="account-menu" id="accountMenu">
-                            @if(auth()->user()->isDashboardAdmin())
-                                @if(auth()->user()->canAccess('dashboard'))
-                                    <a href="{{ route('dashboard') }}">Admin Dashboard</a>
-                                @endif
-                            @else
-                                <a href="{{ route('customer.dashboard') }}">My Dashboard</a>
-                            @endif
-                            <a href="#fleet-section">Our Fleet</a>
-                            <a href="#contact-section">Contact Us</a>
-                            <form method="post" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="danger">Log out</button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    <a class="header-auth-link" href="{{ route('login') }}">Sign In</a>
-                @endauth
-            </div>
-        </div>
-    </header>
 
     <main>
         @if(session('success'))
@@ -1794,169 +1138,351 @@
 
         <section id="home-section" class="section-anchor home-hero">
             <div class="container">
-                <div class="hero-banner">
-                    <img src="{{ asset('images/home.png') }}" alt="R&A Auto Rentals home hero image" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='2rem';this.style.background='#0b1f3a';">
-                    <div class="hero-overlay">
-                        <h1>Your Journey Starts Here</h1>
-                        <p>Flexible and reliable rental solutions tailored to Sri Lankan travel needs, from city rides to airport and hospital trips.</p>
-                        <form class="hero-search" id="availabilityForm" action="{{ route('fleet.index') }}" method="get" novalidate>
-                            <div class="search-field">
-                                <label for="start_location">Pickup Location</label>
-                                <input id="start_location" name="start_location" type="text" placeholder="Pickup location" required aria-describedby="start_location_error">
-                                <small class="field-error" id="start_location_error"></small>
-                            </div>
-                            <div class="search-field date-field">
-                                <label for="start_date">Start Date</label>
-                                <input id="start_date" name="start_date" type="date" required aria-describedby="start_date_error">
-                                <small class="field-error" id="start_date_error"></small>
-                            </div>
-                            <div class="search-field date-field">
-                                <label for="end_date">End Date</label>
-                                <input id="end_date" name="end_date" type="date" required aria-describedby="end_date_error">
-                                <small class="field-error" id="end_date_error"></small>
-                            </div>
-                            <div class="search-field">
-                                <label aria-hidden="true" style="visibility:hidden;">Search</label>
-                                <button class="search-submit btn" type="submit" id="availabilitySubmitBtn" data-loading-text="Checking...">
-                                    <span class="btn-spinner" aria-hidden="true"></span>
-                                    <span class="btn-label">Find Vehicle</span>
-                                </button>
-                                <small class="field-error">&nbsp;</small>
-                            </div>
-                        </form>
-                    </div>
+                <div class="hero-plain">
+                    <span class="hero-kicker">✓ Trusted Car &amp; Van Rentals in Sri Lanka</span>
+                    <h1>Explore Sri Lanka <span class="accent">Your Journey, Our Responsibility.</span></h1>
+                    <p>Tell us where you're going, how many are travelling, and when. We'll help you choose the right vehicle for your journey.</p>
                 </div>
+                <form class="hero-search" action="{{ route('rent-requests.create') }}" method="get">
+                    <div class="hero-search-grid">
+                        <div class="hero-field">
+                            <label for="hero_pickup">📍 Pickup Point</label>
+                            <input id="hero_pickup" name="start_location" type="text" placeholder="Where are you starting?">
+                        </div>
+                        <div class="hero-field">
+                            <label for="hero_destination">🧭 Places to Visit</label>
+                            <input id="hero_destination" name="destination" type="text" placeholder="Where do you want to go?">
+                        </div>
+                        <div class="hero-field">
+                            <label for="hero_window">📅 How Many Days</label>
+                            <select id="hero_window" name="window">
+                                <option value="" selected disabled>Select your trip duration</option>
+                                <option value="Airport transfer only">Just an Airport Transfer</option>
+                                <option value="3-4 days (short trip)">3 - 4 Days (Short Trip)</option>
+                                <option value="5-7 days (see more of the island)">5 - 7 Days (See More of the Island)</option>
+                                <option value="8-10 days (longer trip)">8 - 10 Days (Longer Trip)</option>
+                                <option value="11+ days (full island trip)">11+ Days (Full Island Trip)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="hero-stops">
+                        <div class="hero-stops-head">
+                            <label for="heroAddStopBtn">🧳 Add Stops on the Way <span class="optional">(optional)</span></label>
+                            <button type="button" class="hero-add-stop-btn" id="heroAddStopBtn">+ Add Another Stop</button>
+                        </div>
+                        <div id="heroStopsList"></div>
+                    </div>
+                    <div class="hero-search-actions">
+                        <div class="hero-search-note">
+                            <span><strong>✓</strong> Flexible Trip Plans</span>
+                            <span>&middot;</span>
+                            <span><strong>✓</strong> Suitable Vehicle Options</span>
+                            <span>&middot;</span>
+                            <span><strong>✓</strong> Quick WhatsApp Support</span>
+                        </div>
+                        <div class="hero-search-buttons">
+                            <a class="btn btn-whatsapp" href="https://wa.me/94775998951" target="_blank" rel="noopener noreferrer">💬 Chat on WhatsApp</a>
+                            <button class="btn btn-primary" type="submit">🧭 Plan Your Trip</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </section>
 
         <section class="trust-strip" aria-label="Key advantages">
             <div class="trust-grid">
-                <div class="trust-item"><span class="dot">24</span>24/7 Support</div>
-                <div class="trust-item"><span class="dot">Rs</span>No Hidden Fees</div>
-                <div class="trust-item"><span class="dot">✓</span>Free Cancellation</div>
+                <div class="trust-item reveal">
+                    <span class="dot">🕐</span>
+                    <span class="trust-item-text">
+                        <span class="trust-item-title">24/7 Support</span>
+                        <span class="trust-item-sub">We are here to help anytime</span>
+                    </span>
+                </div>
+                <div class="trust-item reveal">
+                    <span class="dot">Rs</span>
+                    <span class="trust-item-text">
+                        <span class="trust-item-title">No Hidden Fees</span>
+                        <span class="trust-item-sub">Clear prices, no surprises</span>
+                    </span>
+                </div>
+                <div class="trust-item reveal">
+                    <span class="dot">✓</span>
+                    <span class="trust-item-text">
+                        <span class="trust-item-title">Free Cancellation</span>
+                        <span class="trust-item-sub">Change your plans with no cost</span>
+                    </span>
+                </div>
             </div>
         </section>
 
         <section id="payments-section" class="section section-anchor home-services">
             <div class="container">
-                <h2>Our Premium Services</h2>
-                <p class="head-note">Experience world-class transportation tailored for Sri Lankan daily, airport, family, and event travel.</p>
+                <h2>Our Services</h2>
+                <p class="head-note">Simple vehicle solutions for your trips, family journeys, airport transfers and special occasions across Sri Lanka.</p>
                 <div class="service-grid-modern">
-                    <article class="service-card-modern">
-                        <span class="service-icon-modern">₨</span>
-                        <h3>Monthly Savings</h3>
-                        <p>Best rates for long-term rentals with cost-effective monthly packages and predictable pricing.</p>
+                    <article class="service-card-modern reveal">
+                        <span class="service-icon-modern">🚗</span>
+                        <h3>Trip Rentals</h3>
+                        <p>Choose a vehicle that fits your trip, group size and budget.</p>
                     </article>
-                    <article class="service-card-modern">
+                    <article class="service-card-modern reveal">
                         <span class="service-icon-modern">✈</span>
                         <h3>Airport Transfers</h3>
-                        <p>Fast airport pickups and drop-offs with reliable scheduling and professional trip handling.</p>
+                        <p>Convenient airport pickup and drop-off with a comfortable ride.</p>
                     </article>
-                    <article class="service-card-modern">
+                    <article class="service-card-modern reveal">
                         <span class="service-icon-modern">👨‍👩‍👧</span>
-                        <h3>Family Travel</h3>
-                        <p>Spacious vehicles and practical safety-focused options for family rides across the island.</p>
+                        <h3>Family &amp; Group Travel</h3>
+                        <p>Comfortable vehicle options for family trips and group journeys.</p>
                     </article>
-                    <article class="service-card-modern">
+                    <article class="service-card-modern reveal">
                         <span class="service-icon-modern">★</span>
                         <h3>Special Events</h3>
-                        <p>Clean, premium fleet support for weddings, VIP travel, and business events in Sri Lanka.</p>
+                        <p>Vehicle options for weddings, events and special occasions.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="fleet-section" class="section section-anchor modern-fleet">
+        <section id="routes-section" class="section section-anchor">
             <div class="container">
-                <div class="modern-fleet-head">
-                    <h2>Featured Fleet</h2>
-                    <a class="fleet-head-link" href="{{ route('fleet.index') }}">See More</a>
+                <div class="journeys-head">
+                    <div>
+                        <p class="head-note" style="margin-bottom:.2rem;font-weight:800;color:var(--primary-2);text-transform:uppercase;font-size:.76rem;letter-spacing:.06em;">Trip Ideas</p>
+                        <h2>Popular Sri Lanka Trips</h2>
+                        <p class="head-note">Planning a trip? Choose a route or customise it your way.</p>
+                    </div>
+                    <a class="journeys-head-link" href="{{ route('rent-requests.create') }}">Plan Your Own Trip &rarr;</a>
                 </div>
-                <p class="head-note">Choose from our diverse range of high-performance and family-friendly vehicles.</p>
-                <div class="showcase-grid">
-                    @forelse($featuredCars as $car)
-                        <article class="showcase-card" data-card-link="{{ route('fleet.show', $car['id']) }}" tabindex="0" role="link" aria-label="View details for {{ $car['name'] }}">
-                            <div class="showcase-photo">
-                                <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}">
-                                <span class="showcase-photo-badge">{{ $car['segment'] }}</span>
-                            </div>
-                            <div class="showcase-body">
-                                <div class="showcase-topline">
-                                    <h3 class="showcase-title">{{ $car['name'] }}</h3>
-                                    <div class="showcase-rate">Rs {{ number_format($car['daily_rate'], 0) }} <small>/day</small></div>
+                <div class="carousel" id="journeysCarousel">
+                <div class="carousel-track">
+                    <article class="journey-card carousel-slide">
+                        <div class="journey-media">
+                            <img src="{{ asset('images/journeys/southern-coast.jpg') }}" alt="Aerial view of Sri Lanka's southern coast road along the beach">
+                            <span class="journey-media-badge">South Coast</span>
+                        </div>
+                        <div class="journey-body">
+                            <h3 class="journey-title">South Coast Escape</h3>
+                            <div class="journey-route">Galle &rarr; Mirissa &rarr; Yala</div>
+                            <p class="journey-desc">Beaches, wildlife and beautiful coastal roads.</p>
+                            <div class="journey-footer">
+                                <div class="journey-price-note">
+                                    <span class="journey-price-label">Price</span>
+                                    <span class="journey-price-value">Ask Us for a Price</span>
                                 </div>
-                                <p class="showcase-info-row">
-                                    <span>Vehicle No: {{ $car['plate_no'] ?: '-' }}</span>
-                                    <span>Reg Year: {{ $car['year'] ?: '-' }}</span>
-                                </p>
-                                <div class="showcase-spec-grid">
-                                    <span class="showcase-spec-item spec-seats">{{ $car['seats'] }}</span>
-                                    <span class="showcase-spec-item spec-bags">{{ $car['bags'] }}</span>
-                                    <span class="showcase-spec-item spec-transmission">{{ $car['transmission'] }}</span>
-                                </div>
-                                <div class="showcase-actions">
-                                    <a class="showcase-details" href="{{ route('fleet.show', $car['id']) }}">Details</a>
-                                    <a class="showcase-book" href="{{ route('fleet.show', $car['id']) }}">Book Now</a>
-                                </div>
+                                <a class="journey-cta" href="{{ route('rent-requests.create', ['start_location' => 'Galle', 'destination' => 'Yala', 'note' => 'South Coast Escape route: Galle, Mirissa, Yala']) }}">Plan This Trip</a>
                             </div>
-                        </article>
-                    @empty
-                        <article class="showcase-card" style="grid-column:1 / -1;">
-                            <div class="showcase-body">
-                                <h3 class="showcase-title" style="margin:0;">No vehicles found.</h3>
+                        </div>
+                    </article>
+                    <article class="journey-card carousel-slide">
+                        <div class="journey-media">
+                            <img src="{{ asset('images/journeys/tea-hills.jpg') }}" alt="Tea plantation hills in Nuwara Eliya, Sri Lanka">
+                            <span class="journey-media-badge">Hill Country</span>
+                        </div>
+                        <div class="journey-body">
+                            <h3 class="journey-title">Hill Country Journey</h3>
+                            <div class="journey-route">Galle &rarr; Kandy &rarr; Nuwara Eliya &rarr; Ella</div>
+                            <p class="journey-desc">Mountains, waterfalls, tea estates and scenic roads.</p>
+                            <div class="journey-footer">
+                                <div class="journey-price-note">
+                                    <span class="journey-price-label">Price</span>
+                                    <span class="journey-price-value">Ask Us for a Price</span>
+                                </div>
+                                <a class="journey-cta" href="{{ route('rent-requests.create', ['start_location' => 'Galle', 'destination' => 'Ella', 'note' => 'Hill Country Journey route: Galle, Kandy, Nuwara Eliya, Ella']) }}">Plan This Trip</a>
                             </div>
-                        </article>
-                    @endforelse
+                        </div>
+                    </article>
+                    <article class="journey-card carousel-slide">
+                        <div class="journey-media">
+                            <img src="{{ asset('images/journeys/cultural-triangle.jpg') }}" alt="Golden Buddha statue at Dambulla Cave Temple, Sri Lanka">
+                            <span class="journey-media-badge">Cultural Triangle</span>
+                        </div>
+                        <div class="journey-body">
+                            <h3 class="journey-title">Cultural Triangle Discovery</h3>
+                            <div class="journey-route">Galle &rarr; Dambulla &rarr; Sigiriya &rarr; Anuradhapura</div>
+                            <p class="journey-desc">Ancient cities, cave temples and iconic rock fortresses steeped in history.</p>
+                            <div class="journey-footer">
+                                <div class="journey-price-note">
+                                    <span class="journey-price-label">Price</span>
+                                    <span class="journey-price-value">Ask Us for a Price</span>
+                                </div>
+                                <a class="journey-cta" href="{{ route('rent-requests.create', ['start_location' => 'Galle', 'destination' => 'Anuradhapura', 'note' => 'Cultural Triangle Discovery route: Galle, Dambulla, Sigiriya, Anuradhapura']) }}">Plan This Trip</a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="journey-card carousel-slide">
+                        <div class="journey-media">
+                            <img src="{{ asset('images/journeys/airport-transfer.jpg') }}" alt="Aerial view of an expressway interchange">
+                            <span class="journey-media-badge">Direct &middot; Fast</span>
+                        </div>
+                        <div class="journey-body">
+                            <h3 class="journey-title">Airport Transfer</h3>
+                            <div class="journey-route">Galle &rarr; Colombo &rarr; Bandaranaike International Airport</div>
+                            <p class="journey-desc">Easy pickup and drop-off with a comfortable ride.</p>
+                            <div class="journey-footer">
+                                <div class="journey-price-note">
+                                    <span class="journey-price-label">Price</span>
+                                    <span class="journey-price-value">Ask Us for a Price</span>
+                                </div>
+                                <a class="journey-cta" href="{{ route('rent-requests.create', ['start_location' => 'Galle', 'destination' => 'Bandaranaike International Airport', 'note' => 'Airport Transfer route: Galle, Colombo, Bandaranaike International Airport']) }}">Book Transfer</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <button type="button" class="carousel-arrow prev" aria-label="Previous journey">&lsaquo;</button>
+                <button type="button" class="carousel-arrow next" aria-label="Next journey">&rsaquo;</button>
+                <div class="carousel-dots"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works-section" class="section section-anchor how-it-works">
+            <div class="container">
+                <p class="head-note" style="margin-bottom:.2rem;font-weight:800;color:var(--primary-2);text-transform:uppercase;font-size:.76rem;letter-spacing:.06em;">Simple Steps</p>
+                <h2>How It Works</h2>
+                <p class="head-note">Tell us about your trip. We will find the right vehicle and driver for you &mdash; no guesswork.</p>
+                <div class="steps-grid">
+                    <article class="step-card reveal">
+                        <span class="step-number">1</span>
+                        <h3>Tell Us Your Trip</h3>
+                        <p>Share your pickup point, destinations, dates and number of passengers.</p>
+                    </article>
+                    <article class="step-card is-featured reveal">
+                        <span class="step-number">2</span>
+                        <h3>We Find the Right Vehicle</h3>
+                        <p>We'll recommend a vehicle that suits your trip and group.</p>
+                    </article>
+                    <article class="step-card reveal">
+                        <span class="step-number">3</span>
+                        <h3>Confirm &amp; Go</h3>
+                        <p>Confirm your booking and get ready for your journey.</p>
+                    </article>
+                </div>
+                <div class="how-it-works-cta">
+                    <a class="btn btn-primary" href="{{ route('rent-requests.create') }}">Plan My Trip</a>
+                    <p class="how-it-works-cta-note">Want to look around first? <a href="{{ route('fleet.index') }}">See our vehicles</a>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fleet-section" class="section section-anchor our-fleet">
+            <div class="container">
+                <p class="head-note" style="margin-bottom:.2rem;font-weight:800;color:var(--primary-2);text-transform:uppercase;font-size:.76rem;letter-spacing:.06em;">Well Maintained</p>
+                <h2>Find the Right Vehicle for Your Trip</h2>
+                <p class="head-note">From small groups to family trips, we'll help you choose a vehicle that fits your journey.</p>
+                <div class="vehicle-type-grid">
+                    <article class="vehicle-type-card reveal">
+                        <span class="vehicle-type-icon">🚗</span>
+                        <h3>Cars</h3>
+                        <p>Perfect for couples and small groups.</p>
+                    </article>
+                    <article class="vehicle-type-card reveal">
+                        <span class="vehicle-type-icon">🚐</span>
+                        <h3>Vans</h3>
+                        <p>Comfortable for families and medium-sized groups.</p>
+                    </article>
+                    <article class="vehicle-type-card reveal">
+                        <span class="vehicle-type-icon">🚌</span>
+                        <h3>Large Vans</h3>
+                        <p>More space for bigger groups and longer journeys.</p>
+                    </article>
+                </div>
+                <div class="how-it-works-cta">
+                    <a class="btn btn-primary" href="{{ route('fleet.index') }}">View Vehicles</a>
                 </div>
             </div>
         </section>
 
         <section id="contact-section" class="section section-anchor">
             <div class="container">
-                <h2>Find Us & Contact Support</h2>
-                <p class="head-note">Send your request for booking help, pricing questions, or service support. Our team will respond quickly.</p>
-                <div class="contact-card">
+                <div class="contact-card reveal">
                     <div class="contact-lines">
-                        <div>
-                            <strong>Main Office</strong>
-                            Galle, Sri Lanka
+                        <p class="head-note" style="margin-bottom:.2rem;font-weight:800;color:var(--primary-2);text-transform:uppercase;font-size:.76rem;letter-spacing:.06em;">Contact Us</p>
+                        <h2 style="margin-top:0;">Planning a Trip? Let's Talk.</h2>
+                        <p class="head-note" style="margin-bottom:1.4rem;">Tell us your destination, travel dates and number of passengers. We'll help you find a suitable vehicle and plan your journey.</p>
+                        <div class="contact-info-item">
+                            <span class="contact-info-icon">📍</span>
+                            <span class="contact-info-text">
+                                <span class="contact-info-label">Main Office</span>
+                                <span class="contact-info-value">Galle, Sri Lanka</span>
+                            </span>
                         </div>
-                        <div>
-                            <strong>Phone</strong>
-                            +94 77 717 3264
+                        <div class="contact-info-item">
+                            <span class="contact-info-icon">📞</span>
+                            <span class="contact-info-text">
+                                <span class="contact-info-label">Hotline / WhatsApp</span>
+                                <span class="contact-info-value"><a href="tel:+94775998951">077 599 8951</a></span>
+                            </span>
                         </div>
-                        <div>
-                            <strong>Email</strong>
-                            info@rnaautorentals.com.lk
+                        <div class="contact-info-item">
+                            <span class="contact-info-icon">✉️</span>
+                            <span class="contact-info-text">
+                                <span class="contact-info-label">Email</span>
+                                <span class="contact-info-value"><a href="mailto:info@rnaautorentals.com.lk">info@rnaautorentals.com.lk</a></span>
+                            </span>
                         </div>
-                        <div>
-                            <strong>Working Hours</strong>
-                            Monday - Sunday, 7.00 AM - 9.00 PM
+                        <div class="contact-info-item">
+                            <span class="contact-info-icon">🕐</span>
+                            <span class="contact-info-text">
+                                <span class="contact-info-label">Working Hours</span>
+                                <span class="contact-info-value">Monday - Sunday, 7.00 AM - 9.00 PM</span>
+                            </span>
                         </div>
+                        <a class="whatsapp-cta-box" href="https://wa.me/94775998951" target="_blank" rel="noopener noreferrer">
+                            <span class="whatsapp-cta-left">
+                                <span class="whatsapp-cta-icon">💬</span>
+                                <span>
+                                    <span class="whatsapp-cta-title">Chat with Us on WhatsApp</span><br>
+                                    <span class="whatsapp-cta-sub">We reply fast</span>
+                                </span>
+                            </span>
+                            <span class="whatsapp-cta-arrow">&rarr;</span>
+                        </a>
                     </div>
                     <div class="contact-form">
-                        <h3 class="contact-form-title">Contact Support Form</h3>
+                        <h3 class="contact-form-title">Request a Trip Quote</h3>
+                        <p class="contact-form-sub">Tell us about your trip and we'll get back to you with suitable vehicle options.</p>
                         <form action="{{ route('support-requests.store') }}" method="post">
                             @csrf
                             <div class="contact-grid">
                                 <div class="contact-field">
-                                    <label for="contactName">Name</label>
-                                    <input id="contactName" type="text" name="name" value="{{ old('name') }}" placeholder="Your name" required>
+                                    <label for="contactName">Full Name <span class="required">*</span></label>
+                                    <input id="contactName" type="text" name="name" value="{{ old('name') }}" placeholder="e.g. Maya Miller" required>
                                 </div>
                                 <div class="contact-field">
-                                    <label for="contactPhone">Phone</label>
-                                    <input id="contactPhone" type="text" name="phone" value="{{ old('phone') }}" placeholder="+94 ...">
+                                    <label for="contactPhone">Phone / WhatsApp <span class="required">*</span></label>
+                                    <input id="contactPhone" type="text" name="phone" value="{{ old('phone') }}" placeholder="+94 77 123 4567" required>
+                                </div>
+                                <div class="contact-field">
+                                    <label for="contactTravelDate">Travel Date</label>
+                                    <input id="contactTravelDate" type="date" name="travel_date" value="{{ old('travel_date') }}">
+                                </div>
+                                <div class="contact-field">
+                                    <label for="contactPassengers">Number of Passengers</label>
+                                    <input id="contactPassengers" type="number" min="1" name="passenger_count" value="{{ old('passenger_count') }}" placeholder="e.g. 4">
+                                </div>
+                                <div class="contact-field">
+                                    <label for="contactPickup">Pickup Location</label>
+                                    <input id="contactPickup" type="text" name="pickup_location" value="{{ old('pickup_location') }}" placeholder="e.g. Colombo Airport">
+                                </div>
+                                <div class="contact-field">
+                                    <label for="contactDestination">Destinations / Route</label>
+                                    <input id="contactDestination" type="text" name="destination" value="{{ old('destination') }}" placeholder="e.g. Galle, Mirissa, Yala">
                                 </div>
                                 <div class="contact-field full">
-                                    <label for="contactEmail">Email</label>
-                                    <input id="contactEmail" type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com">
-                                </div>
-                                <div class="contact-field full">
-                                    <label for="contactMessage">Message</label>
-                                    <textarea id="contactMessage" name="message" placeholder="Tell us your rental need (daily, monthly, airport, medical)." required>{{ old('message') }}</textarea>
+                                    <label for="contactVehicle">Preferred Vehicle</label>
+                                    <select id="contactVehicle" name="vehicle_type">
+                                        <option value="">Not sure &mdash; recommend one</option>
+                                        <option value="Car">Car</option>
+                                        <option value="Van">Van</option>
+                                        <option value="Large Van">Large Van</option>
+                                    </select>
                                 </div>
                             </div>
-                            <button type="submit" class="contact-submit">Send Message</button>
+                            <div class="contact-submit-row">
+                                <span class="contact-submit-note">🔒 Your details are kept private and are only used to contact you about your request.</span>
+                                <button type="submit" class="contact-submit">Get My Quote</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1968,192 +1494,188 @@
 
     <script>
         (function () {
-            const toggle = document.getElementById('menuToggle');
-            if (toggle) {
-                toggle.addEventListener('click', function () {
-                    const open = document.body.classList.toggle('nav-open');
-                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-                });
-            }
-
-            const accountWrap = document.getElementById('accountWrap');
-            const accountToggle = document.getElementById('accountToggle');
-            if (accountWrap && accountToggle) {
-                accountToggle.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const isOpen = accountWrap.classList.toggle('account-open');
-                    accountToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                });
-
-                document.addEventListener('click', function (event) {
-                    if (!accountWrap.contains(event.target)) {
-                        accountWrap.classList.remove('account-open');
-                        accountToggle.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            }
-
-            const form = document.getElementById('availabilityForm');
-            if (!form) {
+            const stopsList = document.getElementById('heroStopsList');
+            const addStopBtn = document.getElementById('heroAddStopBtn');
+            if (!stopsList || !addStopBtn) {
                 return;
             }
 
-            const pickupInput = document.getElementById('start_location');
-            const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
-            const availabilitySubmitBtn = document.getElementById('availabilitySubmitBtn');
-            const pickupError = document.getElementById('start_location_error');
-            const startDateError = document.getElementById('start_date_error');
-            const endDateError = document.getElementById('end_date_error');
-            let hasTriedSubmit = false;
-
-            const setLoadingState = (button) => {
-                if (!button) return;
-                const label = button.querySelector('.btn-label');
-                const loadingText = button.dataset.loadingText || 'Loading...';
-                if (label) {
-                    label.dataset.originalText = label.textContent;
-                    label.textContent = loadingText;
-                }
-                button.classList.add('is-loading');
-                button.disabled = true;
+            const renumberStops = () => {
+                stopsList.querySelectorAll('.hero-stop-badge').forEach((badge, index) => {
+                    badge.textContent = String(index + 1);
+                });
             };
 
-            const clearLoadingState = (button) => {
-                if (!button) return;
-                const label = button.querySelector('.btn-label');
-                if (label && label.dataset.originalText) {
-                    label.textContent = label.dataset.originalText;
-                }
-                button.classList.remove('is-loading');
-                button.disabled = false;
-            };
+            const addStopRow = (value) => {
+                const row = document.createElement('div');
+                row.className = 'hero-stop-row';
 
-            const resetAvailabilitySubmitState = () => {
-                clearLoadingState(availabilitySubmitBtn);
-            };
+                const badge = document.createElement('span');
+                badge.className = 'hero-stop-badge';
+                badge.textContent = '1';
 
-            const showError = (input, errorEl, message) => {
-                input.classList.add('input-error');
-                errorEl.textContent = message;
-                errorEl.classList.add('show');
-            };
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'stops[]';
+                input.placeholder = 'e.g. Kandy';
+                input.value = value || '';
 
-            const clearError = (input, errorEl) => {
-                input.classList.remove('input-error');
-                errorEl.textContent = '';
-                errorEl.classList.remove('show');
-            };
-
-            const syncEndDateMin = () => {
-                if (!startDateInput.value) {
-                    endDateInput.min = '';
-                    return;
-                }
-
-                endDateInput.min = startDateInput.value;
-                if (endDateInput.value && endDateInput.value < startDateInput.value) {
-                    endDateInput.value = '';
-                }
-            };
-
-            const setTodayMin = () => {
-                const today = new Date();
-                const y = today.getFullYear();
-                const m = String(today.getMonth() + 1).padStart(2, '0');
-                const d = String(today.getDate()).padStart(2, '0');
-                const isoToday = `${y}-${m}-${d}`;
-                startDateInput.min = isoToday;
-                if (!endDateInput.min || endDateInput.min < isoToday) {
-                    endDateInput.min = isoToday;
-                }
-            };
-
-            const validateAvailabilityForm = (focusFirstInvalid = true) => {
-                let isValid = true;
-                let firstInvalidInput = null;
-
-                clearError(pickupInput, pickupError);
-                clearError(startDateInput, startDateError);
-                clearError(endDateInput, endDateError);
-
-                if (!pickupInput.value.trim()) {
-                    showError(pickupInput, pickupError, 'Please enter pickup location.');
-                    firstInvalidInput = firstInvalidInput || pickupInput;
-                    isValid = false;
-                }
-
-                if (!startDateInput.value) {
-                    showError(startDateInput, startDateError, 'Please select a start date.');
-                    firstInvalidInput = firstInvalidInput || startDateInput;
-                    isValid = false;
-                }
-
-                if (!endDateInput.value) {
-                    showError(endDateInput, endDateError, 'Please select an end date.');
-                    firstInvalidInput = firstInvalidInput || endDateInput;
-                    isValid = false;
-                }
-
-                if (startDateInput.value && endDateInput.value && endDateInput.value < startDateInput.value) {
-                    showError(endDateInput, endDateError, 'End date must be on or after start date.');
-                    firstInvalidInput = firstInvalidInput || endDateInput;
-                    isValid = false;
-                }
-
-                if (!isValid && firstInvalidInput && focusFirstInvalid) {
-                    firstInvalidInput.focus();
-                }
-
-                return isValid;
-            };
-
-            form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                hasTriedSubmit = true;
-
-                if (!validateAvailabilityForm()) {
-                    clearLoadingState(availabilitySubmitBtn);
-                    return;
-                }
-
-                setLoadingState(availabilitySubmitBtn);
-
-                const params = new URLSearchParams({
-                    start_location: pickupInput.value.trim(),
-                    start_date: startDateInput.value,
-                    end_date: endDateInput.value,
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'hero-stop-remove';
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    row.remove();
+                    renumberStops();
                 });
 
-                const targetUrl = `${form.action}?${params.toString()}`;
-                setTimeout(() => {
-                    if (document.visibilityState === 'visible') {
-                        resetAvailabilitySubmitState();
-                    }
-                }, 5000);
-                window.location.assign(targetUrl);
-            });
+                row.appendChild(badge);
+                row.appendChild(input);
+                row.appendChild(removeBtn);
+                stopsList.appendChild(row);
+                renumberStops();
+            };
 
-            [pickupInput, startDateInput, endDateInput].forEach((input) => {
-                const handleFieldChange = () => {
-                    if (input === startDateInput) {
-                        syncEndDateMin();
+            addStopBtn.addEventListener('click', () => addStopRow());
+        })();
+
+        (function () {
+            const revealEls = document.querySelectorAll('.reveal');
+            if (!revealEls.length) {
+                return;
+            }
+
+            if (!('IntersectionObserver' in window)) {
+                revealEls.forEach((el) => el.classList.add('is-visible'));
+                return;
+            }
+
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        io.unobserve(entry.target);
                     }
-                    if (input === endDateInput && startDateInput.value && endDateInput.value < startDateInput.value) {
-                        endDateInput.value = '';
-                    }
-                    if (!hasTriedSubmit) return;
-                    validateAvailabilityForm(false);
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            revealEls.forEach((el) => io.observe(el));
+        })();
+
+        (function () {
+            const AUTOPLAY_DELAY = 7500;
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const initCarousel = (root) => {
+                const track = root.querySelector('.carousel-track');
+                const slides = track ? Array.from(track.children) : [];
+                if (!track || slides.length < 2) {
+                    return;
+                }
+
+                const prevBtn = root.querySelector('.carousel-arrow.prev');
+                const nextBtn = root.querySelector('.carousel-arrow.next');
+                const dotsWrap = root.querySelector('.carousel-dots');
+
+                if (dotsWrap) {
+                    slides.forEach((_, index) => {
+                        const dot = document.createElement('button');
+                        dot.type = 'button';
+                        dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+                        dot.setAttribute('aria-label', 'Go to slide ' + (index + 1));
+                        dot.addEventListener('click', () => {
+                            slides[index].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+                            resetAutoplay();
+                        });
+                        dotsWrap.appendChild(dot);
+                    });
+                }
+
+                const dots = dotsWrap ? Array.from(dotsWrap.children) : [];
+
+                const updateActiveDot = () => {
+                    if (!dots.length) return;
+                    const trackLeft = track.getBoundingClientRect().left;
+                    let closestIndex = 0;
+                    let closestDistance = Infinity;
+                    slides.forEach((slide, index) => {
+                        const distance = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestIndex = index;
+                        }
+                    });
+                    dots.forEach((dot, index) => dot.classList.toggle('active', index === closestIndex));
                 };
-                input.addEventListener('input', handleFieldChange);
-                input.addEventListener('change', handleFieldChange);
-            });
 
-            setTodayMin();
-            syncEndDateMin();
-            window.addEventListener('pageshow', resetAvailabilitySubmitState);
-            window.addEventListener('focus', resetAvailabilitySubmitState);
+                let scrollTimer = null;
+                track.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(updateActiveDot, 100);
+                });
+
+                const scrollNext = () => {
+                    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+                    if (atEnd) {
+                        track.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        track.scrollBy({ left: track.clientWidth * 0.9, behavior: 'smooth' });
+                    }
+                };
+
+                prevBtn?.addEventListener('click', () => {
+                    track.scrollBy({ left: -track.clientWidth * 0.9, behavior: 'smooth' });
+                    resetAutoplay();
+                });
+                nextBtn?.addEventListener('click', () => {
+                    scrollNext();
+                    resetAutoplay();
+                });
+
+                let autoplayTimer = null;
+                let autoplayAllowed = false;
+
+                function startAutoplay() {
+                    if (prefersReducedMotion || !autoplayAllowed || autoplayTimer) return;
+                    autoplayTimer = setInterval(scrollNext, AUTOPLAY_DELAY);
+                }
+
+                function stopAutoplay() {
+                    clearInterval(autoplayTimer);
+                    autoplayTimer = null;
+                }
+
+                function resetAutoplay() {
+                    stopAutoplay();
+                    startAutoplay();
+                }
+
+                root.addEventListener('mouseenter', stopAutoplay);
+                root.addEventListener('mouseleave', startAutoplay);
+                root.addEventListener('touchstart', stopAutoplay, { passive: true });
+                root.addEventListener('touchend', () => setTimeout(startAutoplay, AUTOPLAY_DELAY));
+
+                if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+                    const visibilityObserver = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            autoplayAllowed = entry.isIntersecting;
+                            if (autoplayAllowed) {
+                                startAutoplay();
+                            } else {
+                                stopAutoplay();
+                            }
+                        });
+                    }, { threshold: 0.4 });
+                    visibilityObserver.observe(root);
+                } else if (!prefersReducedMotion) {
+                    autoplayAllowed = true;
+                    startAutoplay();
+                }
+
+                updateActiveDot();
+            };
+
+            document.querySelectorAll('.carousel').forEach(initCarousel);
         })();
     </script>
 </body>

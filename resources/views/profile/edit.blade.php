@@ -193,8 +193,8 @@
             <tr>
               <td data-label="Booking">#{{ $trip->id }}</td>
               <td data-label="Vehicle">
-                {{ $trip->car?->name ?: '-' }}<br>
-                <span class="text-muted">{{ $trip->car?->plate_no ?: '-' }}</span>
+                {{ $trip->vehicle?->name ?: '-' }}<br>
+                <span class="text-muted">{{ $trip->vehicle?->plate_no ?: '-' }}</span>
               </td>
               <td data-label="Dates">
                 {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}<br>

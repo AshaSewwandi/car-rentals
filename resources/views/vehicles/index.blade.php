@@ -1,26 +1,26 @@
 @extends('layouts.app')
-@section('title', 'Car Details')
+@section('title', 'Vehicle Details')
 
 @section('content')
 <style>
-  .car-summary-meta {
+  .vehicle-summary-meta {
     display: flex;
     flex-wrap: wrap;
     gap: .4rem;
   }
 
-  .car-summary-meta .badge {
+  .vehicle-summary-meta .badge {
     font-weight: 600;
   }
 
-  .car-actions {
+  .vehicle-actions {
     display: flex;
     flex-wrap: wrap;
     gap: .5rem;
     align-items: flex-start;
   }
 
-  .car-actions-admin {
+  .vehicle-actions-admin {
     display: flex;
     flex-wrap: wrap;
     gap: .5rem;
@@ -31,30 +31,30 @@
   }
 
   @media (max-width: 920px) {
-    .car-actions,
-    .car-actions-admin {
+    .vehicle-actions,
+    .vehicle-actions-admin {
       width: 100%;
     }
 
-    .car-actions {
+    .vehicle-actions {
       display: grid;
       grid-template-columns: 1fr;
       gap: .5rem;
     }
 
-    .car-actions-admin {
+    .vehicle-actions-admin {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: .5rem;
     }
 
-    .car-actions .btn,
-    .car-actions-admin .btn,
-    .car-actions-admin form {
+    .vehicle-actions .btn,
+    .vehicle-actions-admin .btn,
+    .vehicle-actions-admin form {
       width: 100%;
     }
 
-    .car-actions-admin form .btn {
+    .vehicle-actions-admin form .btn {
       height: 100%;
     }
 
@@ -161,7 +161,7 @@
 </style>
 <div class="page-toolbar">
   <div class="mb-3">
-    <h4 class="mb-1">Cars</h4>
+    <h4 class="mb-1">Vehicles</h4>
     <div class="text-muted">{{ auth()->user()->canManageData() ? 'Manage fleet information, tracker details, and current rental status.' : 'View only the vehicles assigned to your partner account.' }}</div>
   </div>
 </div>
@@ -180,80 +180,86 @@
 @endif
 <div class="card list-card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <span class="header-title">Car List</span>
+    <span class="header-title">Vehicle List</span>
     @if(auth()->user()->canManageData())
-      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCarModal">Add Car Details</button>
+      <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addVehicleModal">Add Vehicle Details</button>
     @endif
   </div>
   <div class="card-body p-3">
-    @forelse($cars as $car)
+    @forelse($vehicles as $vehicle)
       <div class="card record-card mb-3">
         <div class="card-body">
           <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
-              <h6 class="mb-1">{{ $car->name }}</h6>
-              <div class="car-summary-meta">
-                <span class="badge text-bg-light">{{ $car->plate_no }}</span>
-                <span class="badge {{ $car->status === 'rented' ? 'text-bg-warning' : 'text-bg-success' }}">
-                  {{ ucfirst($car->status) }}
+              <h6 class="mb-1">{{ $vehicle->name }}</h6>
+              <div class="vehicle-summary-meta">
+                <span class="badge text-bg-light">{{ $vehicle->plate_no }}</span>
+                <span class="badge {{ $vehicle->status === 'rented' ? 'text-bg-warning' : 'text-bg-success' }}">
+                  {{ ucfirst($vehicle->status) }}
                 </span>
-                @if($car->partner)
-                  <span class="badge text-bg-primary">Partner: {{ $car->partner->name }}</span>
+                @if($vehicle->partner)
+                  <span class="badge text-bg-primary">Partner: {{ $vehicle->partner->name }}</span>
                 @endif
-                @if($car->make || $car->model)
-                  <span class="badge text-bg-light">{{ trim(($car->make ?? '').' '.($car->model ?? '')) }}</span>
+                @if($vehicle->make || $vehicle->model)
+                  <span class="badge text-bg-light">{{ trim(($vehicle->make ?? '').' '.($vehicle->model ?? '')) }}</span>
                 @endif
-                @if($car->year)
-                  <span class="badge text-bg-light">{{ $car->year }}</span>
+                @if($vehicle->year)
+                  <span class="badge text-bg-light">{{ $vehicle->year }}</span>
                 @endif
                 <span class="badge text-bg-light">
-                  @if(($car->driver_mode ?? 'both') === 'with_driver_only')
+                  @if(($vehicle->driver_mode ?? 'both') === 'with_driver_only')
                     With driver only
-                  @elseif(($car->driver_mode ?? 'both') === 'without_driver_only')
+                  @elseif(($vehicle->driver_mode ?? 'both') === 'without_driver_only')
                     Without driver only
                   @else
                     With / Without driver
                   @endif
                 </span>
-                <span class="badge {{ $car->allow_long_term ? 'text-bg-info' : 'text-bg-secondary' }}">
-                  {{ $car->allow_long_term ? 'Long-term enabled' : 'No long-term' }}
+                <span class="badge {{ $vehicle->allow_long_term ? 'text-bg-info' : 'text-bg-secondary' }}">
+                  {{ $vehicle->allow_long_term ? 'Long-term enabled' : 'No long-term' }}
                 </span>
-                @if($car->dagps_device_id)
-                  <span class="badge text-bg-light">DAGPS: {{ $car->dagps_device_id }}</span>
+                <span class="badge {{ $vehicle->available_for_hire ? 'text-bg-info' : 'text-bg-secondary' }}">
+                  {{ $vehicle->available_for_hire ? 'Hire enabled' : 'Not for hire' }}
+                </span>
+                <span class="badge {{ $vehicle->available_for_rent ? 'text-bg-info' : 'text-bg-secondary' }}">
+                  {{ $vehicle->available_for_rent ? 'Rent enabled' : 'Not for rent' }}
+                </span>
+                @if($vehicle->dagps_device_id)
+                  <span class="badge text-bg-light">DAGPS: {{ $vehicle->dagps_device_id }}</span>
                 @endif
               </div>
-              @if($car->note)
-                <div class="small text-muted mt-2">Note: {{ $car->note }}</div>
+              @if($vehicle->note)
+                <div class="small text-muted mt-2">Note: {{ $vehicle->note }}</div>
               @endif
-              @if($car->images->isNotEmpty())
-                <div class="small text-muted mt-1">{{ $car->images->count() }} image(s) uploaded</div>
+              @if($vehicle->images->isNotEmpty())
+                <div class="small text-muted mt-1">{{ $vehicle->images->count() }} image(s) uploaded</div>
               @endif
-              @if($car->maintenance_last_service_date || $car->maintenance_next_service_date || $car->tracker_maintenance_mileage)
+              @if($vehicle->maintenance_last_service_date || $vehicle->maintenance_next_service_date || $vehicle->tracker_maintenance_mileage)
                 <div class="small text-muted mt-2">
                   Maintenance:
-                  @if($car->maintenance_last_service_date)
-                    Last service {{ $car->maintenance_last_service_date->format('Y-m-d') }}
+                  @if($vehicle->maintenance_last_service_date)
+                    Last service {{ $vehicle->maintenance_last_service_date->format('Y-m-d') }}
                   @endif
-                  @if($car->maintenance_next_service_date)
-                    | Next service {{ $car->maintenance_next_service_date->format('Y-m-d') }}
+                  @if($vehicle->maintenance_next_service_date)
+                    | Next service {{ $vehicle->maintenance_next_service_date->format('Y-m-d') }}
                   @endif
-                  @if($car->tracker_maintenance_mileage)
-                    | Interval {{ number_format($car->tracker_maintenance_mileage) }} km
+                  @if($vehicle->tracker_maintenance_mileage)
+                    | Interval {{ number_format($vehicle->tracker_maintenance_mileage) }} km
                   @endif
                 </div>
               @endif
             </div>
 
-            <div class="car-actions">
-              <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#viewCarModal{{ $car->id }}">
+            <div class="vehicle-actions">
+              <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#viewVehicleModal{{ $vehicle->id }}">
                 See more details
               </button>
             @if(auth()->user()->canManageData())
-              <div class="car-actions-admin">
-                <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editCarModal{{ $car->id }}">
+              <div class="vehicle-actions-admin">
+                <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="modal" data-bs-target="#editVehicleModal{{ $vehicle->id }}">
                   Edit details
                 </button>
-                <form method="post" action="{{ route('cars.destroy', $car) }}" onsubmit="return confirm('Delete this car?');">
+                <form method="post" action="{{ route('vehicles.destroy', $vehicle) }}" onsubmit="return confirm('Delete this vehicle?');">
                   @csrf
                   @method('DELETE')
                   <button class="btn btn-sm btn-outline-danger">Delete</button>
@@ -264,14 +270,14 @@
           </div>
 
           @if(auth()->user()->canManageData())
-            <div class="modal fade" id="editCarModal{{ $car->id }}" tabindex="-1" aria-labelledby="editCarModalLabel{{ $car->id }}" aria-hidden="true">
+            <div class="modal fade" id="editVehicleModal{{ $vehicle->id }}" tabindex="-1" aria-labelledby="editVehicleModalLabel{{ $vehicle->id }}" aria-hidden="true">
               <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="editCarModalLabel{{ $car->id }}">Edit {{ $car->name }}</h5>
+                    <h5 class="modal-title" id="editVehicleModalLabel{{ $vehicle->id }}">Edit {{ $vehicle->name }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                  <form method="post" action="{{ route('cars.update', $car) }}" enctype="multipart/form-data">
+                  <form method="post" action="{{ route('vehicles.update', $vehicle) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -279,17 +285,17 @@
               <div class="row g-2">
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Display Name</label>
-                  <input type="text" name="name" class="form-control form-control-sm" value="{{ $car->name }}" required>
+                  <input type="text" name="name" class="form-control form-control-sm" value="{{ $vehicle->name }}" required>
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Plate Number</label>
-                  <input type="text" name="plate_no" class="form-control form-control-sm" value="{{ $car->plate_no }}" required>
+                  <input type="text" name="plate_no" class="form-control form-control-sm" value="{{ $vehicle->plate_no }}" required>
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Status</label>
                   <select name="status" class="form-select form-select-sm" required>
-                    <option value="available" @selected($car->status === 'available')>Available</option>
-                    <option value="rented" @selected($car->status === 'rented')>Rented</option>
+                    <option value="available" @selected($vehicle->status === 'available')>Available</option>
+                    <option value="rented" @selected($vehicle->status === 'rented')>Rented</option>
                   </select>
                 </div>
                 <div class="col-12 col-lg-4">
@@ -297,7 +303,7 @@
                   <select name="partner_user_id" class="form-select form-select-sm">
                     <option value="">No partner</option>
                     @foreach($partners as $partner)
-                      <option value="{{ $partner->id }}" @selected((int) $car->partner_user_id === (int) $partner->id)>{{ $partner->name }}</option>
+                      <option value="{{ $partner->id }}" @selected((int) $vehicle->partner_user_id === (int) $partner->id)>{{ $partner->name }}</option>
                     @endforeach
                   </select>
                 </div>
@@ -306,64 +312,78 @@
               <div class="row g-2 mt-1">
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">Make</label>
-                  <input type="text" name="make" class="form-control form-control-sm" value="{{ $car->make }}">
+                  <input type="text" name="make" class="form-control form-control-sm" value="{{ $vehicle->make }}">
                 </div>
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">Model</label>
-                  <input type="text" name="model" class="form-control form-control-sm" value="{{ $car->model }}">
+                  <input type="text" name="model" class="form-control form-control-sm" value="{{ $vehicle->model }}">
                 </div>
                 <div class="col-12 col-lg-2">
                   <label class="form-label small mb-1">Year</label>
-                  <input type="number" name="year" min="1990" class="form-control form-control-sm" value="{{ $car->year }}">
+                  <input type="number" name="year" min="1990" class="form-control form-control-sm" value="{{ $vehicle->year }}">
                 </div>
                 <div class="col-12 col-lg-2">
                   <label class="form-label small mb-1">Color</label>
-                  <input type="text" name="color" class="form-control form-control-sm" value="{{ $car->color }}">
+                  <input type="text" name="color" class="form-control form-control-sm" value="{{ $vehicle->color }}">
                 </div>
                 <div class="col-12 col-lg-2">
                   <label class="form-label small mb-1">Fuel</label>
-                  <input type="text" name="fuel_type" class="form-control form-control-sm" value="{{ $car->fuel_type }}">
+                  <input type="text" name="fuel_type" class="form-control form-control-sm" value="{{ $vehicle->fuel_type }}">
                 </div>
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">Transmission</label>
-                  <input type="text" name="transmission" class="form-control form-control-sm" value="{{ $car->transmission }}">
+                  <input type="text" name="transmission" class="form-control form-control-sm" value="{{ $vehicle->transmission }}">
                 </div>
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">Driver Mode</label>
                   <select name="driver_mode" class="form-select form-select-sm" required>
-                    <option value="both" @selected(($car->driver_mode ?? 'both') === 'both')>With or Without Driver</option>
-                    <option value="with_driver_only" @selected(($car->driver_mode ?? 'both') === 'with_driver_only')>With Driver Only</option>
-                    <option value="without_driver_only" @selected(($car->driver_mode ?? 'both') === 'without_driver_only')>Without Driver Only</option>
+                    <option value="both" @selected(($vehicle->driver_mode ?? 'both') === 'both')>With or Without Driver</option>
+                    <option value="with_driver_only" @selected(($vehicle->driver_mode ?? 'both') === 'with_driver_only')>With Driver Only</option>
+                    <option value="without_driver_only" @selected(($vehicle->driver_mode ?? 'both') === 'without_driver_only')>Without Driver Only</option>
                   </select>
                 </div>
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">Long-Term Rental</label>
                   <select name="allow_long_term" class="form-select form-select-sm" required>
-                    <option value="1" @selected($car->allow_long_term)>Yes</option>
-                    <option value="0" @selected(!$car->allow_long_term)>No</option>
+                    <option value="1" @selected($vehicle->allow_long_term)>Yes</option>
+                    <option value="0" @selected(!$vehicle->allow_long_term)>No</option>
+                  </select>
+                </div>
+                <div class="col-12 col-lg-3">
+                  <label class="form-label small mb-1">Available for Hire</label>
+                  <select name="available_for_hire" class="form-select form-select-sm" required>
+                    <option value="1" @selected($vehicle->available_for_hire)>Yes</option>
+                    <option value="0" @selected(!$vehicle->available_for_hire)>No</option>
+                  </select>
+                </div>
+                <div class="col-12 col-lg-3">
+                  <label class="form-label small mb-1">Available for Rent</label>
+                  <select name="available_for_rent" class="form-select form-select-sm" required>
+                    <option value="1" @selected($vehicle->available_for_rent)>Yes</option>
+                    <option value="0" @selected(!$vehicle->available_for_rent)>No</option>
                   </select>
                 </div>
                 <div class="col-12 col-lg-3">
                   <label class="form-label small mb-1">DAGPS Device ID</label>
-                  <input type="text" name="dagps_device_id" class="form-control form-control-sm" value="{{ $car->dagps_device_id }}">
+                  <input type="text" name="dagps_device_id" class="form-control form-control-sm" value="{{ $vehicle->dagps_device_id }}">
                 </div>
                 <div class="col-12 col-lg-6">
                   <label class="form-label small mb-1">Note</label>
-                  <input type="text" name="note" class="form-control form-control-sm" value="{{ $car->note }}">
+                  <input type="text" name="note" class="form-control form-control-sm" value="{{ $vehicle->note }}">
                 </div>
                 <div class="col-12">
                   <label class="form-label small mb-1">Add Vehicle Images</label>
                   <input type="file" name="images[]" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png,.webp,image/*">
                   <div class="form-text">You can upload multiple images. Supported: JPG, PNG, WEBP (max 4MB each).</div>
                 </div>
-                @if($car->images->isNotEmpty())
+                @if($vehicle->images->isNotEmpty())
                   <div class="col-12">
                     <label class="form-label small mb-1">Remove Existing Images</label>
                     <div class="d-flex flex-wrap gap-3">
-                      @foreach($car->images as $image)
+                      @foreach($vehicle->images as $image)
                         <label class="d-flex align-items-center gap-2 border rounded p-2">
                           <input type="checkbox" name="remove_image_ids[]" value="{{ $image->id }}">
-                          <img src="{{ asset($image->path) }}" alt="Car image {{ $loop->iteration }}" style="width:72px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #dbe6f3;">
+                          <img src="{{ asset($image->path) }}" alt="Vehicle image {{ $loop->iteration }}" style="width:72px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #dbe6f3;">
                         </label>
                       @endforeach
                     </div>
@@ -377,47 +397,47 @@
               <div class="row g-2">
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Device Name</label>
-                  <input type="text" name="tracker_device_name" class="form-control form-control-sm" value="{{ $car->tracker_device_name }}">
+                  <input type="text" name="tracker_device_name" class="form-control form-control-sm" value="{{ $vehicle->tracker_device_name }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Device Type</label>
-                  <input type="text" name="tracker_device_type" class="form-control form-control-sm" value="{{ $car->tracker_device_type }}">
+                  <input type="text" name="tracker_device_type" class="form-control form-control-sm" value="{{ $vehicle->tracker_device_type }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">IMEI</label>
-                  <input type="text" name="tracker_imei" class="form-control form-control-sm" value="{{ $car->tracker_imei }}">
+                  <input type="text" name="tracker_imei" class="form-control form-control-sm" value="{{ $vehicle->tracker_imei }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">SIM</label>
-                  <input type="text" name="tracker_sim" class="form-control form-control-sm" value="{{ $car->tracker_sim }}">
+                  <input type="text" name="tracker_sim" class="form-control form-control-sm" value="{{ $vehicle->tracker_sim }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">ICCID</label>
-                  <input type="text" name="tracker_iccid" class="form-control form-control-sm" value="{{ $car->tracker_iccid }}">
+                  <input type="text" name="tracker_iccid" class="form-control form-control-sm" value="{{ $vehicle->tracker_iccid }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Contact Name</label>
-                  <input type="text" name="tracker_contact_name" class="form-control form-control-sm" value="{{ $car->tracker_contact_name }}">
+                  <input type="text" name="tracker_contact_name" class="form-control form-control-sm" value="{{ $vehicle->tracker_contact_name }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Contact Number</label>
-                  <input type="text" name="tracker_contact_number" class="form-control form-control-sm" value="{{ $car->tracker_contact_number }}">
+                  <input type="text" name="tracker_contact_number" class="form-control form-control-sm" value="{{ $vehicle->tracker_contact_number }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Activation Date</label>
-                  <input type="datetime-local" name="tracker_activation_date" class="form-control form-control-sm" value="{{ optional($car->tracker_activation_date)->format('Y-m-d\\TH:i') }}">
+                  <input type="datetime-local" name="tracker_activation_date" class="form-control form-control-sm" value="{{ optional($vehicle->tracker_activation_date)->format('Y-m-d\\TH:i') }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Expiry Time</label>
-                  <input type="text" name="tracker_expiry_time" class="form-control form-control-sm" value="{{ $car->tracker_expiry_time }}">
+                  <input type="text" name="tracker_expiry_time" class="form-control form-control-sm" value="{{ $vehicle->tracker_expiry_time }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Insurance Expires</label>
-                  <input type="date" name="tracker_insurance_expires" class="form-control form-control-sm" value="{{ optional($car->tracker_insurance_expires)->format('Y-m-d') }}">
+                  <input type="date" name="tracker_insurance_expires" class="form-control form-control-sm" value="{{ optional($vehicle->tracker_insurance_expires)->format('Y-m-d') }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">License Expires</label>
-                  <input type="date" name="tracker_license_expires" class="form-control form-control-sm" value="{{ optional($car->tracker_license_expires)->format('Y-m-d') }}">
+                  <input type="date" name="tracker_license_expires" class="form-control form-control-sm" value="{{ optional($vehicle->tracker_license_expires)->format('Y-m-d') }}">
                 </div>
               </div>
 
@@ -427,23 +447,23 @@
               <div class="row g-2">
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Service Interval (KM)</label>
-                  <input type="number" min="0" name="tracker_maintenance_mileage" class="form-control form-control-sm" value="{{ $car->tracker_maintenance_mileage }}">
+                  <input type="number" min="0" name="tracker_maintenance_mileage" class="form-control form-control-sm" value="{{ $vehicle->tracker_maintenance_mileage }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Last Service Date</label>
-                  <input type="date" name="maintenance_last_service_date" class="form-control form-control-sm" value="{{ optional($car->maintenance_last_service_date)->format('Y-m-d') }}">
+                  <input type="date" name="maintenance_last_service_date" class="form-control form-control-sm" value="{{ optional($vehicle->maintenance_last_service_date)->format('Y-m-d') }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Last Service Mileage</label>
-                  <input type="number" min="0" name="maintenance_last_service_mileage" class="form-control form-control-sm" value="{{ $car->maintenance_last_service_mileage }}">
+                  <input type="number" min="0" name="maintenance_last_service_mileage" class="form-control form-control-sm" value="{{ $vehicle->maintenance_last_service_mileage }}">
                 </div>
                 <div class="col-12 col-lg-4">
                   <label class="form-label small mb-1">Next Service Date</label>
-                  <input type="date" name="maintenance_next_service_date" class="form-control form-control-sm" value="{{ optional($car->maintenance_next_service_date)->format('Y-m-d') }}">
+                  <input type="date" name="maintenance_next_service_date" class="form-control form-control-sm" value="{{ optional($vehicle->maintenance_next_service_date)->format('Y-m-d') }}">
                 </div>
                 <div class="col-12">
                   <label class="form-label small mb-1">Maintenance Notes</label>
-                  <textarea name="maintenance_note" class="form-control form-control-sm" rows="2">{{ $car->maintenance_note }}</textarea>
+                  <textarea name="maintenance_note" class="form-control form-control-sm" rows="2">{{ $vehicle->maintenance_note }}</textarea>
                 </div>
               </div>
 
@@ -460,20 +480,20 @@
         </div>
       </div>
 
-      <div class="modal fade" id="viewCarModal{{ $car->id }}" tabindex="-1" aria-labelledby="viewCarModalLabel{{ $car->id }}" aria-hidden="true">
+      <div class="modal fade" id="viewVehicleModal{{ $vehicle->id }}" tabindex="-1" aria-labelledby="viewVehicleModalLabel{{ $vehicle->id }}" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="viewCarModalLabel{{ $car->id }}">{{ $car->name }} Details</h5>
+              <h5 class="modal-title" id="viewVehicleModalLabel{{ $vehicle->id }}">{{ $vehicle->name }} Details</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              @if($car->images->isNotEmpty())
+              @if($vehicle->images->isNotEmpty())
                 <div class="mb-3">
                   <div class="small text-muted mb-2">Vehicle Images</div>
                   <div class="d-flex flex-wrap gap-2">
-                    @foreach($car->images as $image)
-                      <img src="{{ asset($image->path) }}" alt="{{ $car->name }} image {{ $loop->iteration }}" style="width:140px;height:96px;object-fit:cover;border-radius:8px;border:1px solid #dbe6f3;">
+                    @foreach($vehicle->images as $image)
+                      <img src="{{ asset($image->path) }}" alt="{{ $vehicle->name }} image {{ $loop->iteration }}" style="width:140px;height:96px;object-fit:cover;border-radius:8px;border:1px solid #dbe6f3;">
                     @endforeach
                   </div>
                 </div>
@@ -481,50 +501,50 @@
               <div class="row g-3">
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Plate Number</div>
-                  <div>{{ $car->plate_no }}</div>
+                  <div>{{ $vehicle->plate_no }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Status</div>
-                  <div>{{ ucfirst($car->status) }}</div>
+                  <div>{{ ucfirst($vehicle->status) }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Partner</div>
-                  <div>{{ $car->partner?->name ?: 'No partner assigned' }}</div>
+                  <div>{{ $vehicle->partner?->name ?: 'No partner assigned' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">DAGPS Device ID</div>
-                  <div>{{ $car->dagps_device_id ?: '-' }}</div>
+                  <div>{{ $vehicle->dagps_device_id ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-3">
                   <div class="small text-muted">Make</div>
-                  <div>{{ $car->make ?: '-' }}</div>
+                  <div>{{ $vehicle->make ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-3">
                   <div class="small text-muted">Model</div>
-                  <div>{{ $car->model ?: '-' }}</div>
+                  <div>{{ $vehicle->model ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-3">
                   <div class="small text-muted">Year</div>
-                  <div>{{ $car->year ?: '-' }}</div>
+                  <div>{{ $vehicle->year ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-3">
                   <div class="small text-muted">Color</div>
-                  <div>{{ $car->color ?: '-' }}</div>
+                  <div>{{ $vehicle->color ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Fuel Type</div>
-                  <div>{{ $car->fuel_type ?: '-' }}</div>
+                  <div>{{ $vehicle->fuel_type ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Transmission</div>
-                  <div>{{ $car->transmission ?: '-' }}</div>
+                  <div>{{ $vehicle->transmission ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Driver Mode</div>
                   <div>
-                    @if(($car->driver_mode ?? 'both') === 'with_driver_only')
+                    @if(($vehicle->driver_mode ?? 'both') === 'with_driver_only')
                       With driver only
-                    @elseif(($car->driver_mode ?? 'both') === 'without_driver_only')
+                    @elseif(($vehicle->driver_mode ?? 'both') === 'without_driver_only')
                       Without driver only
                     @else
                       With or without driver
@@ -533,7 +553,15 @@
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Long-Term Rental</div>
-                  <div>{{ $car->allow_long_term ? 'Enabled' : 'Not allowed' }}</div>
+                  <div>{{ $vehicle->allow_long_term ? 'Enabled' : 'Not allowed' }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="small text-muted">Available for Hire</div>
+                  <div>{{ $vehicle->available_for_hire ? 'Yes' : 'No' }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="small text-muted">Available for Rent</div>
+                  <div>{{ $vehicle->available_for_rent ? 'Yes' : 'No' }}</div>
                 </div>
               </div>
 
@@ -542,47 +570,47 @@
               <div class="row g-3">
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Device Name</div>
-                  <div>{{ $car->tracker_device_name ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_device_name ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Device Type</div>
-                  <div>{{ $car->tracker_device_type ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_device_type ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">IMEI</div>
-                  <div>{{ $car->tracker_imei ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_imei ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">SIM</div>
-                  <div>{{ $car->tracker_sim ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_sim ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">ICCID</div>
-                  <div>{{ $car->tracker_iccid ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_iccid ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Contact Name</div>
-                  <div>{{ $car->tracker_contact_name ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_contact_name ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Contact Number</div>
-                  <div>{{ $car->tracker_contact_number ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_contact_number ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Activation Date</div>
-                  <div>{{ optional($car->tracker_activation_date)->format('Y-m-d H:i') ?: '-' }}</div>
+                  <div>{{ optional($vehicle->tracker_activation_date)->format('Y-m-d H:i') ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Expiry Time</div>
-                  <div>{{ $car->tracker_expiry_time ?: '-' }}</div>
+                  <div>{{ $vehicle->tracker_expiry_time ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Insurance Expires</div>
-                  <div>{{ optional($car->tracker_insurance_expires)->format('Y-m-d') ?: '-' }}</div>
+                  <div>{{ optional($vehicle->tracker_insurance_expires)->format('Y-m-d') ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">License Expires</div>
-                  <div>{{ optional($car->tracker_license_expires)->format('Y-m-d') ?: '-' }}</div>
+                  <div>{{ optional($vehicle->tracker_license_expires)->format('Y-m-d') ?: '-' }}</div>
                 </div>
               </div>
 
@@ -591,27 +619,27 @@
               <div class="row g-3">
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Service Interval (KM)</div>
-                  <div>{{ $car->tracker_maintenance_mileage ? number_format($car->tracker_maintenance_mileage) . ' km' : '-' }}</div>
+                  <div>{{ $vehicle->tracker_maintenance_mileage ? number_format($vehicle->tracker_maintenance_mileage) . ' km' : '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Last Service Date</div>
-                  <div>{{ optional($car->maintenance_last_service_date)->format('Y-m-d') ?: '-' }}</div>
+                  <div>{{ optional($vehicle->maintenance_last_service_date)->format('Y-m-d') ?: '-' }}</div>
                 </div>
                 <div class="col-12 col-md-4">
                   <div class="small text-muted">Last Service Mileage</div>
-                  <div>{{ $car->maintenance_last_service_mileage ? number_format($car->maintenance_last_service_mileage) . ' km' : '-' }}</div>
+                  <div>{{ $vehicle->maintenance_last_service_mileage ? number_format($vehicle->maintenance_last_service_mileage) . ' km' : '-' }}</div>
                 </div>
                 <div class="col-12 col-md-6">
                   <div class="small text-muted">Next Service Date</div>
-                  <div>{{ optional($car->maintenance_next_service_date)->format('Y-m-d') ?: '-' }}</div>
+                  <div>{{ optional($vehicle->maintenance_next_service_date)->format('Y-m-d') ?: '-' }}</div>
                 </div>
                 <div class="col-12">
                   <div class="small text-muted">Maintenance Notes</div>
-                  <div>{{ $car->maintenance_note ?: '-' }}</div>
+                  <div>{{ $vehicle->maintenance_note ?: '-' }}</div>
                 </div>
                 <div class="col-12">
                   <div class="small text-muted">General Note</div>
-                  <div>{{ $car->note ?: '-' }}</div>
+                  <div>{{ $vehicle->note ?: '-' }}</div>
                 </div>
               </div>
             </div>
@@ -622,7 +650,7 @@
         </div>
       </div>
     @empty
-      <div class="text-center p-4 text-muted">{{ auth()->user()->canManageData() ? 'No cars yet. Add your first car.' : 'No vehicles are assigned to your partner account yet.' }}</div>
+      <div class="text-center p-4 text-muted">{{ auth()->user()->canManageData() ? 'No vehicles yet. Add your first vehicle.' : 'No vehicles are assigned to your partner account yet.' }}</div>
     @endforelse
   </div>
 </div>
@@ -680,14 +708,14 @@
 @endif
 
 @if(auth()->user()->canManageData())
-  <div class="modal fade" id="addCarModal" tabindex="-1" aria-labelledby="addCarModalLabel" aria-hidden="true">
+  <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addCarModalLabel">Add Car Details</h5>
+          <h5 class="modal-title" id="addVehicleModalLabel">Add Vehicle Details</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form method="post" action="{{ route('cars.store') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('vehicles.store') }}" enctype="multipart/form-data">
           @csrf
           <div class="modal-body">
           <div class="mb-2">
@@ -738,6 +766,22 @@
               <option value="1" @selected(old('allow_long_term', '1') === '1')>Yes</option>
               <option value="0" @selected(old('allow_long_term') === '0')>No</option>
             </select>
+          </div>
+          <div class="row g-2 mt-0">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Available for Hire</label>
+              <select name="available_for_hire" class="form-select" required>
+                <option value="1" @selected(old('available_for_hire', '1') === '1')>Yes</option>
+                <option value="0" @selected(old('available_for_hire') === '0')>No</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Available for Rent</label>
+              <select name="available_for_rent" class="form-select" required>
+                <option value="1" @selected(old('available_for_rent', '1') === '1')>Yes</option>
+                <option value="0" @selected(old('available_for_rent') === '0')>No</option>
+              </select>
+            </div>
           </div>
           <div class="mb-2 mt-2">
             <label class="form-label">Partner</label>
@@ -855,7 +899,7 @@
         </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
-            <button class="btn btn-dark">Save Car</button>
+            <button class="btn btn-dark">Save Vehicle</button>
           </div>
         </form>
       </div>

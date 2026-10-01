@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Expense extends Model
 {
-    protected $fillable = ['car_id','date','type','amount','note'];
+    protected $fillable = ['vehicle_id','date','type','amount','note'];
 
     protected $casts = ['date' => 'date'];
 
-    public function car(): BelongsTo { return $this->belongsTo(Car::class); }
+    public function vehicle(): BelongsTo { return $this->belongsTo(Vehicle::class); }
 }
 

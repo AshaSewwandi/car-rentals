@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Car;
 use App\Models\Expense;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -12,23 +12,23 @@ class ExpenseController extends Controller
     {
         $month = $request->get('month', now()->format('Y-m'));
 
-        $cars = Car::query()->orderBy('name')->get();
+        $vehicles = Vehicle::query()->orderBy('name')->get();
 
         $expenses = Expense::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])
             ->orderByDesc('date')
             ->get();
 
         $total = (float) $expenses->sum('amount');
 
-        return view('expenses.index', compact('cars', 'expenses', 'month', 'total'));
+        return view('expenses.index', compact('vehicles', 'expenses', 'month', 'total'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'date' => ['required', 'date'],
             'type' => ['required', 'in:service,repair,insurance,license,tyre,other'],
             'amount' => ['required', 'numeric', 'min:0'],
@@ -43,7 +43,7 @@ class ExpenseController extends Controller
     public function update(Request $request, Expense $expense)
     {
         $data = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'date' => ['required', 'date'],
             'type' => ['required', 'in:service,repair,insurance,license,tyre,other'],
             'amount' => ['required', 'numeric', 'min:0'],

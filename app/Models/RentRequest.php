@@ -8,13 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RentRequest extends Model
 {
     protected $fillable = [
-        'car_id',
-        'car_name',
+        'vehicle_id',
+        'vehicle_name',
         'plate_no',
         'name',
         'phone',
         'email',
+        'passenger_count',
         'start_location',
+        'final_destination',
+        'stops',
         'start_date',
         'end_date',
         'message',
@@ -27,11 +30,12 @@ class RentRequest extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'accepted_at' => 'datetime',
+        'stops' => 'array',
     ];
 
-    public function car(): BelongsTo
+    public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Vehicle::class);
     }
 
     public function acceptedBy(): BelongsTo

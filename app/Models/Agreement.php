@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Agreement extends Model
 {
     protected $fillable = [
-        'car_id',
+        'vehicle_id',
         'customer_id',
         'agreement_no',
         'start_date',
@@ -25,9 +25,9 @@ class Agreement extends Model
         'end_date' => 'date',
     ];
 
-    public function car(): BelongsTo
+    public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Vehicle::class);
     }
 
     public function customer(): BelongsTo

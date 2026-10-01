@@ -8,6 +8,20 @@
         'description' => 'Professional patient drop-off and non-emergency medical transport with safe, compassionate, and punctual service.',
         'keywords' => ['medical transport', 'patient drop off', 'dialysis transport', 'wheelchair transfer', 'non emergency transport'],
     ])
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => collect($faqItems)->map(fn ($item) => [
+            '@type' => 'Question',
+            'name' => $item['question'],
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => $item['answer'],
+            ],
+        ])->all(),
+    ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=space-grotesk:500,600,700|plus-jakarta-sans:400,500,600,700,800" rel="stylesheet" />
     <style>

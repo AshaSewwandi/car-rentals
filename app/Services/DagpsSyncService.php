@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Car;
+use App\Models\Vehicle;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -52,7 +52,7 @@ class DagpsSyncService
 
         $userIds = $this->extractUserIds($usersPayload);
         if (count($userIds) === 0) {
-            return ['devices_seen' => 0, 'cars_updated' => 0];
+            return ['devices_seen' => 0, 'vehicles_updated' => 0];
         }
 
         $records = [];
@@ -76,12 +76,12 @@ class DagpsSyncService
 
         $updated = 0;
         foreach ($records as $record) {
-            $car = $this->matchCar($record);
-            if (!$car) {
+            $vehicle = $this->matchVehicle($record);
+            if (!$vehicle) {
                 continue;
             }
 
-            $car->update([
+            $vehicle->update([
                 'latest_latitude' => $record['latitude'],
                 'latest_longitude' => $record['longitude'],
                 'latest_speed' => $record['speed'],
@@ -90,7 +90,7 @@ class DagpsSyncService
             $updated++;
         }
 
-        return ['devices_seen' => count($records), 'cars_updated' => $updated];
+        return ['devices_seen' => count($records), 'vehicles_updated' => $updated];
     }
 
     private function parseDashboardUrl(string $url): array
@@ -199,31 +199,31 @@ class DagpsSyncService
         return $records;
     }
 
-    private function matchCar(array $record): ?Car
+    private function matchVehicle(array $record): ?Vehicle
     {
         if (!empty($record['imei'])) {
-            $car = Car::query()->where('tracker_imei', $record['imei'])->first();
-            if ($car) {
-                return $car;
+            $vehicle = Vehicle::query()->where('tracker_imei', $record['imei'])->first();
+            if ($vehicle) {
+                return $vehicle;
             }
         }
 
         if (!empty($record['dagps_device_id'])) {
-            $car = Car::query()->where('dagps_device_id', $record['dagps_device_id'])->first();
-            if ($car) {
-                return $car;
+            $vehicle = Vehicle::query()->where('dagps_device_id', $record['dagps_device_id'])->first();
+            if ($vehicle) {
+                return $vehicle;
             }
         }
 
         if (!empty($record['device_name'])) {
-            $car = Car::query()->where('tracker_device_name', $record['device_name'])->first();
-            if ($car) {
-                return $car;
+            $vehicle = Vehicle::query()->where('tracker_device_name', $record['device_name'])->first();
+            if ($vehicle) {
+                return $vehicle;
             }
         }
 
         if (!empty($record['plate_no'])) {
-            return Car::query()->where('plate_no', $record['plate_no'])->first();
+            return Vehicle::query()->where('plate_no', $record['plate_no'])->first();
         }
 
         return null;

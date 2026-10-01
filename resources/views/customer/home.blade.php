@@ -291,12 +291,12 @@
             @foreach($activeTrips as $trip)
               <article class="order">
                 <div class="order-head">
-                  <strong>#{{ $trip->id }} - {{ $trip->car?->name ?: 'Vehicle' }}</strong>
+                  <strong>#{{ $trip->id }} - {{ $trip->vehicle?->name ?: 'Vehicle' }}</strong>
                   <span class="pill">{{ ucfirst($trip->status) }}</span>
                 </div>
                 <div class="muted">
                   {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}
-                  | {{ $trip->car?->plate_no ?: '-' }}
+                  | {{ $trip->vehicle?->plate_no ?: '-' }}
                   | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
                 </div>
                 <div style="margin-top:.6rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
@@ -325,12 +325,12 @@
             @foreach($completedTrips as $trip)
               <article class="order">
                 <div class="order-head">
-                  <strong>#{{ $trip->id }} - {{ $trip->car?->name ?: 'Vehicle' }}</strong>
+                  <strong>#{{ $trip->id }} - {{ $trip->vehicle?->name ?: 'Vehicle' }}</strong>
                   <span class="pill" style="color:#166534;background:#ecfdf3;border-color:#bbf7d0;">Completed</span>
                 </div>
                 <div class="muted">
                   {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}
-                  | {{ $trip->car?->plate_no ?: '-' }}
+                  | {{ $trip->vehicle?->plate_no ?: '-' }}
                   | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
                 </div>
                 <div style="margin-top:.6rem;">
@@ -351,12 +351,12 @@
             @foreach($canceledTrips as $trip)
               <article class="order">
                 <div class="order-head">
-                  <strong>#{{ $trip->id }} - {{ $trip->car?->name ?: 'Vehicle' }}</strong>
+                  <strong>#{{ $trip->id }} - {{ $trip->vehicle?->name ?: 'Vehicle' }}</strong>
                   <span class="pill" style="color:#991b1b;background:#fef2f2;border-color:#fecaca;">Cancelled</span>
                 </div>
                 <div class="muted">
                   {{ $trip->start_date?->format('Y-m-d') }} to {{ $trip->end_date?->format('Y-m-d') }}
-                  | {{ $trip->car?->plate_no ?: '-' }}
+                  | {{ $trip->vehicle?->plate_no ?: '-' }}
                   | LKR {{ number_format((float)($trip->final_total ?? $trip->total_amount), 2) }}
                 </div>
                 <div style="margin-top:.6rem;">

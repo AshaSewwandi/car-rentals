@@ -17,13 +17,13 @@ class PaymentController extends Controller
         $this->syncRentalsFromAgreements();
 
         $payments = Payment::query()
-            ->with(['rental.car','rental.customer'])
+            ->with(['rental.vehicle','rental.customer'])
             ->where('month', $month)
             ->orderBy('due_date')
             ->get();
 
         $rentals = Rental::query()
-            ->with(['car', 'customer'])
+            ->with(['vehicle', 'customer'])
             ->orderByRaw("CASE WHEN status = 'active' THEN 0 ELSE 1 END")
             ->orderByDesc('id')
             ->get();
@@ -156,7 +156,7 @@ class PaymentController extends Controller
 
             Rental::updateOrCreate(
                 [
-                    'car_id' => $agreement->car_id,
+                    'vehicle_id' => $agreement->vehicle_id,
                     'customer_id' => $agreement->customer_id,
                     'start_date' => $startDate,
                 ],

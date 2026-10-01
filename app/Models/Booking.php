@@ -9,7 +9,8 @@ class Booking extends Model
 {
     protected $fillable = [
         'user_id',
-        'car_id',
+        'created_by',
+        'vehicle_id',
         'customer_name',
         'customer_email',
         'customer_phone',
@@ -18,6 +19,7 @@ class Booking extends Model
         'end_date',
         'rental_days',
         'driver_option',
+        'order_type',
         'daily_rate',
         'driver_rate',
         'total_amount',
@@ -74,9 +76,9 @@ class Booking extends Model
         'admin_share_amount' => 'decimal:2',
     ];
 
-    public function car(): BelongsTo
+    public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Vehicle::class);
     }
 
     public function user(): BelongsTo
@@ -87,5 +89,10 @@ class Booking extends Model
     public function returnedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

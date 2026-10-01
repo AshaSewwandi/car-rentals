@@ -6,8 +6,8 @@ use App\Mail\BookingCancelledMail;
 use App\Mail\BookingInvoiceStatusMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking;
-use App\Models\Car;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Support\RevenueShareResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,14 +25,14 @@ class RentalTripController extends Controller
 
         $bookings = $bookingsQuery->paginate(20)->withQueryString();
 
-        $cars = Car::query()
+        $vehicles = Vehicle::query()
             ->orderBy('name')
             ->orderBy('plate_no')
             ->get(['id', 'name', 'plate_no']);
 
         return view('rental-trips.index', [
             'bookings' => $bookings,
-            'cars' => $cars,
+            'vehicles' => $vehicles,
             'filters' => $filters,
         ]);
     }
@@ -44,15 +44,15 @@ class RentalTripController extends Controller
             ->with('returnedBy')
             ->get();
 
-        $selectedCar = null;
-        if (!empty($filters['car_id'])) {
-            $selectedCar = Car::query()->find($filters['car_id']);
+        $selectedVehicle = null;
+        if (!empty($filters['vehicle_id'])) {
+            $selectedVehicle = Vehicle::query()->find($filters['vehicle_id']);
         }
 
         $pdf = Pdf::loadView('rental-trips.report-pdf', [
             'bookings' => $bookings,
             'filters' => $filters,
-            'selectedCar' => $selectedCar,
+            'selectedVehicle' => $selectedVehicle,
             'generatedAt' => now(),
         ])->setPaper('a4', 'landscape');
 
@@ -63,7 +63,7 @@ class RentalTripController extends Controller
     {
         abort_unless($this->canAccessBooking($request->user(), $booking), 403);
 
-        $booking->load(['car', 'returnedBy', 'user']);
+        $booking->load(['vehicle', 'returnedBy', 'user']);
 
         $baseAmount = (float) $booking->total_amount;
         $additionalAmount = (float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0);
@@ -223,7 +223,7 @@ class RentalTripController extends Controller
     private function validatedFilters(Request $request): array
     {
         return $request->validate([
-            'car_id' => ['nullable', 'integer', 'exists:cars,id'],
+            'vehicle_id' => ['nullable', 'integer', 'exists:vehicles,id'],
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
             'status' => ['nullable', 'in:pending,confirmed,completed,cancelled'],
@@ -233,17 +233,17 @@ class RentalTripController extends Controller
     private function buildFilteredBookingsQuery(array $filters, ?User $user)
     {
         $query = Booking::query()
-            ->with('car.partner')
+            ->with('vehicle.partner')
             ->orderByDesc('id');
 
         if ($user && !$user->isDashboardAdmin()) {
-            $query->whereHas('car', function ($carQuery) use ($user) {
-                $carQuery->where('partner_user_id', $user->id);
+            $query->whereHas('vehicle', function ($vehicleQuery) use ($user) {
+                $vehicleQuery->where('partner_user_id', $user->id);
             });
         }
 
-        if (!empty($filters['car_id'])) {
-            $query->where('car_id', (int) $filters['car_id']);
+        if (!empty($filters['vehicle_id'])) {
+            $query->where('vehicle_id', (int) $filters['vehicle_id']);
         }
 
         if (!empty($filters['status'])) {
@@ -276,9 +276,9 @@ class RentalTripController extends Controller
             return true;
         }
 
-        $booking->loadMissing('car');
+        $booking->loadMissing('vehicle');
 
-        return (int) ($booking->car?->partner_user_id ?? 0) === (int) $user->id;
+        return (int) ($booking->vehicle?->partner_user_id ?? 0) === (int) $user->id;
     }
 
     private function parseMileageInput(string $value): ?float
@@ -294,7 +294,7 @@ class RentalTripController extends Controller
     private function sendBookingInvoiceEmailAfterResponse(int $bookingId, string $stage): void
     {
         dispatch(function () use ($bookingId, $stage) {
-            $booking = Booking::query()->with(['car.partner', 'user'])->find($bookingId);
+            $booking = Booking::query()->with(['vehicle.partner', 'user'])->find($bookingId);
             if (!$booking) {
                 return;
             }
@@ -306,7 +306,7 @@ class RentalTripController extends Controller
                 $recipients->push($customerEmail);
             }
 
-            $partnerEmail = (string) ($booking->car?->partner?->email ?: '');
+            $partnerEmail = (string) ($booking->vehicle?->partner?->email ?: '');
             if ($partnerEmail !== '') {
                 $recipients->push($partnerEmail);
             }
@@ -333,7 +333,7 @@ class RentalTripController extends Controller
 
     private function sendCancellationEmails(Booking $booking, string $cancelledBy, string $cancelledRole): void
     {
-        $booking->loadMissing('car.partner');
+        $booking->loadMissing('vehicle.partner');
 
         $recipients = collect();
 
@@ -341,8 +341,8 @@ class RentalTripController extends Controller
             $recipients->push((string) $booking->customer_email);
         }
 
-        if (!empty($booking->car?->partner?->email)) {
-            $recipients->push((string) $booking->car->partner->email);
+        if (!empty($booking->vehicle?->partner?->email)) {
+            $recipients->push((string) $booking->vehicle->partner->email);
         }
 
         User::query()

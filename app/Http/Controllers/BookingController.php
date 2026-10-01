@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Mail\GuestAccountCreatedMail;
 use App\Mail\BookingInvoiceStatusMail;
-use App\Models\Agreement;
 use App\Models\AppSetting;
 use App\Models\Booking;
-use App\Models\Car;
-use App\Models\Rental;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Support\RevenueShareResolver;
+use App\Support\VehicleAvailabilityChecker;
 use App\Support\VehiclePricingResolver;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +26,7 @@ class BookingController extends Controller
     public function create(Request $request): View|RedirectResponse
     {
         $validated = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'start_location' => ['nullable', 'string', 'max:255'],
@@ -36,28 +35,28 @@ class BookingController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $car = Car::query()->visibleOnPublic()->find($validated['car_id']);
-        if (!$car) {
+        $vehicle = Vehicle::query()->visibleOnPublic()->find($validated['vehicle_id']);
+        if (!$vehicle) {
             return redirect()
                 ->route('fleet.index')
-                ->with('error', 'Selected car is not available for booking.');
+                ->with('error', 'Selected vehicle is not available for booking.');
         }
         $startDate = $validated['start_date'];
         $endDate = $validated['end_date'];
 
-        if (!$this->isCarAvailable($car->id, $startDate, $endDate)) {
+        if (!$this->isVehicleAvailable($vehicle->id, $startDate, $endDate)) {
             return redirect()
                 ->route('fleet.index', $validated)
-                ->with('error', 'Selected car is not available in this date range.');
+                ->with('error', 'Selected vehicle is not available in this date range.');
         }
 
         $days = max(1, (int) Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate)) + 1);
-        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
         $dailyRate = $pricing['daily_rate'];
         $driverCostPerDay = $pricing['driver_cost_per_day'];
         $driverTotal = 0;
         $totalAmount = $dailyRate * $days;
-        $driverMode = (string) ($car->driver_mode ?: 'both');
+        $driverMode = (string) ($vehicle->driver_mode ?: 'both');
         $defaultDriverOption = $driverMode === 'with_driver_only' ? 'with_driver' : 'without_driver';
         $prefillNote = trim((string) ($validated['note'] ?? ''));
 
@@ -78,7 +77,7 @@ class BookingController extends Controller
         }
 
         return view('booking.confirm', [
-            'car' => $car,
+            'vehicle' => $vehicle,
             'filters' => $validated,
             'rentalDays' => $days,
             'dailyRate' => $dailyRate,
@@ -89,6 +88,8 @@ class BookingController extends Controller
             'totalAmount' => $totalAmount,
             'driverMode' => $driverMode,
             'defaultDriverOption' => $defaultDriverOption,
+            'availableForHire' => (bool) $vehicle->available_for_hire,
+            'availableForRent' => (bool) $vehicle->available_for_rent,
             'prefillNote' => $prefillNote,
             'paymentDetails' => AppSetting::paymentDetails(),
         ]);
@@ -97,7 +98,7 @@ class BookingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'pickup_location' => ['nullable', 'string', 'max:255'],
@@ -106,17 +107,25 @@ class BookingController extends Controller
             'customer_phone' => ['required', 'string', 'max:40'],
             'payment_method' => ['required', 'in:pay_later_bank,pay_at_pickup_cash'],
             'driver_option' => ['required', 'in:without_driver,with_driver'],
+            'order_type' => ['required', 'in:hire,rent'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $car = Car::query()->visibleOnPublic()->find($validated['car_id']);
-        if (!$car) {
-            return back()->withInput()->with('error', 'Selected car is not available for booking.');
+        $vehicle = Vehicle::query()->visibleOnPublic()->find($validated['vehicle_id']);
+        if (!$vehicle) {
+            return back()->withInput()->with('error', 'Selected vehicle is not available for booking.');
         }
-        $driverMode = (string) ($car->driver_mode ?: 'both');
+        $driverMode = (string) ($vehicle->driver_mode ?: 'both');
 
-        if (!$this->isCarAvailable($car->id, $validated['start_date'], $validated['end_date'])) {
-            return back()->withInput()->with('error', 'Car became unavailable for the selected dates.');
+        if (!$this->isVehicleAvailable($vehicle->id, $validated['start_date'], $validated['end_date'])) {
+            return back()->withInput()->with('error', 'Vehicle became unavailable for the selected dates.');
+        }
+
+        if ($validated['order_type'] === 'hire' && !$vehicle->available_for_hire) {
+            return back()->withInput()->with('error', 'This vehicle is not available for hire.');
+        }
+        if ($validated['order_type'] === 'rent' && !$vehicle->available_for_rent) {
+            return back()->withInput()->with('error', 'This vehicle is not available for rent.');
         }
 
         $validated['driver_option'] = match ($driverMode) {
@@ -126,18 +135,18 @@ class BookingController extends Controller
         };
 
         $days = max(1, (int) Carbon::parse($validated['start_date'])->diffInDays(Carbon::parse($validated['end_date'])) + 1);
-        $pricing = VehiclePricingResolver::resolveForCar($car);
+        $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
         $dailyRate = $pricing['daily_rate'];
         $driverRate = $validated['driver_option'] === 'with_driver' ? (float) $pricing['driver_cost_per_day'] : 0;
         $driverTotal = $driverRate * $days;
         $totalAmount = ($dailyRate * $days) + $driverTotal;
-        $revenueSplit = RevenueShareResolver::percentagesForCar($car);
+        $revenueSplit = RevenueShareResolver::percentagesForVehicle($vehicle);
         $shareableAmount = RevenueShareResolver::shareableAmount($totalAmount, $driverTotal);
         [$bookingUser, $guestAccountCreated, $guestAccountMailSent] = $this->resolveBookingUser($request, $validated);
 
         $booking = Booking::create([
             'user_id' => $bookingUser?->id,
-            'car_id' => $car->id,
+            'vehicle_id' => $vehicle->id,
             'customer_name' => $validated['customer_name'],
             'customer_email' => $validated['customer_email'] ?? null,
             'customer_phone' => $validated['customer_phone'] ?? null,
@@ -146,6 +155,7 @@ class BookingController extends Controller
             'end_date' => $validated['end_date'],
             'rental_days' => $days,
             'driver_option' => $validated['driver_option'],
+            'order_type' => $validated['order_type'],
             'daily_rate' => $dailyRate,
             'driver_rate' => $driverRate,
             'total_amount' => $totalAmount,
@@ -205,7 +215,7 @@ class BookingController extends Controller
         }
 
         return redirect()->route('booking.confirm', [
-            'car_id' => $booking->car_id,
+            'vehicle_id' => $booking->vehicle_id,
             'start_date' => $booking->start_date?->format('Y-m-d'),
             'end_date' => $booking->end_date?->format('Y-m-d'),
             'start_location' => $booking->pickup_location,
@@ -263,42 +273,9 @@ class BookingController extends Controller
         return 'OK';
     }
 
-    private function isCarAvailable(int $carId, string $startDate, string $endDate): bool
+    private function isVehicleAvailable(int $vehicleId, string $startDate, string $endDate): bool
     {
-        $agreementOverlap = Agreement::query()
-            ->where('car_id', $carId)
-            ->where('status', 'active')
-            ->whereDate('start_date', '<=', $endDate)
-            ->where(function ($q) use ($startDate) {
-                $q->whereNull('end_date')->orWhereDate('end_date', '>=', $startDate);
-            })
-            ->exists();
-
-        if ($agreementOverlap) {
-            return false;
-        }
-
-        $rentalOverlap = Rental::query()
-            ->where('car_id', $carId)
-            ->where('status', 'active')
-            ->whereDate('start_date', '<=', $endDate)
-            ->where(function ($q) use ($startDate) {
-                $q->whereNull('end_date')->orWhereDate('end_date', '>=', $startDate);
-            })
-            ->exists();
-
-        if ($rentalOverlap) {
-            return false;
-        }
-
-        $bookingOverlap = Booking::query()
-            ->where('car_id', $carId)
-            ->where('status', 'confirmed')
-            ->whereDate('start_date', '<=', $endDate)
-            ->whereDate('end_date', '>=', $startDate)
-            ->exists();
-
-        return !$bookingOverlap;
+        return VehicleAvailabilityChecker::isAvailable($vehicleId, $startDate, $endDate);
     }
 
     private function canManageBooking(Request $request, Booking $booking): bool
@@ -334,7 +311,7 @@ class BookingController extends Controller
     private function sendBookingInvoiceEmailAfterResponse(int $bookingId, string $stage): void
     {
         dispatch(function () use ($bookingId, $stage) {
-            $booking = Booking::query()->with(['car.partner', 'user'])->find($bookingId);
+            $booking = Booking::query()->with(['vehicle.partner', 'user'])->find($bookingId);
             if (!$booking) {
                 return;
             }
@@ -346,7 +323,7 @@ class BookingController extends Controller
                 $recipients->push($customerEmail);
             }
 
-            $partnerEmail = (string) ($booking->car?->partner?->email ?: '');
+            $partnerEmail = (string) ($booking->vehicle?->partner?->email ?: '');
             if ($partnerEmail !== '') {
                 $recipients->push($partnerEmail);
             }

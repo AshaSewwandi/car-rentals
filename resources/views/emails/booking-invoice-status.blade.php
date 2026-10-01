@@ -78,22 +78,22 @@
         } elseif (file_exists($logoPath)) {
             $logoSrc = url('/images/logo.png');
         }
-        $carImageSrc = $logoSrc;
-        $plate = strtolower((string) ($booking->car?->plate_no ?? ''));
+        $vehicleImageSrc = $logoSrc;
+        $plate = strtolower((string) ($booking->vehicle?->plate_no ?? ''));
         $plateKey = str_replace([' ', '-'], '_', $plate);
-        $carImageCandidates = [
+        $vehicleImageCandidates = [
             public_path('images/' . $plateKey . '.png'),
             public_path('images/' . $plateKey . '.jpg'),
             public_path('images/' . $plateKey . '.jpeg'),
         ];
-        foreach ($carImageCandidates as $candidatePath) {
+        foreach ($vehicleImageCandidates as $candidatePath) {
             if (file_exists($candidatePath)) {
                 if ($useRemoteImages) {
-                    $carImageSrc = $imageBaseUrl . '/images/' . basename($candidatePath);
+                    $vehicleImageSrc = $imageBaseUrl . '/images/' . basename($candidatePath);
                 } elseif (isset($message)) {
-                    $carImageSrc = $message->embed($candidatePath);
+                    $vehicleImageSrc = $message->embed($candidatePath);
                 } else {
-                    $carImageSrc = url('/images/' . basename($candidatePath));
+                    $vehicleImageSrc = url('/images/' . basename($candidatePath));
                 }
                 break;
             }
@@ -107,9 +107,9 @@
         $rentalAmountOnly = max($baseAmount - $driverAmount, 0);
         $additionalAmount = (float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0);
         $finalAmount = (float) ($booking->final_total ?? $booking->total_amount ?? 0);
-        $vehicleYear = $booking->car?->year ?? $booking->car?->model_year;
-        $vehicleTransmission = $booking->car?->transmission ?? $booking->car?->transmission_type;
-        $vehicleFuel = $booking->car?->fuel_type ?? $booking->car?->fuel;
+        $vehicleYear = $booking->vehicle?->year ?? $booking->vehicle?->model_year;
+        $vehicleTransmission = $booking->vehicle?->transmission ?? $booking->vehicle?->transmission_type;
+        $vehicleFuel = $booking->vehicle?->fuel_type ?? $booking->vehicle?->fuel;
     @endphp
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-shell" style="background:#f4f7fb;padding:24px 0;">
@@ -146,13 +146,13 @@
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
                                                 <td width="140" valign="top" class="stack-cell" style="padding:0 14px 0 0;">
-                                                    @if($carImageSrc)
-                                                        <img src="{{ $carImageSrc }}" alt="{{ $booking->car?->name ?: 'Vehicle image' }}" class="vehicle-image" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
+                                                    @if($vehicleImageSrc)
+                                                        <img src="{{ $vehicleImageSrc }}" alt="{{ $booking->vehicle?->name ?: 'Vehicle image' }}" class="vehicle-image" style="display:block;width:130px;height:88px;border-radius:8px;border:1px solid #dbe6f3;background:#f8fbff;object-fit:cover;">
                                                     @endif
                                                 </td>
                                                 <td valign="top" class="stack-cell" style="font-size:14px;color:#334155;line-height:1.8;">
-                                                    <strong style="color:#0f172a;font-size:16px;">{{ $booking->car?->name ?: 'Vehicle' }}</strong><br>
-                                                    <strong style="color:#0f172a;">Plate:</strong> {{ $booking->car?->plate_no ?: '-' }}<br>
+                                                    <strong style="color:#0f172a;font-size:16px;">{{ $booking->vehicle?->name ?: 'Vehicle' }}</strong><br>
+                                                    <strong style="color:#0f172a;">Plate:</strong> {{ $booking->vehicle?->plate_no ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Year:</strong> {{ $vehicleYear ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Transmission:</strong> {{ $vehicleTransmission ?: '-' }}<br>
                                                     <strong style="color:#0f172a;">Fuel:</strong> {{ $vehicleFuel ?: '-' }}
@@ -162,7 +162,7 @@
                                                         <tr>
                                                             <td style="padding:10px 8px;text-align:center;">
                                                                 <div style="font-size:11px;font-weight:700;color:#b45309;letter-spacing:.08em;text-transform:uppercase;">Rental Vehicle</div>
-                                                                <div style="margin-top:4px;font-size:14px;font-weight:700;color:#92400e;">{{ $booking->car?->plate_no ?: 'N/A' }}</div>
+                                                                <div style="margin-top:4px;font-size:14px;font-weight:700;color:#92400e;">{{ $booking->vehicle?->plate_no ?: 'N/A' }}</div>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -190,7 +190,7 @@
                                 <tr>
                                     <td style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;padding-bottom:8px;font-weight:700;">Trip Details</td>
                                 </tr>
-                                <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Vehicle:</strong> {{ $booking->car?->name }} ({{ $booking->car?->plate_no }})</td></tr>
+                                <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Vehicle:</strong> {{ $booking->vehicle?->name }} ({{ $booking->vehicle?->plate_no }})</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Date Range:</strong> {{ $booking->start_date?->format('M d, Y') }} - {{ $booking->end_date?->format('M d, Y') }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Pickup Location:</strong> {{ $booking->pickup_location ?: 'Not specified' }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Rental Days:</strong> {{ $booking->rental_days }} day(s)</td></tr>

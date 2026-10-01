@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Car;
 use App\Models\Expense;
 use App\Models\Payment;
+use App\Models\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -58,7 +58,7 @@ class DashboardController extends Controller
             ->sum('amount');
 
         $upcomingPayments = Payment::query()
-            ->with(['rental.car', 'rental.customer'])
+            ->with(['rental.vehicle', 'rental.customer'])
             ->where('month', $month)
             ->where('status', 'pending')
             ->orderBy('due_date')
@@ -66,13 +66,13 @@ class DashboardController extends Controller
             ->get();
 
         $upcomingExpenses = Expense::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
             ->orderBy('date')
             ->limit(8)
             ->get();
 
-        $renewalAlerts = Car::query()
+        $renewalAlerts = Vehicle::query()
             ->where(function ($query) use ($renewalWindowStart, $renewalWindowEnd) {
                 $query
                     ->whereBetween('tracker_insurance_expires', [$renewalWindowStart->toDateString(), $renewalWindowEnd->toDateString()])
@@ -86,27 +86,27 @@ class DashboardController extends Controller
             ")
             ->orderByRaw('LEAST(COALESCE(tracker_insurance_expires, "9999-12-31"), COALESCE(tracker_license_expires, "9999-12-31"))')
             ->get()
-            ->map(function (Car $car) use ($renewalWindowStart, $renewalWindowEnd) {
+            ->map(function (Vehicle $vehicle) use ($renewalWindowStart, $renewalWindowEnd) {
                 $items = collect();
 
-                if ($car->tracker_insurance_expires && $car->tracker_insurance_expires->between($renewalWindowStart, $renewalWindowEnd)) {
+                if ($vehicle->tracker_insurance_expires && $vehicle->tracker_insurance_expires->between($renewalWindowStart, $renewalWindowEnd)) {
                     $items->push([
                         'type' => 'Insurance',
-                        'date' => $car->tracker_insurance_expires,
-                        'days_left' => $renewalWindowStart->diffInDays($car->tracker_insurance_expires, false),
+                        'date' => $vehicle->tracker_insurance_expires,
+                        'days_left' => $renewalWindowStart->diffInDays($vehicle->tracker_insurance_expires, false),
                     ]);
                 }
 
-                if ($car->tracker_license_expires && $car->tracker_license_expires->between($renewalWindowStart, $renewalWindowEnd)) {
+                if ($vehicle->tracker_license_expires && $vehicle->tracker_license_expires->between($renewalWindowStart, $renewalWindowEnd)) {
                     $items->push([
                         'type' => 'License',
-                        'date' => $car->tracker_license_expires,
-                        'days_left' => $renewalWindowStart->diffInDays($car->tracker_license_expires, false),
+                        'date' => $vehicle->tracker_license_expires,
+                        'days_left' => $renewalWindowStart->diffInDays($vehicle->tracker_license_expires, false),
                     ]);
                 }
 
                 return $items->map(fn (array $item) => [
-                    'car' => $car,
+                    'vehicle' => $vehicle,
                     'type' => $item['type'],
                     'date' => $item['date'],
                     'days_left' => $item['days_left'],

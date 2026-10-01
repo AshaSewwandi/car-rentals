@@ -209,11 +209,11 @@
       </div>
       <div class="col-12 col-md-4">
         <label class="form-label mb-1">Vehicle</label>
-        <select class="form-select" name="car_id">
+        <select class="form-select" name="vehicle_id">
           <option value="">All Vehicles</option>
-          @foreach($cars as $car)
-            <option value="{{ $car->id }}" {{ (($filters['car_id'] ?? '') == $car->id) ? 'selected' : '' }}>
-              {{ $car->name }} ({{ $car->plate_no }})
+          @foreach($vehicles as $vehicle)
+            <option value="{{ $vehicle->id }}" {{ (($filters['vehicle_id'] ?? '') == $vehicle->id) ? 'selected' : '' }}>
+              {{ $vehicle->name }} ({{ $vehicle->plate_no }})
             </option>
           @endforeach
         </select>

@@ -24,14 +24,33 @@ class CustomerSupportRequestController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40', 'required_without:email'],
             'email' => ['nullable', 'email', 'max:180', 'required_without:phone'],
-            'message' => ['required', 'string', 'max:3000'],
+            'vehicle_type' => ['nullable', 'string', 'max:120'],
+            'travel_date' => ['nullable', 'date'],
+            'passenger_count' => ['nullable', 'integer', 'min:1'],
+            'pickup_location' => ['nullable', 'string', 'max:255'],
+            'destination' => ['nullable', 'string', 'max:255'],
+            'message' => ['nullable', 'string', 'max:3000'],
         ]);
+
+        $tripLines = collect([
+            !empty($validated['pickup_location']) ? 'Pickup: ' . $validated['pickup_location'] : null,
+            !empty($validated['destination']) ? 'Destinations / Route: ' . $validated['destination'] : null,
+            !empty($validated['travel_date']) ? 'Travel date: ' . $validated['travel_date'] : null,
+            !empty($validated['passenger_count']) ? 'Passengers: ' . $validated['passenger_count'] : null,
+            !empty($validated['vehicle_type']) ? 'Preferred vehicle: ' . $validated['vehicle_type'] : null,
+        ])->filter()->implode("\n");
+
+        $extraMessage = trim((string) ($validated['message'] ?? ''));
+        $message = trim($tripLines . "\n" . $extraMessage);
+        if ($message === '') {
+            $message = 'Trip quote request submitted via website.';
+        }
 
         $this->createSupportRequest($request, [
             'name' => $validated['name'],
             'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'] ?? null,
-            'message' => $validated['message'],
+            'message' => $message,
             'source_page' => url()->previous(),
         ]);
 

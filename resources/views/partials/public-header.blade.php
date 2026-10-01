@@ -36,21 +36,9 @@
     }
 
     .site-header-common .brand img {
-        width: 36px;
-        height: 36px;
+        height: 46px;
+        width: auto;
         object-fit: contain;
-        border-radius: 9px;
-        border: 1px solid #d8e5f5;
-        background: #f8fbff;
-        padding: 3px;
-    }
-
-    .site-header-common .brand-name {
-        color: #0b3f88;
-        font-weight: 700;
-        letter-spacing: -.02em;
-        font-size: 1.32rem;
-        font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
     }
 
     .site-header-common .main-nav {
@@ -76,12 +64,45 @@
         background: #edf4ff;
     }
 
+    .site-header-common .main-nav a.nav-active {
+        background: #eef2f7;
+        color: #0f172a;
+    }
+
     .site-header-common .right {
         display: inline-flex;
         align-items: center;
         justify-content: flex-end;
-        min-width: 150px;
+        gap: .9rem;
         position: relative;
+    }
+
+    .site-header-common .header-phone {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        color: #334155;
+        font-weight: 600;
+        font-size: .88rem;
+        white-space: nowrap;
+    }
+
+    .site-header-common .header-phone:hover {
+        color: #0f4b9e;
+    }
+
+    .site-header-common .header-signin {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        color: #334155;
+        font-weight: 600;
+        font-size: .9rem;
+        white-space: nowrap;
+    }
+
+    .site-header-common .header-signin:hover {
+        color: #0f4b9e;
     }
 
     .site-header-common .auth-link {
@@ -245,17 +266,15 @@
 <header class="site-header-common site-header-hide-legacy" id="publicHeaderCommon">
     <div class="header-wrap">
         <a class="brand" href="{{ route('home') }}">
-            <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals logo">
-            <span class="brand-name">R&amp;A Auto Rentals</span>
+            <img src="{{ asset('images/logo-full.png') }}" alt="R&A Auto Rentals">
         </a>
         <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" id="publicHeaderMenuToggle">&#9776;</button>
         <nav class="main-nav" aria-label="Primary navigation">
-            <a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a>
-            <a href="{{ route('long-term-rentals.index') }}">Long-Term Rentals</a>
-            <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
-            <a href="{{ route('group-packages.index') }}">Special Events</a>
-            <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
-            <a href="{{ route('partner-recruitment.create') }}">Become a Partner</a>
+            <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'nav-active' : '' }}">Home</a>
+            <a href="{{ route('rent-requests.create') }}" class="{{ request()->routeIs('rent-requests.create') ? 'nav-active' : '' }}">Custom Trip Planner</a>
+            <a href="{{ route('home') }}#routes-section">Popular Routes</a>
+            <a href="{{ route('home') }}#contact-section">Contact</a>
+            <a class="mobile-auth" href="tel:+94775998951">Call 077 599 8951</a>
             @auth
                 @if(auth()->user()->isDashboardAdmin())
                     @if(auth()->user()->canAccess('dashboard'))
@@ -278,6 +297,7 @@
         </nav>
 
         <div class="right">
+            <a class="header-phone" href="tel:+94775998951">📞 077 599 8951</a>
             @auth
                 <div class="account-wrap" id="publicHeaderAccountWrap">
                     <button type="button" class="account-btn" id="publicHeaderAccountBtn" aria-haspopup="true" aria-expanded="false">
@@ -305,8 +325,9 @@
                     </div>
                 </div>
             @else
-                <a class="auth-link" href="{{ route('login') }}">Sign In</a>
+                <a class="header-signin" href="{{ route('login') }}">👤 Sign In</a>
             @endauth
+            <a class="auth-link" href="{{ route('rent-requests.create') }}">🧭 Plan Custom Route</a>
         </div>
     </div>
 </header>

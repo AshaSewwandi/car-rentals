@@ -194,12 +194,12 @@
   </div>
   <form method="get" action="{{ route('rental-trips.index') }}" class="d-flex flex-wrap align-items-end gap-2">
     <div>
-      <label for="trip_car_id" class="form-label mb-1">Vehicle</label>
-      <select id="trip_car_id" name="car_id" class="form-select form-select-sm" style="min-width: 220px;">
+      <label for="trip_vehicle_id" class="form-label mb-1">Vehicle</label>
+      <select id="trip_vehicle_id" name="vehicle_id" class="form-select form-select-sm" style="min-width: 220px;">
         <option value="">All Vehicles</option>
-        @foreach($cars as $car)
-          <option value="{{ $car->id }}" @selected((string)($filters['car_id'] ?? '') === (string)$car->id)>
-            {{ $car->name }} ({{ $car->plate_no }})
+        @foreach($vehicles as $vehicle)
+          <option value="{{ $vehicle->id }}" @selected((string)($filters['vehicle_id'] ?? '') === (string)$vehicle->id)>
+            {{ $vehicle->name }} ({{ $vehicle->plate_no }})
           </option>
         @endforeach
       </select>
@@ -225,7 +225,7 @@
     <button type="submit" class="btn btn-sm btn-dark">Filter</button>
     <a href="{{ route('rental-trips.index') }}" class="btn btn-sm btn-outline-dark">Reset</a>
     <a href="{{ route('rental-trips.export-pdf', array_filter([
-      'car_id' => $filters['car_id'] ?? null,
+      'vehicle_id' => $filters['vehicle_id'] ?? null,
       'date_from' => $filters['date_from'] ?? null,
       'date_to' => $filters['date_to'] ?? null,
       'status' => $filters['status'] ?? null,
@@ -293,12 +293,13 @@
                 <span class="text-muted">{{ $booking->customer_name }}</span>
               </td>
               <td data-label="Vehicle">
-                {{ $booking->car?->name }}<br>
-                <span class="text-muted">{{ $booking->car?->plate_no }}</span>
+                {{ $booking->vehicle?->name }}<br>
+                <span class="text-muted">{{ $booking->vehicle?->plate_no }}</span>
               </td>
               <td data-label="Dates">
                 {{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}<br>
-                <span class="text-muted">{{ $booking->rental_days }} day(s)</span>
+                <span class="text-muted">{{ $booking->rental_days }} day(s)</span><br>
+                <span class="badge text-bg-light">{{ $booking->order_type === 'rent' ? 'Rent' : 'Hire' }}</span>
               </td>
               <td data-label="Base">
                 <div>LKR {{ number_format((float)$booking->daily_rate, 2) }}/day</div>

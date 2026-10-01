@@ -135,16 +135,16 @@
         <label for="maintenance-month" class="visually-hidden">Select month</label>
         <input type="month" class="form-control" id="maintenance-month" name="month" value="{{ $month ?? '' }}" aria-label="Select month">
       </div>
-      <select name="car_id" class="form-select">
+      <select name="vehicle_id" class="form-select">
         <option value="">All Vehicles</option>
-        @foreach($cars as $car)
-          <option value="{{ $car->id }}" @selected((string) $carId === (string) $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+        @foreach($vehicles as $vehicle)
+          <option value="{{ $vehicle->id }}" @selected((string) $vehicleId === (string) $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
         @endforeach
       </select>
       <button class="btn btn-dark">Filter</button>
     </form>
     @if($canExportPdf)
-      <a class="btn btn-outline-dark" href="{{ route('vehicle-maintenance.export-pdf', ['month' => $month, 'car_id' => $carId]) }}">Export PDF</a>
+      <a class="btn btn-outline-dark" href="{{ route('vehicle-maintenance.export-pdf', ['month' => $month, 'vehicle_id' => $vehicleId]) }}">Export PDF</a>
     @endif
   </div>
 </div>
@@ -189,7 +189,7 @@
           @forelse($records as $record)
             <tr>
               <td data-label="Date">{{ $record->service_date->format('Y-m-d') }}</td>
-              <td data-label="Vehicle">{{ $record->car?->name }}{{ $record->car?->plate_no ? ' (' . $record->car->plate_no . ')' : '' }}</td>
+              <td data-label="Vehicle">{{ $record->vehicle?->name }}{{ $record->vehicle?->plate_no ? ' (' . $record->vehicle->plate_no . ')' : '' }}</td>
               <td data-label="Part / Work">{{ $record->part_name }}</td>
               <td data-label="Mileage">{{ $record->mileage !== null ? number_format($record->mileage) . ' km' : '-' }}</td>
               <td data-label="Amount" class="text-end">Rs {{ number_format((float) $record->amount, 2) }}</td>
@@ -203,7 +203,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#deleteMaintenanceModal"
                     data-delete-url="{{ route('vehicle-maintenance.destroy', $record) }}"
-                    data-record-text="{{ $record->service_date->format('Y-m-d') }} | {{ $record->car?->name }} | {{ $record->part_name }}"
+                    data-record-text="{{ $record->service_date->format('Y-m-d') }} | {{ $record->vehicle?->name }} | {{ $record->part_name }}"
                   >
                     Delete
                   </button>
@@ -232,10 +232,10 @@
         <div class="modal-body">
           <div class="mb-2">
             <label class="form-label">Vehicle</label>
-            <select name="car_id" class="form-select" required>
+            <select name="vehicle_id" class="form-select" required>
               <option value="">Select Vehicle</option>
-              @foreach($cars as $car)
-                <option value="{{ $car->id }}" @selected(old('car_id', $carId) == $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+              @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}" @selected(old('vehicle_id', $vehicleId) == $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
               @endforeach
             </select>
           </div>
@@ -285,9 +285,9 @@
           <div class="modal-body">
             <div class="mb-2">
               <label class="form-label">Vehicle</label>
-              <select name="car_id" class="form-select" required>
-                @foreach($cars as $car)
-                  <option value="{{ $car->id }}" @selected($record->car_id === $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+              <select name="vehicle_id" class="form-select" required>
+                @foreach($vehicles as $vehicle)
+                  <option value="{{ $vehicle->id }}" @selected($record->vehicle_id === $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
                 @endforeach
               </select>
             </div>

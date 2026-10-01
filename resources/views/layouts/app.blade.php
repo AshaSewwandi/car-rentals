@@ -98,53 +98,15 @@
       gap: .72rem;
     }
 
-    .brand-name {
-      font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      line-height: .95;
-      color: #0b1f3a;
-    }
-
-    .brand-logo-wrap {
-      width: 40px;
-      height: 40px;
-      border-radius: 9px;
-      border: 1px solid #d8e5f5;
-      background: #f8fbff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
     .brand-logo {
-      width: 100%;
-      height: 100%;
+      height: 46px;
+      width: auto;
       object-fit: contain;
-      border-radius: 9px;
       border: 0;
       background: transparent;
       padding: 0;
       box-shadow: none;
       filter: none;
-      flex-shrink: 0;
-    }
-
-    .brand-fallback {
-      width: 58px;
-      height: 34px;
-      border-radius: .55rem;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #fff;
-      font-size: .82rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
     }
 
     .nav-link {
@@ -564,23 +526,7 @@
       }
 
       .brand-logo {
-        width: 100%;
-        height: 100%;
-      }
-
-      .brand-logo-wrap {
-        width: 40px;
-        height: 40px;
-        border-radius: 9px;
-        padding: 3px;
-      }
-
-      .brand-name {
-        font-size: 1.04rem;
-        line-height: 1.1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        height: 34px;
       }
 
       .app-main {
@@ -902,11 +848,7 @@
       </button>
     @endauth
     <a class="navbar-brand" href="{{ url('/') }}">
-      <span class="brand-logo-wrap">
-        <img src="{{ asset('images/logo.png') }}" alt="R&A Auto Rentals logo" class="brand-logo" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='inline-flex';">
-      </span>
-      <span class="brand-fallback" style="display:none;">R&A</span>
-      <span class="brand-name">R&A Auto Rentals</span>
+      <img src="{{ asset('images/logo-full.png') }}" alt="R&A Auto Rentals" class="brand-logo">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
@@ -946,10 +888,13 @@
           @if(auth()->user()->isDashboardAdmin() || auth()->user()->canAccess('rental_trips'))
             <div class="mobile-admin-title">Trips</div>
             @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
-              <a class="mobile-admin-link" href="{{ route('rent-requests.index') }}">Rent Requests</a>
+              <a class="mobile-admin-link" href="{{ route('rent-requests.index') }}">Trip Requests</a>
             @endif
             @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
               <a class="mobile-admin-link" href="{{ route('availability-check.index') }}">Availability Check</a>
+            @endif
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('orders.create'))
+              <a class="mobile-admin-link" href="{{ route('orders.create') }}">Place Order</a>
             @endif
             @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
               <a class="mobile-admin-link" href="{{ route('rental-trips.index') }}">Rental Trips</a>
@@ -957,10 +902,10 @@
           @endif
 
           <div class="mobile-admin-title">Operations</div>
-          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('cars.index'))
-            <a class="mobile-admin-link" href="{{ route('cars.index') }}">Cars</a>
+          @if(auth()->user()->canAccess('vehicles') && \Illuminate\Support\Facades\Route::has('vehicles.index'))
+            <a class="mobile-admin-link" href="{{ route('vehicles.index') }}">Vehicles</a>
           @endif
-          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
+          @if(auth()->user()->canAccess('vehicles') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
             <a class="mobile-admin-link" href="{{ route('vehicle-pricings.index') }}">Pricing</a>
           @endif
           @if(!auth()->user()->isPartner() && auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))
@@ -1022,10 +967,13 @@
           <div class="menu-section">
             <div class="menu-title">Trips</div>
             @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('rent-requests.index'))
-              <a class="menu-link {{ request()->routeIs('rent-requests.*') ? 'active' : '' }}" href="{{ route('rent-requests.index') }}"><span class="menu-dot"></span>Rent Requests</a>
+              <a class="menu-link {{ request()->routeIs('rent-requests.*') ? 'active' : '' }}" href="{{ route('rent-requests.index') }}"><span class="menu-dot"></span>Trip Requests</a>
             @endif
             @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('availability-check.index'))
               <a class="menu-link {{ request()->routeIs('availability-check.*') ? 'active' : '' }}" href="{{ route('availability-check.index') }}"><span class="menu-dot"></span>Availability Check</a>
+            @endif
+            @if(auth()->user()->isDashboardAdmin() && \Illuminate\Support\Facades\Route::has('orders.create'))
+              <a class="menu-link {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.create') }}"><span class="menu-dot"></span>Place Order</a>
             @endif
             @if(auth()->user()->canAccess('rental_trips') && \Illuminate\Support\Facades\Route::has('rental-trips.index'))
               <a class="menu-link {{ request()->routeIs('rental-trips.*') ? 'active' : '' }}" href="{{ route('rental-trips.index') }}"><span class="menu-dot"></span>Rental Trips</a>
@@ -1035,10 +983,10 @@
 
         <div class="menu-section">
           <div class="menu-title">Operations</div>
-          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('cars.index'))
-            <a class="menu-link {{ request()->routeIs('cars.*') ? 'active' : '' }}" href="{{ route('cars.index') }}"><span class="menu-dot"></span>Cars</a>
+          @if(auth()->user()->canAccess('vehicles') && \Illuminate\Support\Facades\Route::has('vehicles.index'))
+            <a class="menu-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}" href="{{ route('vehicles.index') }}"><span class="menu-dot"></span>Vehicles</a>
           @endif
-          @if(auth()->user()->canAccess('cars') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
+          @if(auth()->user()->canAccess('vehicles') && \Illuminate\Support\Facades\Route::has('vehicle-pricings.index'))
             <a class="menu-link {{ request()->routeIs('vehicle-pricings.*') ? 'active' : '' }}" href="{{ route('vehicle-pricings.index') }}"><span class="menu-dot"></span>Pricing</a>
           @endif
           @if(!auth()->user()->isPartner() && auth()->user()->canAccess('customers') && \Illuminate\Support\Facades\Route::has('customers.index'))

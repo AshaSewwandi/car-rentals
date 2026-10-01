@@ -25,7 +25,7 @@
     $keywordContent = is_array($keywordSource) ? implode(', ', $keywordSource) : (string) $keywordSource;
     $tagContent = is_array($tagSource) ? implode(', ', $tagSource) : (string) $tagSource;
 
-    $metaTitle = $title ?? 'R&A Auto Rentals | Car Rental Platform';
+    $metaTitle = $title ?? 'R&A Auto Rentals | Vehicle Rental Platform';
     $metaDescription = $description ?? 'Book reliable daily or monthly rental vehicles with R&A Auto Rentals. Check availability, confirm trips, and manage bookings online.';
     $metaType = $type ?? 'website';
     $metaRobots = $robots ?? 'index,follow';
@@ -52,6 +52,36 @@
 <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo-rounded-64.png') }}">
 <link rel="shortcut icon" href="{{ asset('images/logo-rounded-64.png') }}">
 <link rel="apple-touch-icon" href="{{ asset('images/logo-rounded-64.png') }}">
+<script type="application/ld+json">
+{!! json_encode([
+    '@@context' => 'https://schema.org',
+    '@type' => 'AutoRental',
+    'name' => 'R&A Auto Rentals',
+    'image' => asset('images/logo.png'),
+    'url' => route('home'),
+    'telephone' => '+94775998951',
+    'email' => 'info@rnaautorentals.com.lk',
+    'address' => [
+        '@type' => 'PostalAddress',
+        'addressLocality' => 'Galle',
+        'addressCountry' => 'LK',
+    ],
+    'openingHoursSpecification' => [
+        '@type' => 'OpeningHoursSpecification',
+        'dayOfWeek' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        'opens' => '07:00',
+        'closes' => '21:00',
+    ],
+], JSON_UNESCAPED_SLASHES) !!}
+</script>
+<script type="application/ld+json">
+{!! json_encode([
+    '@@context' => 'https://schema.org',
+    '@type' => 'WebSite',
+    'name' => 'R&A Auto Rentals',
+    'url' => route('home'),
+], JSON_UNESCAPED_SLASHES) !!}
+</script>
 <style>
     img,
     video,

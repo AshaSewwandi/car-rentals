@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\Car;
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,12 +14,12 @@ class PartnerApplicationReceivedMail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public User $partner;
-    public Car $car;
+    public Vehicle $vehicle;
 
-    public function __construct(User $partner, Car $car)
+    public function __construct(User $partner, Vehicle $vehicle)
     {
         $this->partner = $partner;
-        $this->car = $car;
+        $this->vehicle = $vehicle;
     }
 
     public function build(): self

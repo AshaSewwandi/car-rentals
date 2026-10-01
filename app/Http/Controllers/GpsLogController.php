@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Agreement;
-use App\Models\Car;
 use App\Models\GpsLog;
+use App\Models\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,44 +16,44 @@ class GpsLogController extends Controller
     {
         $user = $request->user();
         $month = $this->sanitizeMonth($request->get('month'));
-        $carId = $request->get('car_id');
+        $vehicleId = $request->get('vehicle_id');
         $cycleDay = (int) $request->get('cycle_day', 2);
         $cycleDay = max(1, min(28, $cycleDay));
         [$startDate, $endDate, $usingCustomRange, $periodLabel] = $this->resolveRange($request, $month);
-        $allowedCarIds = null;
+        $allowedVehicleIds = null;
 
         if ($user?->isCustomerPortal()) {
             $customerId = $user->customer_id;
-            $allowedCarIds = Agreement::query()
+            $allowedVehicleIds = Agreement::query()
                 ->where('customer_id', $customerId)
-                ->pluck('car_id')
+                ->pluck('vehicle_id')
                 ->unique()
                 ->filter()
                 ->values();
 
-            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
-            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+            $allowedVehicleIdList = $allowedVehicleIds->map(fn ($id) => (int) $id)->all();
+            if ($vehicleId !== null && $vehicleId !== '' && !in_array((int) $vehicleId, $allowedVehicleIdList, true)) {
                 abort(403, 'You do not have permission to access this vehicle.');
             }
 
-            $cars = $allowedCarIds->isEmpty()
+            $vehicles = $allowedVehicleIds->isEmpty()
                 ? collect()
-                : Car::query()->whereIn('id', $allowedCarIds)->orderBy('name')->get();
+                : Vehicle::query()->whereIn('id', $allowedVehicleIds)->orderBy('name')->get();
         } else {
-            $cars = Car::query()->orderBy('name')->get();
+            $vehicles = Vehicle::query()->orderBy('name')->get();
         }
 
         $logsQuery = GpsLog::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereBetween('log_date', [$startDate, $endDate])
             ->orderByDesc('log_date');
 
-        if ($allowedCarIds !== null) {
-            $logsQuery->whereIn('car_id', $allowedCarIds);
+        if ($allowedVehicleIds !== null) {
+            $logsQuery->whereIn('vehicle_id', $allowedVehicleIds);
         }
 
-        if (!empty($carId)) {
-            $logsQuery->where('car_id', $carId);
+        if (!empty($vehicleId)) {
+            $logsQuery->where('vehicle_id', $vehicleId);
         }
 
         $allLogs = (clone $logsQuery)->get();
@@ -66,18 +66,18 @@ class GpsLogController extends Controller
             : 1;
         $avgKmPerMonth = $periodMonthsCount > 0 ? round($totalDistance / $periodMonthsCount, 2) : 0;
 
-        $monthlyByCar = $allLogs
-            ->groupBy('car_id')
+        $monthlyByVehicle = $allLogs
+            ->groupBy('vehicle_id')
             ->map(function ($group) {
-                $car = $group->first()?->car;
+                $vehicle = $group->first()?->vehicle;
                 $distance = (float) $group->sum('distance_km');
                 $days = (int) $group->pluck('log_date')->map(fn ($date) => $date->format('Y-m-d'))->unique()->count();
                 $latest = $group->sortByDesc('log_date')->first();
 
                 return [
-                    'car_id' => $car?->id,
-                    'car_name' => $car?->name ?? 'Unknown car',
-                    'plate_no' => $car?->plate_no ?? '-',
+                    'vehicle_id' => $vehicle?->id,
+                    'vehicle_name' => $vehicle?->name ?? 'Unknown vehicle',
+                    'plate_no' => $vehicle?->plate_no ?? '-',
                     'total_distance' => $distance,
                     'days_logged' => $days,
                     'avg_per_day' => $days > 0 ? round($distance / $days, 2) : 0,
@@ -89,14 +89,14 @@ class GpsLogController extends Controller
 
         $sheetPeriods = [];
         $serviceStats = null;
-        if (!empty($carId)) {
+        if (!empty($vehicleId)) {
             if ($usingCustomRange) {
                 [$sheetPeriods, $sheetStart, $sheetEnd] = $this->buildSheetPeriodsFromRange($startDate, $endDate);
             } else {
                 [$sheetPeriods, $sheetStart, $sheetEnd] = $this->buildSheetPeriods($month, $cycleDay, 4);
             }
             $sheetLogs = GpsLog::query()
-                ->where('car_id', $carId)
+                ->where('vehicle_id', $vehicleId)
                 ->whereBetween('log_date', [$sheetStart, $sheetEnd])
                 ->get()
                 ->keyBy(fn (GpsLog $log) => $log->log_date->format('Y-m-d'));
@@ -116,23 +116,23 @@ class GpsLogController extends Controller
             }
             unset($row, $period);
 
-            $car = Car::query()->find($carId);
-            $intervalKm = (int) ($car?->tracker_maintenance_mileage ?? 0);
+            $vehicle = Vehicle::query()->find($vehicleId);
+            $intervalKm = (int) ($vehicle?->tracker_maintenance_mileage ?? 0);
             if ($intervalKm <= 0) {
                 $intervalKm = 5000;
             }
 
-            $carLogsAll = GpsLog::query()
-                ->where('car_id', $carId)
+            $vehicleLogsAll = GpsLog::query()
+                ->where('vehicle_id', $vehicleId)
                 ->orderBy('log_date')
                 ->get();
 
-            $lastServiceLog = $carLogsAll
+            $lastServiceLog = $vehicleLogsAll
                 ->filter(fn (GpsLog $log) => str_contains(strtolower((string) $log->note), 'service'))
                 ->last();
 
             $lastServiceDate = $lastServiceLog?->log_date;
-            $usageLogs = $carLogsAll->filter(function (GpsLog $log) use ($lastServiceDate) {
+            $usageLogs = $vehicleLogsAll->filter(function (GpsLog $log) use ($lastServiceDate) {
                 if (!$lastServiceDate) {
                     return true;
                 }
@@ -151,7 +151,7 @@ class GpsLogController extends Controller
             $remainingKm = max((float) $intervalKm - $kmAfterService, 0);
             $overdueKm = $kmAfterService > $intervalKm ? ($kmAfterService - (float) $intervalKm) : 0;
 
-            $latestLogDate = $carLogsAll->last()?->log_date;
+            $latestLogDate = $vehicleLogsAll->last()?->log_date;
             $nextServiceDate = null;
             if ($latestLogDate && $avgPerDayAfterService > 0) {
                 if ($overdueKm > 0) {
@@ -173,44 +173,44 @@ class GpsLogController extends Controller
             ];
         }
 
-        return view('gps-logs.index', compact('cars', 'logs', 'month', 'totalDistance', 'carId', 'monthlyByCar', 'daysLogged', 'avgKmPerMonth', 'periodMonthsCount', 'sheetPeriods', 'cycleDay', 'startDate', 'endDate', 'usingCustomRange', 'periodLabel', 'serviceStats'));
+        return view('gps-logs.index', compact('vehicles', 'logs', 'month', 'totalDistance', 'vehicleId', 'monthlyByVehicle', 'daysLogged', 'avgKmPerMonth', 'periodMonthsCount', 'sheetPeriods', 'cycleDay', 'startDate', 'endDate', 'usingCustomRange', 'periodLabel', 'serviceStats'));
     }
 
     public function monthlyReport(Request $request): Response
     {
         $user = $request->user();
         $month = $this->sanitizeMonth($request->get('month'));
-        $carId = $request->get('car_id');
+        $vehicleId = $request->get('vehicle_id');
         [$startDate, $endDate] = $this->resolveRange($request, $month);
 
-        $allowedCarIds = null;
+        $allowedVehicleIds = null;
         if ($user?->isCustomerPortal()) {
             $customerId = $user->customer_id;
-            $allowedCarIds = Agreement::query()
+            $allowedVehicleIds = Agreement::query()
                 ->where('customer_id', $customerId)
-                ->pluck('car_id')
+                ->pluck('vehicle_id')
                 ->unique()
                 ->filter()
                 ->values();
 
-            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
-            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+            $allowedVehicleIdList = $allowedVehicleIds->map(fn ($id) => (int) $id)->all();
+            if ($vehicleId !== null && $vehicleId !== '' && !in_array((int) $vehicleId, $allowedVehicleIdList, true)) {
                 abort(403, 'You do not have permission to access this vehicle.');
             }
         }
 
         $logsQuery = GpsLog::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereBetween('log_date', [$startDate, $endDate])
             ->orderBy('log_date')
-            ->orderBy('car_id');
+            ->orderBy('vehicle_id');
 
-        if ($allowedCarIds !== null) {
-            $logsQuery->whereIn('car_id', $allowedCarIds);
+        if ($allowedVehicleIds !== null) {
+            $logsQuery->whereIn('vehicle_id', $allowedVehicleIds);
         }
 
-        if (!empty($carId)) {
-            $logsQuery->where('car_id', $carId);
+        if (!empty($vehicleId)) {
+            $logsQuery->where('vehicle_id', $vehicleId);
         }
 
         $logs = $logsQuery->get();
@@ -219,8 +219,8 @@ class GpsLogController extends Controller
             ->groupBy(fn (GpsLog $log) => $log->log_date->format('Y-m-d'))
             ->map(fn ($group) => (float) $group->sum('distance_km'));
 
-        $filename = 'km-report-'.$startDate.'-to-'.$endDate.(!empty($carId) ? '-car-'.$carId : '').'.pdf';
-        $selectedCar = !empty($carId) ? Car::query()->find($carId) : null;
+        $filename = 'km-report-'.$startDate.'-to-'.$endDate.(!empty($vehicleId) ? '-vehicle-'.$vehicleId : '').'.pdf';
+        $selectedVehicle = !empty($vehicleId) ? Vehicle::query()->find($vehicleId) : null;
         $rows = [];
         $cursor = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
@@ -241,7 +241,7 @@ class GpsLogController extends Controller
         $pdf = Pdf::loadView('gps-logs.report-pdf', [
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'selectedCar' => $selectedCar,
+            'selectedVehicle' => $selectedVehicle,
             'rows' => $rows,
             'totalMileage' => $totalMileage,
             'loggedDays' => $loggedDays,
@@ -279,7 +279,7 @@ class GpsLogController extends Controller
     public function saveSheet(Request $request)
     {
         $data = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'month' => ['required', 'regex:/^\d{4}-\d{2}$/'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -305,7 +305,7 @@ class GpsLogController extends Controller
             $distance = (float) $distance;
 
             $log = GpsLog::query()
-                ->where('car_id', $data['car_id'])
+                ->where('vehicle_id', $data['vehicle_id'])
                 ->whereDate('log_date', $date)
                 ->first();
 
@@ -318,7 +318,7 @@ class GpsLogController extends Controller
                 ]);
             } else {
                 GpsLog::create([
-                    'car_id' => $data['car_id'],
+                    'vehicle_id' => $data['vehicle_id'],
                     'log_date' => $date,
                     'opening_km' => 0.00,
                     'closing_km' => $distance,
@@ -334,7 +334,7 @@ class GpsLogController extends Controller
                 'month' => $data['month'],
                 'start_date' => $data['start_date'] ?? null,
                 'end_date' => $data['end_date'] ?? null,
-                'car_id' => $data['car_id'],
+                'vehicle_id' => $data['vehicle_id'],
                 'cycle_day' => $data['cycle_day'],
             ])
             ->with('success', "Daily KM sheet saved ({$saved} day(s) updated).");
@@ -343,7 +343,7 @@ class GpsLogController extends Controller
     public function saveService(Request $request)
     {
         $data = $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'month' => ['required', 'regex:/^\d{4}-\d{2}$/'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -369,7 +369,7 @@ class GpsLogController extends Controller
 
         if ($originalServiceDate && $originalServiceDate !== $serviceDate) {
             $oldLog = GpsLog::query()
-                ->where('car_id', $data['car_id'])
+                ->where('vehicle_id', $data['vehicle_id'])
                 ->whereDate('log_date', $originalServiceDate)
                 ->first();
 
@@ -382,7 +382,7 @@ class GpsLogController extends Controller
         }
 
         $log = GpsLog::query()
-            ->where('car_id', $data['car_id'])
+            ->where('vehicle_id', $data['vehicle_id'])
             ->whereDate('log_date', $serviceDate)
             ->first();
 
@@ -392,7 +392,7 @@ class GpsLogController extends Controller
             ]);
         } else {
                 GpsLog::create([
-                    'car_id' => $data['car_id'],
+                    'vehicle_id' => $data['vehicle_id'],
                     'log_date' => $serviceDate,
                     'opening_km' => 0.00,
                     'closing_km' => 0.00,
@@ -406,7 +406,7 @@ class GpsLogController extends Controller
                 'month' => $data['month'],
                 'start_date' => $data['start_date'] ?? null,
                 'end_date' => $data['end_date'] ?? null,
-                'car_id' => $data['car_id'],
+                'vehicle_id' => $data['vehicle_id'],
                 'cycle_day' => $data['cycle_day'],
             ])
             ->with('success', 'Service details saved for '.$serviceDate.'.');
@@ -415,7 +415,7 @@ class GpsLogController extends Controller
     private function validateLog(Request $request): array
     {
         return $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'log_date' => ['required', 'date'],
             'opening_km' => ['required', 'numeric', 'min:0'],
             'closing_km' => ['required', 'numeric', 'gte:opening_km'],

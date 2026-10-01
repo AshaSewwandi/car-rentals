@@ -243,7 +243,7 @@
                         <label aria-hidden="true" style="visibility:hidden;">Search</label>
                         <button class="search-btn" type="submit" id="airportSubmitBtn" data-loading-text="Checking...">
                             <span class="btn-spinner" aria-hidden="true"></span>
-                            <span class="btn-label">Find Available Cars</span>
+                            <span class="btn-label">Find Available Vehicles</span>
                         </button>
                         <small class="field-error">&nbsp;</small>
                     </div>
@@ -305,7 +305,7 @@
                     <div class="contact-info">
                         <p class="contact-kicker">Find Us</p>
                         <div class="contact-line"><strong>Main Office</strong><a href="https://maps.google.com/?q=Galle,Sri Lanka" target="_blank" rel="noopener">Galle, Sri Lanka</a></div>
-                        <div class="contact-line"><strong>Phone</strong><a href="tel:+94777173264">+94 77 717 3264</a></div>
+                        <div class="contact-line"><strong>Phone</strong><a href="tel:+94775998951">077 599 8951</a></div>
                         <div class="contact-line" style="margin-bottom:0;"><strong>Email</strong><a href="mailto:info@rnaautorentals.com.lk">info@rnaautorentals.com.lk</a></div>
                     </div>
                     <div class="contact-form">

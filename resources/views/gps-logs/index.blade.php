@@ -139,17 +139,17 @@
     <input type="month" class="form-control" name="month" value="{{ $month }}">
     <input type="date" class="form-control" name="start_date" value="{{ $usingCustomRange ? $startDate : '' }}">
     <input type="date" class="form-control" name="end_date" value="{{ $usingCustomRange ? $endDate : '' }}">
-    <select name="car_id" class="form-select">
-      <option value="">Select Car</option>
-      @foreach($cars as $car)
-        <option value="{{ $car->id }}" @selected((string) $carId === (string) $car->id)>
-          {{ $car->name }}
+    <select name="vehicle_id" class="form-select">
+      <option value="">Select Vehicle</option>
+      @foreach($vehicles as $vehicle)
+        <option value="{{ $vehicle->id }}" @selected((string) $vehicleId === (string) $vehicle->id)>
+          {{ $vehicle->name }}
         </option>
       @endforeach
     </select>
     <button class="btn btn-dark">Filter</button>
   </form>
-  <a class="btn btn-outline-dark" href="{{ route('gps-logs.report', ['month' => $month, 'start_date' => $usingCustomRange ? $startDate : null, 'end_date' => $usingCustomRange ? $endDate : null, 'car_id' => $carId]) }}">Export PDF</a>
+  <a class="btn btn-outline-dark" href="{{ route('gps-logs.report', ['month' => $month, 'start_date' => $usingCustomRange ? $startDate : null, 'end_date' => $usingCustomRange ? $endDate : null, 'vehicle_id' => $vehicleId]) }}">Export PDF</a>
   </div>
 </div>
 
@@ -227,16 +227,16 @@
 <div class="card list-card mt-3 mb-3">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="header-title">Daily Mileage Sheet</span>
-    <!-- <span class="small text-muted">Select one car to input day-by-day KM</span> -->
+    <!-- <span class="small text-muted">Select one vehicle to input day-by-day KM</span> -->
   </div>
   <div class="card-body">
-    @if(empty($carId))
-      <div class="text-muted">Choose a specific car from the filter above to load the sheet.</div>
+    @if(empty($vehicleId))
+      <div class="text-muted">Choose a specific vehicle from the filter above to load the sheet.</div>
     @else
       @if($canManageGps)
         <form method="post" action="{{ route('gps-logs.sheet') }}">
           @csrf
-          <input type="hidden" name="car_id" value="{{ $carId }}">
+          <input type="hidden" name="vehicle_id" value="{{ $vehicleId }}">
           <input type="hidden" name="month" value="{{ $month }}">
           <input type="hidden" name="start_date" value="{{ $usingCustomRange ? $startDate : '' }}">
           <input type="hidden" name="end_date" value="{{ $usingCustomRange ? $endDate : '' }}">
@@ -358,7 +358,7 @@
       </div>
       <form method="post" action="{{ route('gps-logs.service') }}">
         @csrf
-        <input type="hidden" name="car_id" value="{{ $carId }}">
+        <input type="hidden" name="vehicle_id" value="{{ $vehicleId }}">
         <input type="hidden" name="month" value="{{ $month }}">
         <input type="hidden" name="start_date" value="{{ $usingCustomRange ? $startDate : '' }}">
         <input type="hidden" name="end_date" value="{{ $usingCustomRange ? $endDate : '' }}">

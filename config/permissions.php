@@ -4,7 +4,7 @@ return [
     'modules' => [
         'dashboard' => 'Dashboard',
         'rental_trips' => 'Rental Trips',
-        'cars' => 'Cars',
+        'vehicles' => 'Vehicles',
         'customers' => 'Customers',
         'payments' => 'Payments',
         'expenses' => 'Expenses',
@@ -19,7 +19,7 @@ return [
         'super_admin' => [
             'dashboard' => true,
             'rental_trips' => true,
-            'cars' => true,
+            'vehicles' => true,
             'customers' => true,
             'payments' => true,
             'expenses' => true,
@@ -32,7 +32,7 @@ return [
         'admin' => [
             'dashboard' => true,
             'rental_trips' => true,
-            'cars' => true,
+            'vehicles' => true,
             'customers' => true,
             'payments' => true,
             'expenses' => true,
@@ -45,7 +45,7 @@ return [
         'customer' => [
             'dashboard' => true,
             'rental_trips' => false,
-            'cars' => false,
+            'vehicles' => false,
             'customers' => false,
             'payments' => false,
             'expenses' => false,
@@ -58,7 +58,7 @@ return [
         'customer_portal' => [
             'dashboard' => true,
             'rental_trips' => false,
-            'cars' => false,
+            'vehicles' => false,
             'customers' => false,
             'payments' => false,
             'expenses' => false,
@@ -71,7 +71,7 @@ return [
         'partner' => [
             'dashboard' => false,
             'rental_trips' => true,
-            'cars' => false,
+            'vehicles' => false,
             'customers' => false,
             'payments' => false,
             'expenses' => false,
@@ -84,7 +84,7 @@ return [
         'partner_applicant' => [
             'dashboard' => false,
             'rental_trips' => false,
-            'cars' => false,
+            'vehicles' => false,
             'customers' => false,
             'payments' => false,
             'expenses' => false,

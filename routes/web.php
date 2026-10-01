@@ -4,13 +4,13 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AvailabilityCheckController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\CarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FleetController;
 use App\Http\Controllers\GpsLogController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PartnerRecruitmentController;
 use App\Http\Controllers\PermissionManagementController;
@@ -19,6 +19,7 @@ use App\Http\Controllers\RentRequestController;
 use App\Http\Controllers\RentalTripController;
 use App\Http\Controllers\CustomerSupportRequestController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleMaintenanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,7 @@ Route::view('/blogs', 'blogs')->middleware('auth')->name('blogs');
 Route::view('/terms-of-service', 'terms-of-service')->name('terms-of-service');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::get('/fleet', [FleetController::class, 'index'])->name('fleet.index');
-Route::get('/fleet/{car}', [FleetController::class, 'show'])->name('fleet.show');
+Route::get('/fleet/{vehicle}', [FleetController::class, 'show'])->name('fleet.show');
 Route::get('/airport-hires', [HomeController::class, 'airportHires'])->name('airport-hires.index');
 Route::get('/short-term-rentals', [HomeController::class, 'shortTermRentals'])->name('short-term-rentals.index');
 Route::get('/long-term-rentals', [HomeController::class, 'longTermRentals'])->name('long-term-rentals.index');
@@ -38,9 +39,10 @@ Route::get('/booking/confirm', [BookingController::class, 'create'])->name('book
 Route::post('/booking/confirm', [BookingController::class, 'store'])->name('booking.store');
 Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->name('booking.success');
 Route::get('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
-Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->middleware('auth')->name('support-requests.store');
+Route::post('/support-requests', [CustomerSupportRequestController::class, 'store'])->name('support-requests.store');
 Route::post('/airport-hires/support', [CustomerSupportRequestController::class, 'store'])->name('airport-hires.support.store');
 Route::post('/long-term-rentals/inquiry', [CustomerSupportRequestController::class, 'storeLongTerm'])->name('long-term-rentals.inquiry.store');
+Route::get('/request-trip', [RentRequestController::class, 'create'])->name('rent-requests.create');
 Route::post('/rent-requests', [RentRequestController::class, 'store'])->name('rent-requests.store');
 
 Route::middleware('guest')->group(function () {
@@ -64,18 +66,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/bookings/{booking}/invoice/pdf', [ProfileController::class, 'invoicePdf'])->name('profile.bookings.invoice-pdf');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
-    Route::middleware('permission:cars')->group(function () {
-        Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
-        Route::get('/vehicle-pricings', [CarController::class, 'pricingIndex'])->name('vehicle-pricings.index');
+    Route::middleware('permission:vehicles')->group(function () {
+        Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
+        Route::get('/vehicle-pricings', [VehicleController::class, 'pricingIndex'])->name('vehicle-pricings.index');
     });
-    Route::middleware(['role:super_admin', 'permission:cars'])->group(function () {
-        Route::post('/cars', [CarController::class, 'store'])->name('cars.store');
-        Route::put('/cars/{car}', [CarController::class, 'update'])->name('cars.update');
-        Route::patch('/cars/{car}/renewal', [CarController::class, 'updateRenewal'])->name('cars.renewal.update');
-        Route::delete('/cars/{car}', [CarController::class, 'destroy'])->name('cars.destroy');
-        Route::post('/vehicle-pricings', [CarController::class, 'storePricing'])->name('vehicle-pricings.store');
-        Route::put('/vehicle-pricings/{vehiclePricing}', [CarController::class, 'updatePricing'])->name('vehicle-pricings.update');
-        Route::delete('/vehicle-pricings/{vehiclePricing}', [CarController::class, 'destroyPricing'])->name('vehicle-pricings.destroy');
+    Route::middleware(['role:super_admin', 'permission:vehicles'])->group(function () {
+        Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
+        Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
+        Route::patch('/vehicles/{vehicle}/renewal', [VehicleController::class, 'updateRenewal'])->name('vehicles.renewal.update');
+        Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
+        Route::post('/vehicle-pricings', [VehicleController::class, 'storePricing'])->name('vehicle-pricings.store');
+        Route::put('/vehicle-pricings/{vehiclePricing}', [VehicleController::class, 'updatePricing'])->name('vehicle-pricings.update');
+        Route::delete('/vehicle-pricings/{vehiclePricing}', [VehicleController::class, 'destroyPricing'])->name('vehicle-pricings.destroy');
     });
 
     Route::middleware('permission:payments')->group(function () {
@@ -164,6 +166,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/support-requests', [CustomerSupportRequestController::class, 'index'])->name('support-requests.index');
         Route::get('/rent-requests', [RentRequestController::class, 'index'])->name('rent-requests.index');
         Route::get('/availability-check', [AvailabilityCheckController::class, 'index'])->name('availability-check.index');
+        Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::get('/orders/customers/search', [OrderController::class, 'searchCustomers'])->name('orders.customers.search');
+        Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     });
     Route::middleware('role:super_admin')->group(function () {
         Route::put('/rent-requests/{rentRequest}', [RentRequestController::class, 'update'])->name('rent-requests.update');

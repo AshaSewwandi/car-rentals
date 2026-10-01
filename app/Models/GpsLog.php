@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class GpsLog extends Model
 {
     protected $fillable = [
-        'car_id',
+        'vehicle_id',
         'log_date',
         'opening_km',
         'closing_km',
@@ -25,9 +25,9 @@ class GpsLog extends Model
 
     protected $appends = ['distance_km'];
 
-    public function car(): BelongsTo
+    public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Vehicle::class);
     }
 
     public function getDistanceKmAttribute(): float

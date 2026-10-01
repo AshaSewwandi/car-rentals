@@ -218,7 +218,7 @@
       <table class="table table-striped mb-0 align-middle payments-table">
         <thead>
           <tr>
-            <th>Car</th>
+            <th>Vehicle</th>
             <th>Customer</th>
             <th>Month</th>
             <th>Due Date</th>
@@ -232,7 +232,7 @@
         <tbody>
           @forelse($payments as $payment)
             <tr>
-              <td data-label="Car">{{ $payment->rental->car->name }}</td>
+              <td data-label="Vehicle">{{ $payment->rental->vehicle->name }}</td>
               <td data-label="Customer">{{ $payment->rental->customer->name }}</td>
               <td data-label="Month">{{ $payment->month }}</td>
               <td data-label="Due Date">{{ $payment->due_date->format('Y-m-d') }}</td>
@@ -258,7 +258,7 @@
                   data-bs-toggle="modal"
                   data-bs-target="#deletePaymentModal"
                   data-delete-url="{{ route('payments.destroy', $payment) }}"
-                  data-payment-text="{{ $payment->rental->car->name }} | {{ $payment->rental->customer->name }} | {{ $payment->month }}"
+                  data-payment-text="{{ $payment->rental->vehicle->name }} | {{ $payment->rental->customer->name }} | {{ $payment->month }}"
                 >
                   Delete
                 </button>
@@ -294,7 +294,7 @@
                 <option value="">Select Rental</option>
                 @foreach($rentals as $rental)
                   <option value="{{ $rental->id }}" @selected(old('rental_id') == $rental->id)>
-                    {{ $rental->car->plate_no }} - {{ $rental->car->name }} - {{ $rental->customer->name }}
+                    {{ $rental->vehicle->plate_no }} - {{ $rental->vehicle->name }} - {{ $rental->customer->name }}
                     ({{ strtoupper($rental->status) }}, Rs {{ number_format($rental->monthly_rent, 2) }})
                   </option>
                 @endforeach

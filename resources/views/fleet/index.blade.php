@@ -618,193 +618,6 @@
             border-color: #fecaca;
         }
 
-        .request-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(2, 6, 23, 0.56);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            z-index: 60;
-        }
-
-        .request-modal.open {
-            display: flex;
-        }
-
-        .request-panel {
-            width: min(620px, 100%);
-            overflow: hidden;
-            background: #fff;
-            border: 1px solid #dbe6f3;
-            border-radius: 14px;
-            box-shadow: 0 24px 54px rgba(15, 23, 42, 0.25);
-        }
-
-        .request-panel-body {
-            max-height: calc(100vh - 2rem);
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 1rem;
-            scrollbar-width: thin;
-            scrollbar-color: #94a3b8 #e2e8f0;
-        }
-
-        .request-panel-body::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        .request-panel-body::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 999px;
-        }
-
-        .request-panel-body::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 999px;
-            border: 2px solid #e2e8f0;
-            background-clip: padding-box;
-        }
-
-        .request-panel-body::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        .request-panel-body::-webkit-scrollbar-button {
-            width: 0;
-            height: 0;
-            display: none;
-        }
-
-        .request-title {
-            margin: 0 0 .25rem;
-            font-size: 1.2rem;
-            font-family: "Space Grotesk", "Segoe UI", Tahoma, sans-serif;
-        }
-
-        .request-sub {
-            margin: 0 0 .8rem;
-            color: #64748b;
-            font-size: .9rem;
-        }
-
-        .request-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: .65rem;
-        }
-
-        .request-field label {
-            display: block;
-            margin-bottom: .35rem;
-            font-size: .74rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            color: #64748b;
-            font-weight: 700;
-        }
-
-        .request-field input,
-        .request-field textarea {
-            width: 100%;
-            border: 1px solid #c8d7ea;
-            background: #f8fbff;
-            border-radius: 10px;
-            padding: .62rem .7rem;
-            color: #0f172a;
-            font: inherit;
-        }
-
-        .request-field textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .request-field.full {
-            grid-column: 1 / -1;
-        }
-
-        .request-field input.input-error,
-        .request-field textarea.input-error,
-        .request-summary.input-error {
-            border-color: #dc2626 !important;
-            background: #fff7f7 !important;
-        }
-
-        .request-error {
-            display: none;
-            margin-top: .35rem;
-            color: #b91c1c;
-            font-size: .8rem;
-            font-weight: 600;
-            line-height: 1.3;
-        }
-
-        .request-error.show {
-            display: block;
-        }
-
-        .request-summary {
-            border: 1px solid #dbe6f3;
-            border-radius: 12px;
-            background: #f8fbff;
-            padding: .7rem .8rem;
-        }
-
-        .request-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: .55rem .8rem;
-        }
-
-        .request-summary-item {
-            padding: .45rem .55rem;
-            border-radius: 10px;
-            border: 1px solid #dbe6f3;
-            background: #fff;
-        }
-
-        .request-summary-item strong {
-            display: block;
-            font-size: .7rem;
-            color: #64748b;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-            margin-bottom: .2rem;
-        }
-
-        .request-summary-item span {
-            color: #0f172a;
-            font-weight: 600;
-            font-size: .9rem;
-            line-height: 1.35;
-        }
-
-        .request-summary-item input {
-            width: 100%;
-            border: 1px solid #c8d7ea;
-            background: #f8fbff;
-            border-radius: 8px;
-            padding: .46rem .5rem;
-            color: #0f172a;
-            font: inherit;
-            font-size: .9rem;
-        }
-
-        .request-actions {
-            margin-top: .85rem;
-            display: flex;
-            justify-content: flex-end;
-            gap: .55rem;
-        }
-
-        .btn-cancel {
-            border: 1px solid #cbd5e1;
-            background: #fff;
-            color: #334155;
-        }
-
         @media (max-width: 1050px) {
             .fleet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -935,14 +748,29 @@
                         </div>
                         <small class="field-error" id="fleet_end_date_error"></small>
                     </div>
+                    <div class="control">
+                        <label for="order_type">Hire or Rent</label>
+                        <div class="control-shell">
+                            <select id="order_type" name="order_type">
+                                <option value="" @selected(($filters['order_type'] ?? '') === '')>Either</option>
+                                <option value="hire" @selected(($filters['order_type'] ?? '') === 'hire')>Hire</option>
+                                <option value="rent" @selected(($filters['order_type'] ?? '') === 'rent')>Rent</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="control filter-submit-wrap">
                         <span class="filter-submit-spacer">Action</span>
                         <button class="btn btn-primary filter-submit js-loading-submit" type="submit" data-loading-text="Checking Availability...">
                             <span class="btn-spinner" aria-hidden="true"></span>
-                            <span class="btn-label">Find Available Cars</span>
+                            <span class="btn-label">Find Available Vehicles</span>
                         </button>
                     </div>
                 </form>
+
+                <p class="fleet-tip">
+                    Multi-stop trip or not sure which vehicle you need?
+                    <a class="btn-request" href="{{ route('rent-requests.create') }}">Request a Custom Trip</a>
+                </p>
 
                 @if($filters['start_date'] && $filters['end_date'])
                     <div class="results-note">
@@ -1020,35 +848,13 @@
                         <div class="fleet-status {{ $isAvailable ? '' : 'rented' }}">{{ $availabilityLabel }}</div>
                         <div class="fleet-actions">
                             <div class="fleet-primary-action">
-                            @if($hasDateFilter)
                                 <a
                                     class="btn-request btn-primary-action"
-                                    data-loading-link="true"
-                                    data-loading-text="Opening..."
-                                    href="{{ route('booking.confirm', [
-                                        'car_id' => $car['id'],
-                                        'start_date' => $filters['start_date'],
-                                        'end_date' => $filters['end_date'],
-                                        'start_location' => $filters['start_location'],
-                                    ]) }}"
+                                    href="{{ route('rent-requests.create', ['vehicle' => ($car['name'] ?: $car['plate_no']) . ' (' . $car['plate_no'] . ')']) }}"
                                 >
-                                    <span class="btn-spinner" aria-hidden="true"></span>
-                                    <span class="btn-label">Continue to Book</span>
+                                    Request This Vehicle
                                 </a>
-                            @else
-                                <button
-                                    type="button"
-                                    class="btn-request btn-muted-action"
-                                    title="Select start date and end date first"
-                                    disabled
-                                >
-                                    Continue to Book
-                                </button>
-                            @endif
                             </div>
-                            @unless($hasDateFilter)
-                                <p class="fleet-tip">Select start and end dates to continue booking.</p>
-                            @endunless
                             <div class="fleet-secondary-actions">
                                 <a
                                     class="btn-request"
@@ -1056,19 +862,6 @@
                                 >
                                     View Details
                                 </a>
-                                <button
-                                    type="button"
-                                    class="btn-request js-request-btn"
-                                    data-car-id="{{ $car['id'] }}"
-                                    data-car="{{ $car['name'] ?: $car['plate_no'] }}"
-                                    data-plate="{{ $car['plate_no'] }}"
-                                    data-start-date="{{ $filters['start_date'] }}"
-                                    data-end-date="{{ $filters['end_date'] }}"
-                                    data-start-location="{{ $filters['start_location'] }}"
-                                >
-                                    <span class="btn-spinner" aria-hidden="true"></span>
-                                    <span class="btn-label">Rent on Request</span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -1078,84 +871,13 @@
                     @if($filters['start_date'] && $filters['end_date'])
                         No vehicles are available for the selected date range.
                     @else
-                        No cars found in the fleet yet.
+                        No vehicles found in the fleet yet.
                     @endif
                 </div>
             @endforelse
         </section>
     </main>
     @include('partials.public-footer')
-
-    <div class="request-modal" id="requestModal" aria-hidden="true">
-        <div class="request-panel" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
-            <div class="request-panel-body">
-                <h2 class="request-title" id="requestTitle">Rent on Request</h2>
-                <p class="request-sub" id="requestSub">Submit your request and our team will contact you.</p>
-                @php
-                    $currentUser = auth()->user();
-                @endphp
-
-                <form id="requestForm" method="post" action="{{ route('rent-requests.store') }}" novalidate>
-                    @csrf
-                    <input type="hidden" name="car_id" id="requestCarId">
-                    <input type="hidden" name="car_name" id="requestCarName">
-                    <input type="hidden" name="plate_no" id="requestPlateNo">
-                    <div class="request-grid">
-                        <div class="request-field">
-                            <label for="requestName">Name</label>
-                            <input id="requestName" name="name" type="text" value="{{ old('name', $currentUser?->name) }}" required>
-                            <small class="request-error" id="requestNameError"></small>
-                        </div>
-                        <div class="request-field">
-                            <label for="requestPhone">Phone</label>
-                            <input id="requestPhone" name="phone" type="text" value="{{ old('phone', $currentUser?->phone) }}" placeholder="+94 ...">
-                            <small class="request-error" id="requestPhoneError"></small>
-                        </div>
-                        <div class="request-field full">
-                            <label for="requestEmail">Email</label>
-                            <input id="requestEmail" name="email" type="email" value="{{ old('email', $currentUser?->email) }}" placeholder="you@example.com">
-                            <small class="request-error" id="requestEmailError"></small>
-                        </div>
-                        <div class="request-field full">
-                            <label>Rental Details</label>
-                            <div class="request-summary" id="requestSummaryBlock">
-                                <div class="request-summary-grid">
-                                    <div class="request-summary-item">
-                                        <strong>Vehicle</strong>
-                                        <span id="requestSummaryVehicle">-</span>
-                                    </div>
-                                    <div class="request-summary-item">
-                                        <strong>Pickup</strong>
-                                        <input type="text" id="requestStartLocation" name="start_location" placeholder="City, Airport, or Address">
-                                    </div>
-                                    <div class="request-summary-item">
-                                        <strong>Start Date</strong>
-                                        <input type="date" id="requestStartDate" name="start_date">
-                                    </div>
-                                    <div class="request-summary-item">
-                                        <strong>End Date</strong>
-                                        <input type="date" id="requestEndDate" name="end_date">
-                                    </div>
-                                </div>
-                            </div>
-                            <small class="request-error" id="requestDetailsError"></small>
-                        </div>
-                        <div class="request-field full">
-                            <label for="requestMessage">Additional Note (Optional)</label>
-                            <textarea id="requestMessage" name="message" placeholder="Any special request, pickup time, child seat, driver, etc."></textarea>
-                        </div>
-                    </div>
-                    <div class="request-actions">
-                        <button type="button" class="btn btn-cancel" id="requestCancel">Cancel</button>
-                        <button type="submit" class="btn btn-primary js-loading-submit" data-loading-text="Sending Request...">
-                            <span class="btn-spinner" aria-hidden="true"></span>
-                            <span class="btn-label">Send Request</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script>
         (function () {
@@ -1189,181 +911,6 @@
                     clearButtonLoading(el);
                 });
             };
-
-            const modal = document.getElementById('requestModal');
-            const cancelBtn = document.getElementById('requestCancel');
-            const messageEl = document.getElementById('requestMessage');
-            const subEl = document.getElementById('requestSub');
-            const openButtons = document.querySelectorAll('.js-request-btn');
-            const carIdEl = document.getElementById('requestCarId');
-            const carNameEl = document.getElementById('requestCarName');
-            const plateNoEl = document.getElementById('requestPlateNo');
-            const startLocationEl = document.getElementById('requestStartLocation');
-            const startDateEl = document.getElementById('requestStartDate');
-            const endDateEl = document.getElementById('requestEndDate');
-            const requestNameEl = document.getElementById('requestName');
-            const requestPhoneEl = document.getElementById('requestPhone');
-            const requestEmailEl = document.getElementById('requestEmail');
-            const requestForm = document.getElementById('requestForm');
-            const requestSummaryBlockEl = document.getElementById('requestSummaryBlock');
-            const requestSummaryVehicleEl = document.getElementById('requestSummaryVehicle');
-            const requestNameErrorEl = document.getElementById('requestNameError');
-            const requestPhoneErrorEl = document.getElementById('requestPhoneError');
-            const requestEmailErrorEl = document.getElementById('requestEmailError');
-            const requestDetailsErrorEl = document.getElementById('requestDetailsError');
-            const requestSubmitBtn = requestForm ? requestForm.querySelector('.js-loading-submit') : null;
-            const defaultRequestName = @json(old('name', $currentUser?->name ?? ''));
-            const defaultRequestPhone = @json(old('phone', $currentUser?->phone ?? ''));
-            const defaultRequestEmail = @json(old('email', $currentUser?->email ?? ''));
-
-            const showRequestError = (inputEl, errorEl, message) => {
-                if (inputEl) inputEl.classList.add('input-error');
-                if (errorEl) {
-                    errorEl.textContent = message;
-                    errorEl.classList.add('show');
-                }
-            };
-
-            const clearRequestError = (inputEl, errorEl) => {
-                if (inputEl) inputEl.classList.remove('input-error');
-                if (errorEl) {
-                    errorEl.textContent = '';
-                    errorEl.classList.remove('show');
-                }
-            };
-
-            const validateRequestForm = () => {
-                let valid = true;
-
-                clearRequestError(requestNameEl, requestNameErrorEl);
-                clearRequestError(requestPhoneEl, requestPhoneErrorEl);
-                clearRequestError(requestEmailEl, requestEmailErrorEl);
-                clearRequestError(requestSummaryBlockEl, requestDetailsErrorEl);
-
-                if (!requestNameEl.value.trim()) {
-                    showRequestError(requestNameEl, requestNameErrorEl, 'Please enter your name.');
-                    valid = false;
-                }
-
-                const phoneValue = (requestPhoneEl.value || '').trim();
-                const emailValue = (requestEmailEl.value || '').trim();
-                const phoneDigits = phoneValue.replace(/\D/g, '');
-                const hasPhone = phoneValue.length > 0;
-                const hasEmail = emailValue.length > 0;
-
-                if (!hasPhone) {
-                    showRequestError(requestPhoneEl, requestPhoneErrorEl, 'Please enter phone number.');
-                    valid = false;
-                } else if (phoneDigits.length < 9 || phoneDigits.length > 15) {
-                    showRequestError(requestPhoneEl, requestPhoneErrorEl, 'Please enter a valid phone number.');
-                    valid = false;
-                }
-
-                if (!hasEmail) {
-                    showRequestError(requestEmailEl, requestEmailErrorEl, 'Please enter email.');
-                    valid = false;
-                } else {
-                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailPattern.test(emailValue)) {
-                        showRequestError(requestEmailEl, requestEmailErrorEl, 'Please enter a valid email address.');
-                        valid = false;
-                    }
-                }
-
-                if (!startLocationEl.value.trim() || !startDateEl.value || !endDateEl.value) {
-                    showRequestError(requestSummaryBlockEl, requestDetailsErrorEl, 'Please select pickup location, start date, and end date first.');
-                    valid = false;
-                }
-
-                if (startDateEl.value && endDateEl.value && endDateEl.value < startDateEl.value) {
-                    showRequestError(requestSummaryBlockEl, requestDetailsErrorEl, 'End date must be on or after start date.');
-                    valid = false;
-                }
-
-                return valid;
-            };
-
-            const syncRequestEndDateMin = () => {
-                endDateEl.min = startDateEl.value || '';
-                if (startDateEl.value && endDateEl.value && endDateEl.value < startDateEl.value) {
-                    endDateEl.value = '';
-                }
-            };
-
-            const closeModal = () => {
-                modal.classList.remove('open');
-                modal.setAttribute('aria-hidden', 'true');
-            };
-
-            openButtons.forEach((button) => {
-                button.addEventListener('click', () => {
-                    setButtonLoading(button, 'Opening...');
-                    const carId = button.dataset.carId || '';
-                    const car = button.dataset.car || '-';
-                    const plate = button.dataset.plate || '-';
-                    const startDate = button.dataset.startDate || 'Not selected';
-                    const endDate = button.dataset.endDate || 'Not selected';
-                    const startLocation = button.dataset.startLocation || 'Not selected';
-
-                    carIdEl.value = carId;
-                    carNameEl.value = car;
-                    plateNoEl.value = plate;
-                    startLocationEl.value = startLocation === 'Not selected' ? '' : startLocation;
-                    startDateEl.value = startDate === 'Not selected' ? '' : startDate;
-                    endDateEl.value = endDate === 'Not selected' ? '' : endDate;
-                    syncRequestEndDateMin();
-                    if (requestNameEl) requestNameEl.value = defaultRequestName;
-                    if (requestPhoneEl) requestPhoneEl.value = defaultRequestPhone;
-                    if (requestEmailEl) requestEmailEl.value = defaultRequestEmail;
-                    clearRequestError(requestNameEl, requestNameErrorEl);
-                    clearRequestError(requestPhoneEl, requestPhoneErrorEl);
-                    clearRequestError(requestEmailEl, requestEmailErrorEl);
-                    clearRequestError(requestSummaryBlockEl, requestDetailsErrorEl);
-                    if (requestSummaryVehicleEl) requestSummaryVehicleEl.textContent = `${car} (${plate})`;
-
-                    subEl.textContent = `Vehicle: ${car} (${plate})`;
-                    messageEl.value = 'Please contact me with availability and final rent details.';
-
-                    modal.classList.add('open');
-                    modal.setAttribute('aria-hidden', 'false');
-                    setTimeout(() => clearButtonLoading(button), 250);
-                });
-            });
-
-            cancelBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-
-            if (requestForm) {
-                requestForm.addEventListener('submit', (event) => {
-                    if (!validateRequestForm()) {
-                        event.preventDefault();
-                        clearButtonLoading(requestSubmitBtn);
-                        return;
-                    }
-                    setButtonLoading(requestSubmitBtn, 'Sending Request...');
-                });
-            }
-
-            [requestNameEl, requestPhoneEl, requestEmailEl].forEach((el) => {
-                if (!el) return;
-                el.addEventListener('input', () => {
-                    validateRequestForm();
-                });
-            });
-
-            [startLocationEl, startDateEl, endDateEl].forEach((el) => {
-                if (!el) return;
-                el.addEventListener('input', () => {
-                    if (el === startDateEl) {
-                        syncRequestEndDateMin();
-                    }
-                    validateRequestForm();
-                });
-            });
 
             const filterForm = document.getElementById('fleetFilterForm');
             const filterPickupInput = document.getElementById('start_location');

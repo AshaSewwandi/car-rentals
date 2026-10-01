@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Car;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Models\VehiclePricing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class CarController extends Controller
+class VehicleController extends Controller
 {
     public function index(Request $request)
     {
-        $cars = Car::query()
+        $vehicles = Vehicle::query()
             ->with(['partner', 'images'])
             ->when($request->user()?->isPartner(), function ($query) use ($request) {
                 $query->where('partner_user_id', $request->user()->id);
@@ -30,12 +30,12 @@ class CarController extends Controller
             ->orderBy('model')
             ->get();
 
-        return view('cars.index', compact('cars', 'partners', 'vehiclePricings'));
+        return view('vehicles.index', compact('vehicles', 'partners', 'vehiclePricings'));
     }
 
     public function pricingIndex(Request $request)
     {
-        abort_unless($request->user()?->canAccess('cars'), 403);
+        abort_unless($request->user()?->canAccess('vehicles'), 403);
 
         $vehiclePricings = VehiclePricing::query()
             ->orderBy('make')
@@ -49,26 +49,26 @@ class CarController extends Controller
     {
         abort_unless($request->user()?->canManageData(), 403);
 
-        $data = $this->validateCar($request);
-        $car = Car::create($data);
-        $this->storeUploadedImages($request, $car);
+        $data = $this->validateVehicle($request);
+        $vehicle = Vehicle::create($data);
+        $this->storeUploadedImages($request, $vehicle);
 
-        return back()->with('success', 'Car added successfully.');
+        return back()->with('success', 'Vehicle added successfully.');
     }
 
-    public function update(Request $request, Car $car)
+    public function update(Request $request, Vehicle $vehicle)
     {
         abort_unless($request->user()?->canManageData(), 403);
 
-        $data = $this->validateCar($request, $car->id);
-        $car->update($data);
-        $this->removeSelectedImages($request, $car);
-        $this->storeUploadedImages($request, $car);
+        $data = $this->validateVehicle($request, $vehicle->id);
+        $vehicle->update($data);
+        $this->removeSelectedImages($request, $vehicle);
+        $this->storeUploadedImages($request, $vehicle);
 
-        return back()->with('success', 'Car updated successfully.');
+        return back()->with('success', 'Vehicle updated successfully.');
     }
 
-    public function updateRenewal(Request $request, Car $car)
+    public function updateRenewal(Request $request, Vehicle $vehicle)
     {
         abort_unless($request->user()?->canManageData(), 403);
 
@@ -81,20 +81,20 @@ class CarController extends Controller
             ? 'tracker_insurance_expires'
             : 'tracker_license_expires';
 
-        $car->update([
+        $vehicle->update([
             $field => $data['renewal_date'],
         ]);
 
         return back()->with('success', ucfirst($data['renewal_type']).' renewal date updated successfully.');
     }
 
-    public function destroy(Request $request, Car $car)
+    public function destroy(Request $request, Vehicle $vehicle)
     {
         abort_unless($request->user()?->canManageData(), 403);
 
-        $car->delete();
+        $vehicle->delete();
 
-        return back()->with('success', 'Car deleted successfully.');
+        return back()->with('success', 'Vehicle deleted successfully.');
     }
 
     public function storePricing(Request $request)
@@ -126,7 +126,7 @@ class CarController extends Controller
         return back()->with('success', 'Vehicle pricing deleted successfully.');
     }
 
-    private function validateCar(Request $request, ?int $carId = null): array
+    private function validateVehicle(Request $request, ?int $vehicleId = null): array
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -139,6 +139,8 @@ class CarController extends Controller
             'transmission' => ['nullable', 'string', 'max:50'],
             'driver_mode' => ['required', 'in:both,with_driver_only,without_driver_only'],
             'allow_long_term' => ['required', 'boolean'],
+            'available_for_hire' => ['required', 'boolean'],
+            'available_for_rent' => ['required', 'boolean'],
             'dagps_device_id' => ['nullable', 'string', 'max:100'],
             'tracker_device_name' => ['nullable', 'string', 'max:100'],
             'tracker_device_type' => ['nullable', 'string', 'max:100'],
@@ -156,7 +158,7 @@ class CarController extends Controller
             'maintenance_last_service_mileage' => ['nullable', 'integer', 'min:0'],
             'maintenance_next_service_date' => ['nullable', 'date'],
             'maintenance_note' => ['nullable', 'string', 'max:1000'],
-            'plate_no' => ['required', 'string', 'max:100', Rule::unique('cars', 'plate_no')->ignore($carId)],
+            'plate_no' => ['required', 'string', 'max:100', Rule::unique('vehicles', 'plate_no')->ignore($vehicleId)],
             'status' => ['required', 'in:available,rented'],
             'note' => ['nullable', 'string', 'max:255'],
             'images' => ['nullable', 'array'],
@@ -171,18 +173,18 @@ class CarController extends Controller
         ]);
     }
 
-    private function storeUploadedImages(Request $request, Car $car): void
+    private function storeUploadedImages(Request $request, Vehicle $vehicle): void
     {
         if (!$request->hasFile('images')) {
             return;
         }
 
-        $uploadDir = public_path('uploads/cars');
+        $uploadDir = public_path('uploads/vehicles');
         if (!File::exists($uploadDir)) {
             File::makeDirectory($uploadDir, 0755, true);
         }
 
-        $nextSort = (int) ($car->images()->max('sort_order') ?? -1) + 1;
+        $nextSort = (int) ($vehicle->images()->max('sort_order') ?? -1) + 1;
 
         foreach ($request->file('images', []) as $file) {
             if (!$file || !$file->isValid()) {
@@ -191,7 +193,7 @@ class CarController extends Controller
 
             $fileName = sprintf(
                 '%s_%s_%s.%s',
-                $car->id,
+                $vehicle->id,
                 now()->format('YmdHis'),
                 Str::random(8),
                 $file->getClientOriginalExtension()
@@ -199,14 +201,14 @@ class CarController extends Controller
 
             $file->move($uploadDir, $fileName);
 
-            $car->images()->create([
-                'path' => 'uploads/cars/' . $fileName,
+            $vehicle->images()->create([
+                'path' => 'uploads/vehicles/' . $fileName,
                 'sort_order' => $nextSort++,
             ]);
         }
     }
 
-    private function removeSelectedImages(Request $request, Car $car): void
+    private function removeSelectedImages(Request $request, Vehicle $vehicle): void
     {
         $ids = collect($request->input('remove_image_ids', []))
             ->filter(fn ($id) => is_numeric($id))
@@ -217,7 +219,7 @@ class CarController extends Controller
             return;
         }
 
-        $images = $car->images()->whereIn('id', $ids)->get();
+        $images = $vehicle->images()->whereIn('id', $ids)->get();
         foreach ($images as $image) {
             File::delete(public_path($image->path));
             $image->delete();

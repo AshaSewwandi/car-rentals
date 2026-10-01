@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
-use App\Models\Car;
 use App\Models\Customer;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,14 +15,14 @@ class AgreementController extends Controller
         $user = auth()->user();
 
         $agreementsQuery = Agreement::query()
-            ->with(['car', 'customer'])
+            ->with(['vehicle', 'customer'])
             ->latest();
 
         if ($user?->isCustomerPortal()) {
             $customerId = $user->customer_id;
             if (!$customerId) {
                 return view('agreements.index', [
-                    'cars' => collect(),
+                    'vehicles' => collect(),
                     'customers' => collect(),
                     'agreements' => collect(),
                 ]);
@@ -33,17 +33,17 @@ class AgreementController extends Controller
         $agreements = $agreementsQuery->get();
 
         if ($user?->isCustomerPortal()) {
-            $carIds = $agreements->pluck('car_id')->unique()->filter()->values();
-            $cars = $carIds->isEmpty()
+            $vehicleIds = $agreements->pluck('vehicle_id')->unique()->filter()->values();
+            $vehicles = $vehicleIds->isEmpty()
                 ? collect()
-                : Car::query()->whereIn('id', $carIds)->orderBy('name')->get();
+                : Vehicle::query()->whereIn('id', $vehicleIds)->orderBy('name')->get();
             $customers = Customer::query()->where('id', $user->customer_id)->orderBy('name')->get();
         } else {
-            $cars = Car::query()->orderBy('name')->get();
+            $vehicles = Vehicle::query()->orderBy('name')->get();
             $customers = Customer::query()->orderBy('name')->get();
         }
 
-        return view('agreements.index', compact('cars', 'customers', 'agreements'));
+        return view('agreements.index', compact('vehicles', 'customers', 'agreements'));
     }
 
     public function store(Request $request)
@@ -89,7 +89,7 @@ class AgreementController extends Controller
     private function validateAgreement(Request $request): array
     {
         return $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'customer_id' => ['required', 'exists:customers,id'],
             'agreement_no' => ['nullable', 'string', 'max:100'],
             'start_date' => ['required', 'date'],

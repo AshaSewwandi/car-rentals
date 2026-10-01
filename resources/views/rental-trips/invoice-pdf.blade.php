@@ -98,7 +98,7 @@
             <div class="header-left">
                 <p class="brand">R&A Auto Rentals</p>
                 <p class="muted">Galle, Sri Lanka</p>
-                <p class="muted">Phone: +94 77 717 3264</p>
+                <p class="muted">Phone: 077 599 8951</p>
             </div>
             <div class="header-right">
                 <p class="invoice-title">Invoice</p>
@@ -115,7 +115,7 @@
                     <tr><td class="label">Customer</td><td class="value">{{ $booking->customer_name }}</td></tr>
                     <tr><td class="label">Phone</td><td class="value">{{ $booking->customer_phone ?: '-' }}</td></tr>
                     <tr><td class="label">Email</td><td class="value">{{ $booking->customer_email ?: '-' }}</td></tr>
-                    <tr><td class="label">Vehicle</td><td class="value">{{ $booking->car?->name }} ({{ $booking->car?->plate_no }})</td></tr>
+                    <tr><td class="label">Vehicle</td><td class="value">{{ $booking->vehicle?->name }} ({{ $booking->vehicle?->plate_no }})</td></tr>
                     <tr><td class="label">Trip Dates</td><td class="value">{{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}</td></tr>
                     <tr><td class="label">Rental Days</td><td class="value">{{ $booking->rental_days }} day(s)</td></tr>
                     <tr><td class="label">Rental Option</td><td class="value">{{ $booking->driver_option === 'with_driver' ? 'With driver' : 'Without driver' }}</td></tr>
