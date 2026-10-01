@@ -1,0 +1,406 @@
+@extends('layouts.app')
+@section('title', 'Expenses Management')
+
+@section('content')
+@php
+  $canManageData = auth()->user()->canManageData();
+@endphp
+<style>
+  .expenses-page .expenses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+  }
+
+  .expenses-page .expenses-header-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+
+  .expenses-page .expenses-header-total {
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .expenses-page .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .expenses-page .expenses-table {
+    min-width: 680px;
+  }
+
+  @media (max-width: 920px) {
+    .expenses-page .page-toolbar {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .expenses-page .page-toolbar form {
+      width: 100%;
+      display: grid !important;
+      gap: .5rem;
+    }
+
+    .expenses-page .page-toolbar form .btn {
+      width: 100%;
+    }
+
+    .expenses-page .table-responsive {
+      overflow: visible;
+    }
+
+    .expenses-page .expenses-table {
+      min-width: 0;
+    }
+
+    .expenses-page .expenses-table,
+    .expenses-page .expenses-table thead,
+    .expenses-page .expenses-table tbody,
+    .expenses-page .expenses-table th,
+    .expenses-page .expenses-table td,
+    .expenses-page .expenses-table tr {
+      display: block;
+      width: 100%;
+    }
+
+    .expenses-page .expenses-table thead {
+      display: none;
+    }
+
+    .expenses-page .expenses-table tbody tr {
+      border: 1px solid #dbe6f3;
+      border-radius: 12px;
+      margin: .7rem;
+      background: #fff;
+      overflow: hidden;
+      box-sizing: border-box;
+      width: calc(100% - 1.4rem);
+    }
+
+    .expenses-page .expenses-table tbody td {
+      position: relative;
+      border-top: 1px solid #edf3fb;
+      padding: .62rem .7rem .62rem 40%;
+      min-height: 42px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      text-align: left !important;
+    }
+
+    .expenses-page .expenses-table tbody td:first-child {
+      border-top: 0;
+    }
+
+    .expenses-page .expenses-table tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: .7rem;
+      top: .62rem;
+      width: calc(40% - 1rem);
+      color: #64748b;
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions {
+      padding-left: .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .42rem;
+      align-items: stretch;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions::before {
+      position: static;
+      display: block;
+      width: auto;
+      margin-bottom: .4rem;
+    }
+
+    .expenses-page .expenses-table tbody td.expense-actions .btn {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .expenses-page .expenses-table tbody td.no-data {
+      padding: 1rem .8rem !important;
+      text-align: center !important;
+      border-top: 0;
+    }
+
+    .expenses-page .expenses-table tbody td.no-data::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .expenses-page .page-toolbar > div:first-child h4 {
+      font-size: 1.65rem;
+    }
+
+    .expenses-page .expenses-header {
+      align-items: flex-start;
+    }
+
+    .expenses-page .expenses-header .header-title {
+      width: 100%;
+      font-size: 1.22rem;
+      line-height: 1.25;
+    }
+
+    .expenses-page .expenses-header-meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .expenses-page .expenses-header-meta .btn {
+      min-height: 38px;
+      padding-left: .7rem;
+      padding-right: .7rem;
+      white-space: nowrap;
+    }
+  }
+</style>
+<div class="expenses-page">
+<div class="page-toolbar">
+  <div class="mb-1 mb-md-0">
+    <h4 class="mb-1">Manage Expenses</h4>
+    <div class="text-muted">Track service and operational costs by vehicle, month, and expense type.</div>
+  </div>
+  <form class="d-flex gap-2" method="get" action="{{ route('expenses.index') }}">
+    <input type="month" class="form-control" name="month" value="{{ $month }}">
+    <button class="btn btn-dark">Filter</button>
+  </form>
+</div>
+
+@if($errors->any())
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+      @endforeach
+    </ul>
+  </div>
+@endif
+
+<div class="card list-card">
+  <div class="card-header expenses-header">
+    <span class="header-title">Expense List ({{ $month }})</span>
+    <div class="expenses-header-meta">
+      <strong class="expenses-header-total">Rs {{ number_format($total, 2) }}</strong>
+      @if($canManageData)
+        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add Expense</button>
+      @endif
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0 expenses-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Vehicle</th>
+            <th>Type</th>
+            <th class="text-end">Amount</th>
+            <th>Note</th>
+            @if($canManageData)
+              <th>Action</th>
+            @endif
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($expenses as $expense)
+            <tr>
+              <td data-label="Date">{{ $expense->date->format('Y-m-d') }}</td>
+              <td data-label="Vehicle">{{ $expense->vehicle?->name }}{{ $expense->vehicle?->plate_no ? ' (' . $expense->vehicle->plate_no . ')' : '' }}</td>
+              <td data-label="Type">{{ ucfirst($expense->type) }}</td>
+              <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
+              <td data-label="Note">{{ $expense->note ?: '-' }}</td>
+              @if($canManageData)
+                <td data-label="Action" class="text-nowrap expense-actions">
+                  <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editExpenseModal{{ $expense->id }}">Update</button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteExpenseModal"
+                    data-delete-url="{{ route('expenses.destroy', $expense) }}"
+                    data-expense-text="{{ $expense->date->format('Y-m-d') }} | {{ $expense->vehicle?->name }} | Rs {{ number_format($expense->amount, 2) }}"
+                  >
+                    Delete
+                  </button>
+                </td>
+              @endif
+            </tr>
+          @empty
+            <tr><td colspan="{{ $canManageData ? 6 : 5 }}" class="text-center p-4 text-muted no-data">No expenses found for {{ $month }}.</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+@if($canManageData)
+<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{{ route('expenses.store') }}">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Vehicle</label>
+            <select name="vehicle_id" class="form-select @error('vehicle_id') is-invalid @enderror" required>
+              <option value="">Select Vehicle</option>
+              @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}" @selected(old('vehicle_id') == $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control @error('date') is-invalid @enderror" value="{{ old('date', now()->format('Y-m-d')) }}" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Type</label>
+            <select name="type" class="form-select @error('type') is-invalid @enderror" required>
+              @foreach(['service','repair','insurance','license','tyre','other'] as $type)
+                <option value="{{ $type }}" @selected(old('type') === $type)>{{ ucfirst($type) }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Amount</label>
+            <input type="number" step="0.01" min="0" name="amount" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" required>
+          </div>
+          <div class="mb-1">
+            <label class="form-label">Note</label>
+            <input type="text" name="note" class="form-control @error('note') is-invalid @enderror" value="{{ old('note') }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-dark">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@foreach($expenses as $expense)
+  <div class="modal fade" id="editExpenseModal{{ $expense->id }}" tabindex="-1" aria-labelledby="editExpenseModalLabel{{ $expense->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editExpenseModalLabel{{ $expense->id }}">Edit Expense</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="{{ route('expenses.update', $expense) }}">
+          @csrf
+          @method('PUT')
+          <div class="modal-body">
+            <div class="mb-2">
+              <label class="form-label">Vehicle</label>
+              <select name="vehicle_id" class="form-select" required>
+                @foreach($vehicles as $vehicle)
+                  <option value="{{ $vehicle->id }}" @selected($expense->vehicle_id === $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Date</label>
+              <input type="date" name="date" class="form-control" value="{{ $expense->date->format('Y-m-d') }}" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Type</label>
+              <select name="type" class="form-select" required>
+                @foreach(['service','repair','insurance','license','tyre','other'] as $type)
+                  <option value="{{ $type }}" @selected($expense->type === $type)>{{ ucfirst($type) }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Amount</label>
+              <input type="number" step="0.01" min="0" name="amount" class="form-control" value="{{ $expense->amount }}" required>
+            </div>
+            <div class="mb-1">
+              <label class="form-label">Note</label>
+              <input type="text" name="note" class="form-control" value="{{ $expense->note }}">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-dark">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+@endforeach
+
+<div class="modal fade" id="deleteExpenseModal" tabindex="-1" aria-labelledby="deleteExpenseModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteExpenseModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0" id="deleteExpenseText">Are you sure you want to delete this expense?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
+        <form method="post" id="deleteExpenseForm" class="d-inline">
+          @csrf
+          @method('DELETE')
+          <button class="btn btn-outline-danger">Yes, Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+
+@if($canManageData)
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteModal = document.getElementById('deleteExpenseModal');
+    const deleteForm = document.getElementById('deleteExpenseForm');
+    const deleteText = document.getElementById('deleteExpenseText');
+
+    if (!deleteModal || !deleteForm || !deleteText) {
+      return;
+    }
+
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      const trigger = event.relatedTarget;
+      const deleteUrl = trigger?.getAttribute('data-delete-url');
+      const expenseText = trigger?.getAttribute('data-expense-text') || 'this expense';
+
+      if (deleteUrl) {
+        deleteForm.setAttribute('action', deleteUrl);
+      }
+
+      deleteText.textContent = `Are you sure you want to delete "${expenseText}"?`;
+    });
+  });
+</script>
+@endif
+</div>
+@endsection
+
+
