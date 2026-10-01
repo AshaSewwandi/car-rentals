@@ -3,7 +3,7 @@
 namespace App\Support;
 
 use App\Models\Booking;
-use App\Models\Car;
+use App\Models\Vehicle;
 
 class RevenueShareResolver
 {
@@ -12,9 +12,9 @@ class RevenueShareResolver
         return round(max($finalTotal - $driverTotal, 0), 2);
     }
 
-    public static function percentagesForCar(Car $car): array
+    public static function percentagesForVehicle(Vehicle $vehicle): array
     {
-        $partner = $car->partner;
+        $partner = $vehicle->partner;
 
         if (!$partner) {
             return [
@@ -32,9 +32,9 @@ class RevenueShareResolver
         ];
     }
 
-    public static function splitForCar(Car $car, float $finalTotal): array
+    public static function splitForVehicle(Vehicle $vehicle, float $finalTotal): array
     {
-        $percentages = self::percentagesForCar($car);
+        $percentages = self::percentagesForVehicle($vehicle);
         $shareableAmount = round($finalTotal, 2);
 
         return $percentages + [
@@ -53,8 +53,8 @@ class RevenueShareResolver
         $adminPercentage = $booking->admin_share_percentage;
 
         if ($partnerPercentage === null || $adminPercentage === null) {
-            $booking->loadMissing('car.partner');
-            $percentages = self::percentagesForCar($booking->car);
+            $booking->loadMissing('vehicle.partner');
+            $percentages = self::percentagesForVehicle($booking->vehicle);
 
             return $percentages + [
                 'shareable_amount' => $shareableAmount,

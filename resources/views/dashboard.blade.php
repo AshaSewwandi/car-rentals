@@ -361,7 +361,7 @@
 <div class="dashboard-toolbar">
   <div class="dashboard-toolbar-left">
     <h4 class="mb-0">Overview</h4>
-    <input class="dash-search" type="text" placeholder="Search cars, users..." aria-label="Search">
+    <input class="dash-search" type="text" placeholder="Search vehicles, users..." aria-label="Search">
   </div>
   <div class="dashboard-toolbar-right">
     <form class="d-flex gap-2" method="get" action="{{ route('dashboard') }}">
@@ -426,8 +426,8 @@
     <div class="card panel-card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span>Renewals From {{ $renewalWindowStart->format('Y-m-d') }} To {{ $renewalWindowEnd->format('Y-m-d') }}</span>
-        @if(auth()->user()->canAccess('cars'))
-          <a class="panel-link" href="{{ route('cars.index') }}">Manage Vehicles</a>
+        @if(auth()->user()->canAccess('vehicles'))
+          <a class="panel-link" href="{{ route('vehicles.index') }}">Manage Vehicles</a>
         @endif
       </div>
       <div class="card-body p-0">
@@ -447,7 +447,7 @@
             <tbody>
               @forelse($renewalAlerts as $alert)
                 <tr>
-                  <td data-label="Vehicle">{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}</td>
+                  <td data-label="Vehicle">{{ $alert['vehicle']->name }}{{ $alert['vehicle']->plate_no ? ' (' . $alert['vehicle']->plate_no . ')' : '' }}</td>
                   <td data-label="Renewal Type">{{ $alert['type'] }}</td>
                   <td data-label="Renewal Date">{{ $alert['date']->format('Y-m-d') }}</td>
                   <td data-label="Status">
@@ -459,14 +459,14 @@
                   </td>
                   @if(auth()->user()->canManageData())
                     <td data-label="Action">
-                      @if(auth()->user()->canAccess('cars'))
+                      @if(auth()->user()->canAccess('vehicles'))
                         <button
                           type="button"
                           class="btn btn-sm btn-outline-dark"
                           data-bs-toggle="modal"
                           data-bs-target="#renewalUpdateModal"
-                          data-renewal-url="{{ route('cars.renewal.update', $alert['car']) }}"
-                          data-renewal-car="{{ $alert['car']->name }}{{ $alert['car']->plate_no ? ' (' . $alert['car']->plate_no . ')' : '' }}"
+                          data-renewal-url="{{ route('vehicles.renewal.update', $alert['vehicle']) }}"
+                          data-renewal-car="{{ $alert['vehicle']->name }}{{ $alert['vehicle']->plate_no ? ' (' . $alert['vehicle']->plate_no . ')' : '' }}"
                           data-renewal-type="{{ strtolower($alert['type']) }}"
                           data-renewal-date="{{ $alert['date']->format('Y-m-d') }}"
                         >
@@ -500,7 +500,7 @@
             <thead>
               <tr>
                 <th>Due Date</th>
-                <th>Car</th>
+                <th>Vehicle</th>
                 <th>Customer</th>
                 <th>Month</th>
                 <th class="text-end">Amount</th>
@@ -510,7 +510,7 @@
               @forelse($upcomingPayments as $payment)
                 <tr>
                   <td data-label="Due Date">{{ $payment->due_date->format('Y-m-d') }}</td>
-                  <td data-label="Car">{{ $payment->rental->car->name ?? '-' }}</td>
+                  <td data-label="Vehicle">{{ $payment->rental->vehicle->name ?? '-' }}</td>
                   <td data-label="Customer">{{ $payment->rental->customer->name ?? '-' }}</td>
                   <td data-label="Month">{{ $payment->month }}</td>
                   <td data-label="Amount" class="text-end">Rs {{ number_format($payment->amount, 2) }}</td>
@@ -539,7 +539,7 @@
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Car</th>
+                <th>Vehicle</th>
                 <th>Type</th>
                 <th class="text-end">Amount</th>
               </tr>
@@ -548,7 +548,7 @@
               @forelse($upcomingExpenses as $expense)
                 <tr>
                   <td data-label="Date">{{ $expense->date->format('Y-m-d') }}</td>
-                  <td data-label="Car">{{ $expense->car?->name ?? '-' }}</td>
+                  <td data-label="Vehicle">{{ $expense->vehicle?->name ?? '-' }}</td>
                   <td data-label="Type">{{ ucfirst($expense->type) }}</td>
                   <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
                 </tr>

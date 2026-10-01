@@ -129,37 +129,39 @@
         <div class="footer-grid">
             <div>
                 <h3>R&amp;A Auto Rentals</h3>
-                <p>Providing premium mobility solutions with transparent pricing and reliable support.</p>
-            </div>
-            <div>
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li><a href="{{ route('fleet.index') }}">Fleet</a></li>
-                    <li><a href="{{ route('pricing.index') }}">Pricing</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="{{ route('home') }}#contact-section">Contact</a></li>
-                    <li><a href="{{ route('terms-of-service') }}">Terms</a></li>
-                    <li><a href="{{ route('privacy-policy') }}">Policy</a></li>
-                </ul>
+                <p>Reliable vehicle rental solutions for your journeys across Sri Lanka.</p>
             </div>
             <div>
                 <h4>Explore</h4>
                 <ul>
-                    <a href="{{ route('short-term-rentals.index') }}">Short-Term Rentals</a>
-                    <a href="{{ route('long-term-rentals.index') }}">Long-Term Rentals</a>
-                    <a href="{{ route('airport-hires.index') }}">Airport Hires</a>
-                    <a href="{{ route('group-packages.index') }}">Special Events</a>
-                    <a href="{{ route('medical-transport.index') }}">Hospital Service</a>
+                    <li><a href="{{ route('home') }}">Home</a></li>
+                    <li><a href="{{ route('fleet.index') }}">Vehicles</a></li>
+                    <li><a href="{{ route('home') }}#routes-section">Popular Routes</a></li>
+                    <li><a href="{{ route('rent-requests.create') }}">Custom Trip Planner</a></li>
+                    <li><a href="{{ route('home') }}#contact-section">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="{{ route('rent-requests.create') }}">Trip Rentals</a></li>
+                    <li><a href="{{ route('airport-hires.index') }}">Airport Transfers</a></li>
+                    <li><a href="{{ route('home') }}#payments-section">Family Travel</a></li>
+                    <li><a href="{{ route('group-packages.index') }}">Special Events</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="tel:+94775998951">077 599 8951</a></li>
+                    <li><a href="mailto:info@rnaautorentals.com.lk">info@rnaautorentals.com.lk</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
             &copy; {{ now()->year }} R&amp;A Auto Rentals. All rights reserved.
+            &middot; <a href="{{ route('terms-of-service') }}">Terms</a>
+            &middot; <a href="{{ route('privacy-policy') }}">Privacy</a>
         </div>
     </div>
 </footer>

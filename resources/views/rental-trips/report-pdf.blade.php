@@ -65,7 +65,7 @@
     <div class="filters">
         <strong>Filters:</strong>
         Vehicle:
-        <strong>{{ $selectedCar ? ($selectedCar->name . ' (' . $selectedCar->plate_no . ')') : 'All Vehicles' }}</strong>,
+        <strong>{{ $selectedVehicle ? ($selectedVehicle->name . ' (' . $selectedVehicle->plate_no . ')') : 'All Vehicles' }}</strong>,
         Status:
         <strong>{{ isset($filters['status']) && $filters['status'] !== '' ? ucfirst($filters['status']) : 'All' }}</strong>,
         From:
@@ -96,8 +96,8 @@
                         <span class="muted">{{ $booking->customer_phone ?: '-' }}</span>
                     </td>
                     <td>
-                        {{ $booking->car?->name }}<br>
-                        <span class="muted">{{ $booking->car?->plate_no }}</span>
+                        {{ $booking->vehicle?->name }}<br>
+                        <span class="muted">{{ $booking->vehicle?->plate_no }}</span>
                     </td>
                     <td>
                         {{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}<br>

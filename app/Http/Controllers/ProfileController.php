@@ -38,7 +38,7 @@ class ProfileController extends Controller
         }
 
         $activeTrips = Booking::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereIn('status', ['pending', 'confirmed'])
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
@@ -132,7 +132,7 @@ class ProfileController extends Controller
             abort(403);
         }
 
-        $booking->load(['car', 'returnedBy', 'user']);
+        $booking->load(['vehicle', 'returnedBy', 'user']);
 
         $baseAmount = (float) $booking->total_amount;
         $additionalAmount = (float) ($booking->additional_payment_amount ?? $booking->extra_km_charge ?? 0);
@@ -179,7 +179,7 @@ class ProfileController extends Controller
 
     private function sendCancellationEmails(Booking $booking, string $cancelledBy, string $cancelledRole): void
     {
-        $booking->loadMissing('car.partner');
+        $booking->loadMissing('vehicle.partner');
 
         $recipients = collect();
 
@@ -187,8 +187,8 @@ class ProfileController extends Controller
             $recipients->push((string) $booking->customer_email);
         }
 
-        if (!empty($booking->car?->partner?->email)) {
-            $recipients->push((string) $booking->car->partner->email);
+        if (!empty($booking->vehicle?->partner?->email)) {
+            $recipients->push((string) $booking->vehicle->partner->email);
         }
 
         User::query()

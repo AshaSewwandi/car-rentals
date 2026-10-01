@@ -133,7 +133,7 @@
                 <span class="brand-name">R&A Auto Rentals</span>
             </a>
             <nav class="nav">
-                <a href="{{ route('fleet.index') }}">Cars</a>
+                <a href="{{ route('fleet.index') }}">Vehicles</a>
                 <a class="active" href="{{ route('long-term-rentals.index') }}">Long-Term</a>
                 <a href="{{ route('pricing.index') }}">Insurance</a>
                 <a href="{{ route('airport-hires.index') }}">Locations</a>
@@ -223,7 +223,7 @@
                         <h2>Our Monthly Fleet</h2>
                         <p class="section-sub">Choose from well-maintained vehicles ready for long journeys.</p>
                     </div>
-                    <a class="text-link" href="{{ route('fleet.index') }}">View all cars</a>
+                    <a class="text-link" href="{{ route('fleet.index') }}">View all vehicles</a>
                 </div>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
@@ -244,7 +244,12 @@
                                         Rs {{ number_format($car['monthly_rate'], 0) }}
                                         <small>/ month (without driver)</small>
                                     </div>
-                                    <a class="select-btn" href="{{ route('booking.confirm', ['car' => $car['id']]) }}">Select</a>
+                                    <a
+                                        class="select-btn"
+                                        href="{{ route('rent-requests.create', ['vehicle' => $car['name']]) }}"
+                                    >
+                                        Request
+                                    </a>
                                 </div>
                             </div>
                         </article>
@@ -256,7 +261,7 @@
                 <h2>How it Works</h2>
                 <p class="section-sub">Simple process to get your monthly rental running fast.</p>
                 <div class="steps">
-                    <article class="step"><div class="num">1</div><h3>Choose Car</h3><p>Select the vehicle that matches your monthly need.</p></article>
+                    <article class="step"><div class="num">1</div><h3>Choose Vehicle</h3><p>Select the vehicle that matches your monthly need.</p></article>
                     <article class="step"><div class="num">2</div><h3>Request Quote</h3><p>Tell us your duration and preferred start date.</p></article>
                     <article class="step"><div class="num">3</div><h3>Verify ID</h3><p>Quick documentation and agreement check.</p></article>
                     <article class="step"><div class="num">4</div><h3>Drive Away</h3><p>Pick up and start your long-term journey.</p></article>
@@ -267,7 +272,7 @@
                 <div class="custom-info">
                     <h3>Need a Custom Plan?</h3>
                     <p>For corporate fleets or 12+ month rentals, we can design a tailored package for your usage.</p>
-                    <p class="contact-line">+94 77 717 3264</p>
+                    <p class="contact-line">077 599 8951</p>
                     <p class="contact-line">business@rna-rentals.com</p>
                 </div>
                 <div class="custom-form">

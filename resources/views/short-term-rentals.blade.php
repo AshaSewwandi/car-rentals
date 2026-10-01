@@ -82,7 +82,7 @@
         .fleet-sub { margin:0 0 .7rem; color:var(--muted); font-size:.92rem; }
         .fleet-meta { display:flex; flex-wrap:wrap; gap:.38rem; margin-bottom:.95rem; }
         .fleet-meta span { padding:.28rem .48rem; border-radius:999px; background:#f3f7fd; border:1px solid #dbe6f3; color:#5b728e; font-size:.72rem; }
-        .select-btn { display:block; width:100%; text-align:center; text-decoration:none; border-radius:10px; padding:.85rem 1rem; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); }
+        .select-btn { display:block; width:100%; text-align:center; text-decoration:none; border:0; cursor:pointer; font:inherit; border-radius:10px; padding:.85rem 1rem; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); }
         .steps-wrap { background:transparent; padding-top:3.5rem; }
         .steps-grid { position:relative; }
         .step-card { padding:1.2rem; text-align:center; box-shadow:none; background:transparent; border:0; }
@@ -124,7 +124,7 @@
         <section class="hero-shell">
             <img class="hero-image" src="{{ asset('images/short-term.png') }}" alt="Short-term car rental">
             <div class="hero-content">
-                <h1>Flexible Short-Term Car Rentals</h1>
+                <h1>Flexible Short-Term Vehicle Rentals</h1>
                 <p>Affordable daily and weekly rates for your next journey. No strings attached.</p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="{{ route('fleet.index') }}">Browse Fleet</a>
@@ -168,7 +168,7 @@
                     <label aria-hidden="true" style="visibility:hidden;">Search</label>
                     <button class="search-btn" type="submit" id="shortTermSubmitBtn" data-loading-text="Checking...">
                         <span class="btn-spinner" aria-hidden="true"></span>
-                        <span class="btn-label">Search Available Cars</span>
+                        <span class="btn-label">Search Available Vehicles</span>
                     </button>
                     <small class="field-error">&nbsp;</small>
                 </div>
@@ -202,9 +202,9 @@
                 <div class="section-row">
                     <div>
                         <h2>Daily Rental Fleet</h2>
-                        <p class="section-sub">Premium quality cars for your daily needs</p>
+                        <p class="section-sub">Premium quality vehicles for your daily needs</p>
                     </div>
-                    <a class="text-link" href="{{ route('fleet.index') }}">View All Cars</a>
+                    <a class="text-link" href="{{ route('fleet.index') }}">View All Vehicles</a>
                 </div>
                 <div class="fleet-grid">
                     @foreach($featuredCars as $car)
@@ -224,7 +224,12 @@
                                         <span>{{ $meta }}</span>
                                     @endforeach
                                 </div>
-                                <a class="select-btn" href="{{ route('booking.confirm', ['car' => $car['id']]) }}">Select Vehicle</a>
+                                <a
+                                    class="select-btn"
+                                    href="{{ route('rent-requests.create', ['vehicle' => ($car['name'] ?: $car['plate_no']) . ' (' . $car['plate_no'] . ')']) }}"
+                                >
+                                    Request This Vehicle
+                                </a>
                             </div>
                         </article>
                     @endforeach

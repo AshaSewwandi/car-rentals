@@ -74,7 +74,7 @@
 
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-block" style="margin-top:18px;border:1px solid #dbe6f3;border-radius:10px;background:#ffffff;padding:14px 16px;">
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Customer:</strong> {{ $booking->customer_name }}</td></tr>
-                                <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Vehicle:</strong> {{ $booking->car?->name }} ({{ $booking->car?->plate_no }})</td></tr>
+                                <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Vehicle:</strong> {{ $booking->vehicle?->name }} ({{ $booking->vehicle?->plate_no }})</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Trip Dates:</strong> {{ $booking->start_date?->format('M d, Y') }} - {{ $booking->end_date?->format('M d, Y') }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Pickup Location:</strong> {{ $booking->pickup_location ?: 'Not specified' }}</td></tr>
                                 <tr><td style="font-size:14px;color:#334155;line-height:1.8;"><strong style="color:#0f172a;">Cancelled By:</strong> {{ ucfirst($cancelledRole) }}{{ $cancelledBy ? ' - ' . $cancelledBy : '' }}</td></tr>

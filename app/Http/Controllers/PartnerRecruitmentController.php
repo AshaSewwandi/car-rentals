@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\PartnerApplicationSubmittedMail;
 use App\Mail\PartnerApplicationReceivedMail;
-use App\Models\Car;
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class PartnerRecruitmentController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
 
             'vehicle_name' => ['required', 'string', 'max:255'],
-            'plate_no' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9\-\s]+$/', 'unique:cars,plate_no'],
+            'plate_no' => ['required', 'string', 'max:100', 'regex:/^[A-Za-z0-9\-\s]+$/', 'unique:vehicles,plate_no'],
             'make' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],
             'year' => ['nullable', 'integer', 'min:1990', 'max:' . ((int) now()->format('Y') + 1)],
@@ -58,7 +58,7 @@ class PartnerRecruitmentController extends Controller
             'driver_mode.required' => 'Please select a driver mode.',
             'allow_long_term.required' => 'Please select long-term rental option.',
         ]);
-        [$partner, $car] = DB::transaction(function () use ($data): array {
+        [$partner, $vehicle] = DB::transaction(function () use ($data): array {
             $partner = User::create([
                 'name' => $data['partner_name'],
                 'phone' => $data['partner_phone'],
@@ -69,7 +69,7 @@ class PartnerRecruitmentController extends Controller
                 'password' => Hash::make($data['password']),
             ]);
 
-            $car = Car::create([
+            $vehicle = Vehicle::create([
                 'name' => $data['vehicle_name'],
                 'plate_no' => $data['plate_no'],
                 'make' => $data['make'] ?? null,
@@ -85,10 +85,10 @@ class PartnerRecruitmentController extends Controller
                 'note' => $data['vehicle_note'] ?? null,
             ]);
 
-            return [$partner, $car];
+            return [$partner, $vehicle];
         });
 
-        $this->sendAdminApplicationEmailsAfterResponse($partner->id, $car->id);
+        $this->sendAdminApplicationEmailsAfterResponse($partner->id, $vehicle->id);
 
         Auth::login($partner);
         $request->session()->regenerate();
@@ -98,12 +98,12 @@ class PartnerRecruitmentController extends Controller
             ->with('success', 'Partner account created successfully.');
     }
 
-    private function sendAdminApplicationEmailsAfterResponse(int $partnerId, int $carId): void
+    private function sendAdminApplicationEmailsAfterResponse(int $partnerId, int $vehicleId): void
     {
-        dispatch(function () use ($partnerId, $carId) {
+        dispatch(function () use ($partnerId, $vehicleId) {
             $partner = User::query()->find($partnerId);
-            $car = Car::query()->find($carId);
-            if (!$partner || !$car) {
+            $vehicle = Vehicle::query()->find($vehicleId);
+            if (!$partner || !$vehicle) {
                 return;
             }
 
@@ -114,9 +114,9 @@ class PartnerRecruitmentController extends Controller
                 ->filter()
                 ->map(fn ($email) => strtolower(trim((string) $email)))
                 ->unique()
-                ->each(function (string $email) use ($partner, $car) {
+                ->each(function (string $email) use ($partner, $vehicle) {
                     try {
-                        Mail::to($email)->queue(new PartnerApplicationSubmittedMail($partner, $car));
+                        Mail::to($email)->queue(new PartnerApplicationSubmittedMail($partner, $vehicle));
                     } catch (Throwable $e) {
                         report($e);
                     }
@@ -124,7 +124,7 @@ class PartnerRecruitmentController extends Controller
 
             if (!empty($partner->email)) {
                 try {
-                    Mail::to($partner->email)->queue(new PartnerApplicationReceivedMail($partner, $car));
+                    Mail::to($partner->email)->queue(new PartnerApplicationReceivedMail($partner, $vehicle));
                 } catch (Throwable $e) {
                     report($e);
                 }

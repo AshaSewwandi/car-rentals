@@ -313,7 +313,7 @@
                         <p class="panel-title">Booking Details</p>
                         <div class="panel-body">
                             <div class="row"><span>Booking ID</span><strong>#{{ $booking->id }}</strong></div>
-                            <div class="row"><span>Vehicle</span><strong>{{ $booking->car?->name }} ({{ $booking->car?->plate_no }})</strong></div>
+                            <div class="row"><span>Vehicle</span><strong>{{ $booking->vehicle?->name }} ({{ $booking->vehicle?->plate_no }})</strong></div>
                             <div class="row"><span>Customer</span><strong>{{ $booking->customer_name }}</strong></div>
                             <div class="row"><span>Trip dates</span><strong>{{ $booking->start_date?->format('Y-m-d') }} to {{ $booking->end_date?->format('Y-m-d') }}</strong></div>
                             <div class="row"><span>Pickup location</span><strong>{{ $booking->pickup_location ?: '-' }}</strong></div>

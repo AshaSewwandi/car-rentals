@@ -39,7 +39,7 @@
                 <div>
                   <h6 class="mb-1">{{ $agreement->agreement_no ?: 'Agreement #'.$agreement->id }}</h6>
                   <div class="agreement-meta">
-                    <span class="badge text-bg-light">{{ $agreement->car?->name ?? 'No car' }}</span>
+                    <span class="badge text-bg-light">{{ $agreement->vehicle?->name ?? 'No vehicle' }}</span>
                     <span class="badge text-bg-light">{{ $agreement->customer?->name ?? 'No customer' }}</span>
                     <span class="badge {{ $agreement->status === 'ended' ? 'text-bg-secondary' : 'text-bg-success' }}">
                       {{ ucfirst($agreement->status) }}
@@ -91,10 +91,10 @@
                             <input type="text" name="agreement_no" class="form-control form-control-sm" value="{{ $agreement->agreement_no }}">
                           </div>
                           <div class="col-12 col-lg-4">
-                            <label class="form-label small mb-1">Car</label>
-                            <select name="car_id" class="form-select form-select-sm" required>
-                              @foreach($cars as $car)
-                                <option value="{{ $car->id }}" @selected($agreement->car_id === $car->id)>{{ $car->name }}</option>
+                            <label class="form-label small mb-1">Vehicle</label>
+                            <select name="vehicle_id" class="form-select form-select-sm" required>
+                              @foreach($vehicles as $vehicle)
+                                <option value="{{ $vehicle->id }}" @selected($agreement->vehicle_id === $vehicle->id)>{{ $vehicle->name }}</option>
                               @endforeach
                             </select>
                           </div>
@@ -175,11 +175,11 @@
             <input type="text" name="agreement_no" class="form-control" value="{{ old('agreement_no') }}">
           </div>
           <div class="mb-2">
-            <label class="form-label">Car</label>
-            <select name="car_id" class="form-select" required>
-              <option value="">Select Car</option>
-              @foreach($cars as $car)
-                <option value="{{ $car->id }}" @selected(old('car_id') == $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+            <label class="form-label">Vehicle</label>
+            <select name="vehicle_id" class="form-select" required>
+              <option value="">Select Vehicle</option>
+              @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}" @selected(old('vehicle_id') == $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
               @endforeach
             </select>
           </div>
@@ -238,7 +238,7 @@
 </div>
 @endif
 
-@if($canManageData && $errors->any() && old('car_id'))
+@if($canManageData && $errors->any() && old('vehicle_id'))
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const modalEl = document.getElementById('addAgreementModal');

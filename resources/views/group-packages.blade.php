@@ -81,7 +81,7 @@
         .fleet-footer { margin-top:auto; display:flex; justify-content:space-between; align-items:end; gap:.75rem; }
         .fleet-rate { color:var(--primary); font-weight:800; font-size:1.65rem; line-height:1; }
         .fleet-rate small { display:block; color:#64748b; font-size:.8rem; font-weight:700; margin-top:.15rem; text-align:right; }
-        .book-btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; border-radius:10px; padding:.7rem .95rem; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); }
+        .book-btn { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; border:0; cursor:pointer; font:inherit; border-radius:10px; padding:.7rem .95rem; font-weight:800; color:#fff; background:linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow:0 10px 20px rgba(10,63,143,.22); }
         .package-band { margin-top:3rem; background:linear-gradient(135deg, #0a3f8f, #0f66c3); color:#fff; padding:2.4rem; display:flex; justify-content:space-between; align-items:center; gap:1.5rem; overflow:hidden; border-radius:20px; position:relative; }
         .package-band::after { content:""; position:absolute; width:240px; height:240px; border-radius:999px; right:-80px; top:-80px; background:rgba(255,255,255,.09); pointer-events:none; }
         .package-copy { position:relative; z-index:1; max-width:44rem; }
@@ -245,7 +245,12 @@
                                 </div>
                                 <div class="fleet-footer">
                                     <div class="fleet-rate">Rs {{ number_format($car['daily_rate'], 0) }}<small>/ day</small></div>
-                                    <a class="book-btn" href="{{ route('booking.confirm', ['car' => $car['id']]) }}">Book Now</a>
+                                    <a
+                                        class="book-btn"
+                                        href="{{ route('rent-requests.create', ['vehicle' => $car['name']]) }}"
+                                    >
+                                        Request This Vehicle
+                                    </a>
                                 </div>
                             </div>
                         </article>

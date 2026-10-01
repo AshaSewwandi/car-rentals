@@ -332,7 +332,7 @@
   <section class="partner-hero">
     <div class="hero-wrap">
       <div>
-        <h1 class="hero-title">Turn Your Car into a Daily Income Stream with R&amp;A Partners</h1>
+        <h1 class="hero-title">Turn Your Vehicle into a Daily Income Stream with R&amp;A Partners</h1>
         <p class="hero-copy">Start earning with zero hassle. List your vehicle on R&A and get consistent bookings from real customers—while we handle the heavy lifting.</p>
         <button type="button" class="hero-cta" id="openPartnerModal">Get Started</button>
       </div>
@@ -359,7 +359,7 @@
     </div>
 
     <div class="partner-band mb-4">
-      <h2>Ready to earn with your car?</h2>
+      <h2>Ready to earn with your vehicle?</h2>
       <p>Join hundreds of partners already growing with R&amp;A Auto Rentals.</p>
       <button type="button" class="band-btn" id="openPartnerModalBottom">Register Now</button>
     </div>

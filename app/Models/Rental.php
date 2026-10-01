@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Rental extends Model
 {
     protected $fillable = [
-        'car_id','customer_id','start_date','end_date','due_day','monthly_rent','deposit','status','note'
+        'vehicle_id','customer_id','start_date','end_date','due_day','monthly_rent','deposit','status','note'
     ];
 
     protected $casts = [
@@ -17,7 +17,7 @@ class Rental extends Model
         'end_date'   => 'date',
     ];
 
-    public function car(): BelongsTo { return $this->belongsTo(Car::class); }
+    public function vehicle(): BelongsTo { return $this->belongsTo(Vehicle::class); }
     public function customer(): BelongsTo { return $this->belongsTo(Customer::class); }
     public function payments(): HasMany { return $this->hasMany(Payment::class); }
 }

@@ -175,7 +175,7 @@
 <div class="page-toolbar">
   <div class="mb-1 mb-md-0">
     <h4 class="mb-1">Manage Expenses</h4>
-    <div class="text-muted">Track service and operational costs by car, month, and expense type.</div>
+    <div class="text-muted">Track service and operational costs by vehicle, month, and expense type.</div>
   </div>
   <form class="d-flex gap-2" method="get" action="{{ route('expenses.index') }}">
     <input type="month" class="form-control" name="month" value="{{ $month }}">
@@ -209,7 +209,7 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>Car</th>
+            <th>Vehicle</th>
             <th>Type</th>
             <th class="text-end">Amount</th>
             <th>Note</th>
@@ -222,7 +222,7 @@
           @forelse($expenses as $expense)
             <tr>
               <td data-label="Date">{{ $expense->date->format('Y-m-d') }}</td>
-              <td data-label="Car">{{ $expense->car?->name }}{{ $expense->car?->plate_no ? ' (' . $expense->car->plate_no . ')' : '' }}</td>
+              <td data-label="Vehicle">{{ $expense->vehicle?->name }}{{ $expense->vehicle?->plate_no ? ' (' . $expense->vehicle->plate_no . ')' : '' }}</td>
               <td data-label="Type">{{ ucfirst($expense->type) }}</td>
               <td data-label="Amount" class="text-end">Rs {{ number_format($expense->amount, 2) }}</td>
               <td data-label="Note">{{ $expense->note ?: '-' }}</td>
@@ -235,7 +235,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#deleteExpenseModal"
                     data-delete-url="{{ route('expenses.destroy', $expense) }}"
-                    data-expense-text="{{ $expense->date->format('Y-m-d') }} | {{ $expense->car?->name }} | Rs {{ number_format($expense->amount, 2) }}"
+                    data-expense-text="{{ $expense->date->format('Y-m-d') }} | {{ $expense->vehicle?->name }} | Rs {{ number_format($expense->amount, 2) }}"
                   >
                     Delete
                   </button>
@@ -263,11 +263,11 @@
         @csrf
         <div class="modal-body">
           <div class="mb-2">
-            <label class="form-label">Car</label>
-            <select name="car_id" class="form-select @error('car_id') is-invalid @enderror" required>
-              <option value="">Select Car</option>
-              @foreach($cars as $car)
-                <option value="{{ $car->id }}" @selected(old('car_id') == $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+            <label class="form-label">Vehicle</label>
+            <select name="vehicle_id" class="form-select @error('vehicle_id') is-invalid @enderror" required>
+              <option value="">Select Vehicle</option>
+              @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}" @selected(old('vehicle_id') == $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
               @endforeach
             </select>
           </div>
@@ -314,10 +314,10 @@
           @method('PUT')
           <div class="modal-body">
             <div class="mb-2">
-              <label class="form-label">Car</label>
-              <select name="car_id" class="form-select" required>
-                @foreach($cars as $car)
-                  <option value="{{ $car->id }}" @selected($expense->car_id === $car->id)>{{ $car->name }} ({{ $car->plate_no }})</option>
+              <label class="form-label">Vehicle</label>
+              <select name="vehicle_id" class="form-select" required>
+                @foreach($vehicles as $vehicle)
+                  <option value="{{ $vehicle->id }}" @selected($expense->vehicle_id === $vehicle->id)>{{ $vehicle->name }} ({{ $vehicle->plate_no }})</option>
                 @endforeach
               </select>
             </div>

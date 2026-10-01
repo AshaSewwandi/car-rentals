@@ -117,17 +117,17 @@
             font-size: 1.05rem;
         }
         .card-body { padding: 1rem; }
-        .car-row {
+        .vehicle-row {
             display: grid;
             grid-template-columns: 150px 1fr;
             gap: .8rem;
         }
-        .car-row img {
+        .vehicle-row img {
             width: 100%; height: 100px; border-radius: 10px;
             border: 1px solid var(--line); object-fit: cover; background: #eef4ff;
         }
-        .car-name { margin: 0 0 .2rem; font-size: 1.14rem; }
-        .car-meta { color: var(--muted); margin: 0 0 .45rem; }
+        .vehicle-name { margin: 0 0 .2rem; font-size: 1.14rem; }
+        .vehicle-meta { color: var(--muted); margin: 0 0 .45rem; }
         .pill {
             display: inline-flex; align-items: center;
             border-radius: 999px; padding: .2rem .56rem;
@@ -284,7 +284,7 @@
         }
         @media (max-width: 760px) {
             .container { width: calc(100% - 1rem); }
-            .car-row { grid-template-columns: 1fr; }
+            .vehicle-row { grid-template-columns: 1fr; }
             .grid, .feature-list { grid-template-columns: 1fr; }
             .bank-details-grid { grid-template-columns: 1fr; }
             .actions { flex-direction: column; }
@@ -321,7 +321,7 @@
 
             <form method="post" action="{{ route('booking.store') }}">
                 @csrf
-                <input type="hidden" name="car_id" value="{{ $car->id }}">
+                <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
                 <input type="hidden" name="start_date" value="{{ $filters['start_date'] }}">
                 <input type="hidden" name="end_date" value="{{ $filters['end_date'] }}">
                 <input type="hidden" name="pickup_location" value="{{ $filters['start_location'] }}">
@@ -331,11 +331,11 @@
                         <div class="card">
                             <div class="card-header">Your deal</div>
                             <div class="card-body">
-                                <div class="car-row">
-                                    <img src="{{ $car->primaryImageUrl() }}" alt="{{ $car->name }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1rem';">
+                                <div class="vehicle-row">
+                                    <img src="{{ $vehicle->primaryImageUrl() }}" alt="{{ $vehicle->name }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.style.objectFit='contain';this.style.padding='1rem';">
                                     <div>
-                                        <h2 class="car-name">{{ trim($car->name . ' ' . ($car->year ?? '')) }}</h2>
-                                        <p class="car-meta">{{ $car->plate_no }} · {{ $car->transmission ?: 'Transmission N/A' }} · {{ $car->fuel_type ?: 'Fuel N/A' }}</p>
+                                        <h2 class="vehicle-name">{{ trim($vehicle->name . ' ' . ($vehicle->year ?? '')) }}</h2>
+                                        <p class="vehicle-meta">{{ $vehicle->plate_no }} · {{ $vehicle->transmission ?: 'Transmission N/A' }} · {{ $vehicle->fuel_type ?: 'Fuel N/A' }}</p>
                                         <span class="pill">Free cancellation up to 48 hours before pickup</span>
                                         <div class="feature-list">
                                             <div>
@@ -383,6 +383,17 @@
                                     <div class="field full">
                                         <label>Email</label>
                                         <input type="email" name="customer_email" value="{{ old('customer_email', $currentUser?->email) }}" placeholder="you@example.com" required>
+                                    </div>
+                                    <div class="field full">
+                                        <label>Hire or Rent</label>
+                                        <select name="order_type" required>
+                                            @if($availableForHire)
+                                                <option value="hire" {{ old('order_type', 'hire') === 'hire' ? 'selected' : '' }}>Hire</option>
+                                            @endif
+                                            @if($availableForRent)
+                                                <option value="rent" {{ old('order_type') === 'rent' ? 'selected' : '' }}>Rent</option>
+                                            @endif
+                                        </select>
                                     </div>
                                     <div class="field full">
                                         <label>Payment method</label>

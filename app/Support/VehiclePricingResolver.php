@@ -2,17 +2,17 @@
 
 namespace App\Support;
 
-use App\Models\Car;
+use App\Models\Vehicle;
 use App\Models\VehiclePricing;
 use Illuminate\Support\Str;
 
 class VehiclePricingResolver
 {
-    public static function resolveForCar(Car $car): array
+    public static function resolveForVehicle(Vehicle $vehicle): array
     {
         $pricing = VehiclePricing::query()
-            ->when(!empty($car->make), fn ($query) => $query->where('make', $car->make))
-            ->where('model', $car->model ?: $car->name)
+            ->when(!empty($vehicle->make), fn ($query) => $query->where('make', $vehicle->make))
+            ->where('model', $vehicle->model ?: $vehicle->name)
             ->first();
 
         if ($pricing) {
@@ -32,7 +32,7 @@ class VehiclePricingResolver
             ];
         }
 
-        $plateKey = strtoupper((string) Str::of((string) $car->plate_no)->replaceMatches('/[^A-Za-z0-9]/', ''));
+        $plateKey = strtoupper((string) Str::of((string) $vehicle->plate_no)->replaceMatches('/[^A-Za-z0-9]/', ''));
         $knownRates = [
             'CAK8043' => 4000,
             'CAK9010' => 4000,
@@ -52,9 +52,9 @@ class VehiclePricingResolver
         ];
     }
 
-    public static function resolveDisplayRate(Car $car): ?string
+    public static function resolveDisplayRate(Vehicle $vehicle): ?string
     {
-        $resolved = static::resolveForCar($car);
+        $resolved = static::resolveForVehicle($vehicle);
 
         return number_format((float) $resolved['daily_rate'], 0);
     }

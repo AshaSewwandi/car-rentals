@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Agreement;
 use App\Models\Booking;
-use App\Models\Car;
 use App\Models\Rental;
+use App\Models\Vehicle;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -18,45 +18,45 @@ class AvailabilityCheckController extends Controller
         $filters = $request->validate([
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'car_id' => ['nullable', 'exists:cars,id'],
+            'vehicle_id' => ['nullable', 'exists:vehicles,id'],
         ]);
 
         $startDate = $filters['start_date'] ?? now()->toDateString();
         $endDate = $filters['end_date'] ?? now()->addDays(13)->toDateString();
-        $carId = $filters['car_id'] ?? null;
+        $vehicleId = $filters['vehicle_id'] ?? null;
 
-        $cars = Car::query()
-            ->when($carId, fn ($q) => $q->where('id', $carId))
+        $vehicles = Vehicle::query()
+            ->when($vehicleId, fn ($q) => $q->where('id', $vehicleId))
             ->orderBy('name')
             ->get(['id', 'name', 'plate_no']);
 
-        $carIds = $cars->pluck('id');
+        $vehicleIds = $vehicles->pluck('id');
 
         $confirmedBookings = Booking::query()
-            ->whereIn('car_id', $carIds)
+            ->whereIn('vehicle_id', $vehicleIds)
             ->where('status', 'confirmed')
-            ->get(['car_id', 'start_date', 'end_date'])
-            ->groupBy('car_id');
+            ->get(['vehicle_id', 'start_date', 'end_date'])
+            ->groupBy('vehicle_id');
 
         $agreements = Agreement::query()
-            ->whereIn('car_id', $carIds)
+            ->whereIn('vehicle_id', $vehicleIds)
             ->where('status', 'active')
-            ->get(['car_id', 'start_date', 'end_date'])
-            ->groupBy('car_id');
+            ->get(['vehicle_id', 'start_date', 'end_date'])
+            ->groupBy('vehicle_id');
 
         $rentals = Rental::query()
-            ->whereIn('car_id', $carIds)
+            ->whereIn('vehicle_id', $vehicleIds)
             ->where('status', 'active')
-            ->get(['car_id', 'start_date', 'end_date'])
-            ->groupBy('car_id');
+            ->get(['vehicle_id', 'start_date', 'end_date'])
+            ->groupBy('vehicle_id');
 
         $timelineDates = collect(CarbonPeriod::create($startDate, $endDate))
             ->map(fn (Carbon $date) => $date->copy());
 
-        $rows = $cars->map(function (Car $car) use ($confirmedBookings, $agreements, $rentals, $timelineDates) {
+        $rows = $vehicles->map(function (Vehicle $vehicle) use ($confirmedBookings, $agreements, $rentals, $timelineDates) {
             $ranges = collect();
 
-            foreach ($agreements->get($car->id, collect()) as $agreement) {
+            foreach ($agreements->get($vehicle->id, collect()) as $agreement) {
                 $ranges->push([
                     'start' => $agreement->start_date,
                     'end' => $agreement->end_date,
@@ -64,7 +64,7 @@ class AvailabilityCheckController extends Controller
                 ]);
             }
 
-            foreach ($rentals->get($car->id, collect()) as $rental) {
+            foreach ($rentals->get($vehicle->id, collect()) as $rental) {
                 $ranges->push([
                     'start' => $rental->start_date,
                     'end' => $rental->end_date,
@@ -72,7 +72,7 @@ class AvailabilityCheckController extends Controller
                 ]);
             }
 
-            foreach ($confirmedBookings->get($car->id, collect()) as $booking) {
+            foreach ($confirmedBookings->get($vehicle->id, collect()) as $booking) {
                 $ranges->push([
                     'start' => $booking->start_date,
                     'end' => $booking->end_date,
@@ -106,8 +106,8 @@ class AvailabilityCheckController extends Controller
             $isAvailable = !$cells->contains(fn ($cell) => $cell['is_booked']);
 
             return [
-                'name' => $car->name,
-                'plate_no' => $car->plate_no,
+                'name' => $vehicle->name,
+                'plate_no' => $vehicle->plate_no,
                 'ranges' => $ranges,
                 'is_available' => $isAvailable,
                 'cells' => $cells,
@@ -116,6 +116,6 @@ class AvailabilityCheckController extends Controller
             ];
         });
 
-        return view('availability-check.index', compact('rows', 'cars', 'filters', 'timelineDates'));
+        return view('availability-check.index', compact('rows', 'vehicles', 'filters', 'timelineDates'));
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class VehicleMaintenance extends Model
 {
     protected $fillable = [
-        'car_id',
+        'vehicle_id',
         'service_date',
         'part_name',
         'amount',
@@ -21,8 +21,8 @@ class VehicleMaintenance extends Model
         'amount' => 'decimal:2',
     ];
 
-    public function car(): BelongsTo
+    public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Car::class);
+        return $this->belongsTo(Vehicle::class);
     }
 }

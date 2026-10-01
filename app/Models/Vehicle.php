@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-class Car extends Model
+class Vehicle extends Model
 {
     protected $fillable = [
         'name',
@@ -20,6 +20,8 @@ class Car extends Model
         'transmission',
         'driver_mode',
         'allow_long_term',
+        'available_for_hire',
+        'available_for_rent',
         'dagps_device_id',
         'tracker_device_name',
         'tracker_device_type',
@@ -56,6 +58,8 @@ class Car extends Model
         'maintenance_next_service_date' => 'date',
         'tracker_last_seen_at' => 'datetime',
         'allow_long_term' => 'boolean',
+        'available_for_hire' => 'boolean',
+        'available_for_rent' => 'boolean',
     ];
 
     public function rentals(): HasMany { return $this->hasMany(Rental::class); }
@@ -64,7 +68,7 @@ class Car extends Model
     public function agreements(): HasMany { return $this->hasMany(Agreement::class); }
     public function gpsLogs(): HasMany { return $this->hasMany(GpsLog::class); }
     public function bookings(): HasMany { return $this->hasMany(Booking::class); }
-    public function images(): HasMany { return $this->hasMany(CarImage::class)->orderBy('sort_order')->orderBy('id'); }
+    public function images(): HasMany { return $this->hasMany(VehicleImage::class)->orderBy('sort_order')->orderBy('id'); }
     public function partner(): BelongsTo { return $this->belongsTo(User::class, 'partner_user_id'); }
 
     public function scopeVisibleOnPublic(Builder $query): Builder

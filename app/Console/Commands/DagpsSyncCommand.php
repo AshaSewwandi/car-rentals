@@ -9,7 +9,7 @@ use Throwable;
 class DagpsSyncCommand extends Command
 {
     protected $signature = 'dagps:sync {--dashboard-url=}';
-    protected $description = 'Pull latest tracking points from DAGPS and update cars.';
+    protected $description = 'Pull latest tracking points from DAGPS and update vehicles.';
 
     public function handle(DagpsSyncService $syncService): int
     {
@@ -23,7 +23,7 @@ class DagpsSyncCommand extends Command
 
         $this->info('DAGPS sync complete.');
         $this->line('Devices seen: '.$result['devices_seen']);
-        $this->line('Cars updated: '.$result['cars_updated']);
+        $this->line('Vehicles updated: '.$result['vehicles_updated']);
 
         return self::SUCCESS;
     }

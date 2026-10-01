@@ -142,7 +142,7 @@ class GenerateSitemap extends Command
 
         $adminNamePrefixes = [
             'dashboard',
-            'cars.',
+            'vehicles.',
             'customers.',
             'payments.',
             'agreements.',
@@ -164,7 +164,7 @@ class GenerateSitemap extends Command
 
         $adminUriPrefixes = [
             'dashboard',
-            'cars',
+            'vehicles',
             'customers',
             'payments',
             'agreements',

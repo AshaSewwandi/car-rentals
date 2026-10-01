@@ -46,8 +46,8 @@
     <div class="meta"><strong>From:</strong> {{ $startDate }}</div>
     <div class="meta"><strong>To:</strong> {{ $endDate }}</div>
     <div class="meta">
-      <strong>Car:</strong>
-      {{ $selectedCar ? ($selectedCar->name) : 'All Cars' }}
+      <strong>Vehicle:</strong>
+      {{ $selectedVehicle ? ($selectedVehicle->name) : 'All Vehicles' }}
     </div>
     <div class="meta"><strong>Total Mileage:</strong> {{ number_format($totalMileage, 2) }} KM</div>
     <div class="meta"><strong>Average (per logged day):</strong> {{ number_format($avgMileage, 2) }} KM</div>

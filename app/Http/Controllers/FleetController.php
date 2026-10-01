@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Car;
+use App\Models\Vehicle;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
 
@@ -14,40 +14,42 @@ class FleetController extends Controller
             'start_location' => ['nullable', 'string', 'max:255'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'order_type' => ['nullable', 'in:hire,rent'],
         ]);
 
         $startDate = $validated['start_date'] ?? null;
         $endDate = $validated['end_date'] ?? null;
+        $orderType = $validated['order_type'] ?? null;
 
-        $allCars = Car::query()->visibleOnPublic()->with('images')->orderBy('name')->get();
+        $allVehicles = Vehicle::query()->visibleOnPublic()->with('images')->orderBy('name')->get();
         $availabilityRows = collect();
-        $availableCarIds = null;
+        $availableVehicleIds = null;
 
         if ($startDate && $endDate) {
-            $carIds = $allCars->pluck('id');
+            $vehicleIds = $allVehicles->pluck('id');
 
             $agreements = \App\Models\Agreement::query()
-                ->whereIn('car_id', $carIds)
+                ->whereIn('vehicle_id', $vehicleIds)
                 ->where('status', 'active')
-                ->get(['car_id', 'start_date', 'end_date'])
-                ->groupBy('car_id');
+                ->get(['vehicle_id', 'start_date', 'end_date'])
+                ->groupBy('vehicle_id');
 
             $rentals = \App\Models\Rental::query()
-                ->whereIn('car_id', $carIds)
+                ->whereIn('vehicle_id', $vehicleIds)
                 ->where('status', 'active')
-                ->get(['car_id', 'start_date', 'end_date'])
-                ->groupBy('car_id');
+                ->get(['vehicle_id', 'start_date', 'end_date'])
+                ->groupBy('vehicle_id');
 
             $confirmedBookings = \App\Models\Booking::query()
-                ->whereIn('car_id', $carIds)
+                ->whereIn('vehicle_id', $vehicleIds)
                 ->where('status', 'confirmed')
-                ->get(['car_id', 'start_date', 'end_date'])
-                ->groupBy('car_id');
+                ->get(['vehicle_id', 'start_date', 'end_date'])
+                ->groupBy('vehicle_id');
 
-            $availabilityRows = $allCars->map(function (Car $car) use ($agreements, $rentals, $confirmedBookings, $startDate, $endDate) {
+            $availabilityRows = $allVehicles->map(function (Vehicle $vehicle) use ($agreements, $rentals, $confirmedBookings, $startDate, $endDate) {
                 $bookingRanges = collect();
 
-                foreach ($agreements->get($car->id, collect()) as $agreement) {
+                foreach ($agreements->get($vehicle->id, collect()) as $agreement) {
                     $bookingRanges->push([
                         'start' => $agreement->start_date,
                         'end' => $agreement->end_date,
@@ -55,7 +57,7 @@ class FleetController extends Controller
                     ]);
                 }
 
-                foreach ($rentals->get($car->id, collect()) as $rental) {
+                foreach ($rentals->get($vehicle->id, collect()) as $rental) {
                     $bookingRanges->push([
                         'start' => $rental->start_date,
                         'end' => $rental->end_date,
@@ -63,7 +65,7 @@ class FleetController extends Controller
                     ]);
                 }
 
-                foreach ($confirmedBookings->get($car->id, collect()) as $booking) {
+                foreach ($confirmedBookings->get($vehicle->id, collect()) as $booking) {
                     $bookingRanges->push([
                         'start' => $booking->start_date,
                         'end' => $booking->end_date,
@@ -87,49 +89,57 @@ class FleetController extends Controller
                 });
 
                 return [
-                    'car_id' => $car->id,
-                    'car_name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'plate_no' => $car->plate_no,
+                    'vehicle_id' => $vehicle->id,
+                    'vehicle_name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'plate_no' => $vehicle->plate_no,
                     'ranges' => $bookingRanges,
                     'is_available' => !$hasOverlap,
                 ];
             });
 
-            $availableCarIds = $availabilityRows
+            $availableVehicleIds = $availabilityRows
                 ->where('is_available', true)
-                ->pluck('car_id')
+                ->pluck('vehicle_id')
                 ->values();
         }
 
-        $carsQuery = Car::query()->visibleOnPublic();
-        if (is_array($availableCarIds) || $availableCarIds instanceof \Illuminate\Support\Collection) {
-            $carsQuery->whereIn('id', $availableCarIds);
+        $vehiclesQuery = Vehicle::query()->visibleOnPublic();
+        if (is_array($availableVehicleIds) || $availableVehicleIds instanceof \Illuminate\Support\Collection) {
+            $vehiclesQuery->whereIn('id', $availableVehicleIds);
         }
 
-        $cars = $carsQuery
+        if ($orderType === 'hire') {
+            $vehiclesQuery->where('available_for_hire', true);
+        } elseif ($orderType === 'rent') {
+            $vehiclesQuery->where('available_for_rent', true);
+        }
+
+        $cars = $vehiclesQuery
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
+            ->map(function (Vehicle $vehicle) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'plate_no' => $car->plate_no,
-                    'status' => $car->status,
-                    'make' => $car->make,
-                    'model' => $car->model,
-                    'year' => $car->year,
-                    'color' => $car->color,
-                    'fuel_type' => $car->fuel_type,
-                    'transmission' => $car->transmission,
-                    'driver_mode' => $car->driver_mode ?: 'both',
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'plate_no' => $vehicle->plate_no,
+                    'status' => $vehicle->status,
+                    'make' => $vehicle->make,
+                    'model' => $vehicle->model,
+                    'year' => $vehicle->year,
+                    'color' => $vehicle->color,
+                    'fuel_type' => $vehicle->fuel_type,
+                    'transmission' => $vehicle->transmission,
+                    'driver_mode' => $vehicle->driver_mode ?: 'both',
+                    'available_for_hire' => (bool) $vehicle->available_for_hire,
+                    'available_for_rent' => (bool) $vehicle->available_for_rent,
                     'per_day_km' => $pricing['per_day_km'],
                     'extra_km_rate' => $pricing['extra_km_rate'],
                     'rate' => number_format((float) $pricing['daily_rate'], 0),
-                    'image' => $car->primaryImageUrl(),
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
@@ -137,20 +147,21 @@ class FleetController extends Controller
             'start_location' => $validated['start_location'] ?? '',
             'start_date' => $startDate,
             'end_date' => $endDate,
+            'order_type' => $orderType ?? '',
         ];
 
         return view('fleet.index', compact('cars', 'filters', 'availabilityRows'));
     }
 
-    public function show(Car $car)
+    public function show(Vehicle $vehicle)
     {
-        if (!Car::query()->visibleOnPublic()->whereKey($car->id)->exists()) {
+        if (!Vehicle::query()->visibleOnPublic()->whereKey($vehicle->id)->exists()) {
             abort(404);
         }
 
-        $car->loadMissing('images');
-        $pricing = VehiclePricingResolver::resolveForCar($car);
-        $driverMode = $car->driver_mode ?: 'both';
+        $vehicle->loadMissing('images');
+        $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
+        $driverMode = $vehicle->driver_mode ?: 'both';
 
         $driverModeLabel = match ($driverMode) {
             'with_driver_only' => 'With driver only',
@@ -158,23 +169,25 @@ class FleetController extends Controller
             default => 'With or without driver',
         };
 
-        $nameLower = strtolower((string) $car->name);
+        $nameLower = strtolower((string) $vehicle->name);
         $estimatedSeats = str_contains($nameLower, 'largo') ? 8 : 5;
         $estimatedBags = str_contains($nameLower, 'largo') ? 4 : 2;
 
-        $vehicle = [
-            'id' => $car->id,
-            'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-            'plate_no' => $car->plate_no,
-            'status' => $car->status,
-            'make' => $car->make,
-            'model' => $car->model,
-            'year' => $car->year,
-            'color' => $car->color,
-            'fuel_type' => $car->fuel_type,
-            'transmission' => $car->transmission,
+        $vehicleData = [
+            'id' => $vehicle->id,
+            'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+            'plate_no' => $vehicle->plate_no,
+            'status' => $vehicle->status,
+            'make' => $vehicle->make,
+            'model' => $vehicle->model,
+            'year' => $vehicle->year,
+            'color' => $vehicle->color,
+            'fuel_type' => $vehicle->fuel_type,
+            'transmission' => $vehicle->transmission,
             'driver_mode_label' => $driverModeLabel,
-            'allow_long_term' => (bool) $car->allow_long_term,
+            'allow_long_term' => (bool) $vehicle->allow_long_term,
+            'available_for_hire' => (bool) $vehicle->available_for_hire,
+            'available_for_rent' => (bool) $vehicle->available_for_rent,
             'daily_rate' => (float) $pricing['daily_rate'],
             'monthly_rate' => (float) ($pricing['monthly_rate'] ?? 0),
             'per_day_km' => (int) $pricing['per_day_km'],
@@ -183,12 +196,12 @@ class FleetController extends Controller
             'driver_cost_per_day' => (float) ($pricing['driver_cost_per_day'] ?? 0),
             'seats' => $estimatedSeats,
             'bags' => $estimatedBags,
-            'image' => $car->primaryImageUrl(),
-            'images' => $car->galleryImageUrls(),
-            'note' => $car->note,
+            'image' => $vehicle->primaryImageUrl(),
+            'images' => $vehicle->galleryImageUrls(),
+            'note' => $vehicle->note,
         ];
 
-        return view('fleet.show', compact('vehicle'));
+        return view('fleet.show', ['vehicle' => $vehicleData]);
     }
 
 }

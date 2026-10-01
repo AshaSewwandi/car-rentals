@@ -545,7 +545,7 @@
                             This page shows the current pricing rows saved in our system for each vehicle make and model. Customers can compare daily package amounts, included KM, extra KM charges, and driver cost in one place before choosing a vehicle.
                         </p>
                         <div class="notice">
-                            Driver availability may still differ by vehicle. Some cars are available with driver only, some without driver only, and some support both options. The booking page will show the exact rule for the selected vehicle.
+                            Driver availability may still differ by vehicle. Some vehicles are available with driver only, some without driver only, and some support both options. The booking page will show the exact rule for the selected vehicle.
                         </div>
                     </div>
 

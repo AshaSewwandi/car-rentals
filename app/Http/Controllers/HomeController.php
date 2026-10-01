@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Car;
+use App\Models\Vehicle;
 use App\Models\VehiclePricing;
 use App\Support\VehiclePricingResolver;
 use Illuminate\Http\Request;
@@ -13,57 +13,21 @@ class HomeController extends Controller
 {
     public function home(): View
     {
-        $featuredCars = Car::query()
-            ->visibleOnPublic()
-            ->with('images')
-            ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
-            ->orderBy('name')
-            ->limit(3)
-            ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
-                $dailyRate = (float) $pricing['daily_rate'];
-                $name = trim((string) $car->name);
-                $makeModel = trim((string) ($car->make ?? '') . ' ' . (string) ($car->model ?? ''));
-                $looksLikePlateAndYear = preg_match('/^[A-Za-z]{2,4}\s*\d{3,4}(\s+\d{4})?$/', $name) === 1;
-                $displayName = $looksLikePlateAndYear && $makeModel !== '' ? $makeModel : ($name !== '' ? $name : 'Vehicle');
-
-                $segment = 'Economy';
-                if (str_contains(strtolower((string) $car->name), 'largo')) {
-                    $segment = 'SUV';
-                } elseif ($dailyRate >= 10000) {
-                    $segment = 'Luxury';
-                }
-
-                return [
-                    'id' => $car->id,
-                    'name' => $displayName,
-                    'plate_no' => $car->plate_no,
-                    'year' => $car->year,
-                    'daily_rate' => $dailyRate,
-                    'segment' => $segment,
-                    'transmission' => $car->transmission ?: 'Auto',
-                    'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
-                    'bags' => str_contains(strtolower((string) $car->name), 'largo') ? '4 Bags' : '2 Bags',
-                    'image' => $car->primaryImageUrl(),
-                ];
-            });
-
-        return view('welcome', compact('featuredCars'));
+        return view('welcome');
     }
 
     public function airportHires(): View
     {
-        $featuredCars = Car::query()
+        $featuredVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(3)
             ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
-                $driverMode = $car->driver_mode ?: 'both';
+            ->map(function (Vehicle $vehicle) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
+                $driverMode = $vehicle->driver_mode ?: 'both';
 
                 $driverModeLabel = match ($driverMode) {
                     'with_driver_only' => 'With driver only',
@@ -72,22 +36,22 @@ class HomeController extends Controller
                 };
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'plate_no' => $car->plate_no,
-                    'make' => $car->make,
-                    'model' => $car->model,
-                    'year' => $car->year,
-                    'transmission' => $car->transmission,
-                    'fuel_type' => $car->fuel_type,
-                    'color' => $car->color,
-                    'status' => $car->status,
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'plate_no' => $vehicle->plate_no,
+                    'make' => $vehicle->make,
+                    'model' => $vehicle->model,
+                    'year' => $vehicle->year,
+                    'transmission' => $vehicle->transmission,
+                    'fuel_type' => $vehicle->fuel_type,
+                    'color' => $vehicle->color,
+                    'status' => $vehicle->status,
                     'daily_rate' => (float) $pricing['daily_rate'],
                     'per_day_km' => (int) $pricing['per_day_km'],
                     'extra_km_rate' => (float) $pricing['extra_km_rate'],
                     'driver_mode_label' => $driverModeLabel,
-                    'airport_tag' => $this->resolveAirportTag($car, (float) $pricing['daily_rate']),
-                    'image' => $car->primaryImageUrl(),
+                    'airport_tag' => $this->resolveAirportTag($vehicle, (float) $pricing['daily_rate']),
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
@@ -98,33 +62,33 @@ class HomeController extends Controller
             'Galle City Pickup',
         ];
 
-        return view('airport-hires', compact('featuredCars', 'airports'));
+        return view('airport-hires', ['featuredCars' => $featuredVehicles, 'airports' => $airports]);
     }
 
     public function shortTermRentals(): View
     {
-        $featuredCars = Car::query()
+        $featuredVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(3)
             ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
+            ->map(function (Vehicle $vehicle) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'plate_no' => $car->plate_no,
-                    'model' => $car->model,
-                    'year' => $car->year,
-                    'transmission' => $car->transmission,
-                    'fuel_type' => $car->fuel_type,
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'plate_no' => $vehicle->plate_no,
+                    'model' => $vehicle->model,
+                    'year' => $vehicle->year,
+                    'transmission' => $vehicle->transmission,
+                    'fuel_type' => $vehicle->fuel_type,
                     'daily_rate' => (float) $pricing['daily_rate'],
-                    'seats' => str_contains(strtolower((string) $car->name), 'largo') ? '8 Seats' : '5 Seats',
-                    'tag' => $car->status === 'available' ? 'Available' : 'Popular',
-                    'image' => $car->primaryImageUrl(),
+                    'seats' => str_contains(strtolower((string) $vehicle->name), 'largo') ? '8 Seats' : '5 Seats',
+                    'tag' => $vehicle->status === 'available' ? 'Available' : 'Popular',
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
@@ -136,12 +100,12 @@ class HomeController extends Controller
             'Kandy',
         ];
 
-        return view('short-term-rentals', compact('featuredCars', 'cities'));
+        return view('short-term-rentals', ['featuredCars' => $featuredVehicles, 'cities' => $cities]);
     }
 
     public function longTermRentals(): View
     {
-        $featuredCars = Car::query()
+        $featuredVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
@@ -149,14 +113,14 @@ class HomeController extends Controller
             ->orderBy('name')
             ->limit(3)
             ->get()
-            ->map(function (Car $car, int $index) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
+            ->map(function (Vehicle $vehicle, int $index) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'model' => $car->model ?: 'Monthly rental vehicle',
-                    'transmission' => $car->transmission ?: 'Automatic',
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'model' => $vehicle->model ?: 'Monthly rental vehicle',
+                    'transmission' => $vehicle->transmission ?: 'Automatic',
                     'daily_rate' => (float) $pricing['daily_rate'],
                     'monthly_rate' => round((float) ($pricing['monthly_rate'] ?? 0), 0),
                     'per_month_km' => (int) ($pricing['per_month_km'] ?? 4500),
@@ -165,7 +129,7 @@ class HomeController extends Controller
                         1 => 'Family',
                         default => 'Executive',
                     },
-                    'image' => $car->primaryImageUrl(),
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
@@ -183,12 +147,12 @@ class HomeController extends Controller
             '12 Months',
         ];
 
-        return view('long-term-rentals', compact('featuredCars', 'categories', 'durationOptions'));
+        return view('long-term-rentals', ['featuredCars' => $featuredVehicles, 'categories' => $categories, 'durationOptions' => $durationOptions]);
     }
 
     public function medicalTransport(): View
     {
-        $featuredCars = Car::query()
+        $featuredVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
@@ -196,16 +160,16 @@ class HomeController extends Controller
             ->orderBy('name')
             ->limit(3)
             ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
+            ->map(function (Vehicle $vehicle) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'transmission' => $car->transmission ?: 'Automatic',
-                    'fuel_type' => $car->fuel_type ?: 'Petrol',
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'transmission' => $vehicle->transmission ?: 'Automatic',
+                    'fuel_type' => $vehicle->fuel_type ?: 'Petrol',
                     'daily_rate' => (float) $pricing['daily_rate'],
-                    'image' => $car->primaryImageUrl(),
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
@@ -232,16 +196,16 @@ class HomeController extends Controller
             ],
             [
                 'question' => 'How do I contact you quickly in Sri Lanka?',
-                'answer' => 'You can call us directly on +94 77 717 3264 or send a request through the booking form on this page.',
+                'answer' => 'You can call us directly on 077 599 8951 or send a request through the booking form on this page.',
             ],
         ];
 
-        return view('medical-transport', compact('featuredCars', 'faqItems'));
+        return view('medical-transport', ['featuredCars' => $featuredVehicles, 'faqItems' => $faqItems]);
     }
 
     public function groupPackages(): View
     {
-        $featuredCars = Car::query()
+        $featuredVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
@@ -249,9 +213,9 @@ class HomeController extends Controller
             ->orderBy('name')
             ->limit(2)
             ->get()
-            ->map(function (Car $car) {
-                $pricing = VehiclePricingResolver::resolveForCar($car);
-                $name = strtolower(trim(($car->name ?? '') . ' ' . ($car->model ?? '')));
+            ->map(function (Vehicle $vehicle) {
+                $pricing = VehiclePricingResolver::resolveForVehicle($vehicle);
+                $name = strtolower(trim(($vehicle->name ?? '') . ' ' . ($vehicle->model ?? '')));
 
                 $estimatedSeats = 5;
                 $estimatedBags = 2;
@@ -272,19 +236,19 @@ class HomeController extends Controller
                 }
 
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'model' => $car->model ?: 'Group travel vehicle',
-                    'transmission' => $car->transmission ?: 'Automatic',
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'model' => $vehicle->model ?: 'Group travel vehicle',
+                    'transmission' => $vehicle->transmission ?: 'Automatic',
                     'daily_rate' => (float) $pricing['daily_rate'],
                     'seats' => $estimatedSeats,
                     'bags' => $estimatedBags,
                     'tag' => $tag,
-                    'image' => $car->primaryImageUrl(),
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
-        return view('group-packages', compact('featuredCars'));
+        return view('group-packages', ['featuredCars' => $featuredVehicles]);
     }
 
     public function pricingIndex(): View
@@ -309,7 +273,7 @@ class HomeController extends Controller
         }
 
         $activeTrips = Booking::query()
-            ->with('car')
+            ->with('vehicle')
             ->whereIn('status', ['pending', 'confirmed'])
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id);
@@ -339,7 +303,7 @@ class HomeController extends Controller
             ->get();
 
         $canceledTrips = Booking::query()
-            ->with('car')
+            ->with('vehicle')
             ->where('status', 'cancelled')
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id);
@@ -369,7 +333,7 @@ class HomeController extends Controller
             ->get();
 
         $completedTrips = Booking::query()
-            ->with('car')
+            ->with('vehicle')
             ->where('status', 'completed')
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id);
@@ -398,30 +362,36 @@ class HomeController extends Controller
             ->orderByDesc('updated_at')
             ->get();
 
-        $recommendedCars = Car::query()
+        $recommendedVehicles = Vehicle::query()
             ->visibleOnPublic()
             ->with('images')
             ->orderByRaw("CASE WHEN status = 'available' THEN 0 ELSE 1 END")
             ->orderBy('name')
             ->limit(4)
             ->get()
-            ->map(function (Car $car) {
+            ->map(function (Vehicle $vehicle) {
                 return [
-                    'id' => $car->id,
-                    'name' => trim($car->name . ($car->year ? ' ' . $car->year : '')),
-                    'plate_no' => $car->plate_no,
-                    'daily_rate' => VehiclePricingResolver::resolveForCar($car)['daily_rate'],
-                    'image' => $car->primaryImageUrl(),
+                    'id' => $vehicle->id,
+                    'name' => trim($vehicle->name . ($vehicle->year ? ' ' . $vehicle->year : '')),
+                    'plate_no' => $vehicle->plate_no,
+                    'daily_rate' => VehiclePricingResolver::resolveForVehicle($vehicle)['daily_rate'],
+                    'image' => $vehicle->primaryImageUrl(),
                 ];
             });
 
-        return view('customer.home', compact('user', 'activeTrips', 'canceledTrips', 'completedTrips', 'recommendedCars'));
+        return view('customer.home', [
+            'user' => $user,
+            'activeTrips' => $activeTrips,
+            'canceledTrips' => $canceledTrips,
+            'completedTrips' => $completedTrips,
+            'recommendedCars' => $recommendedVehicles,
+        ]);
     }
 
-    private function resolveAirportTag(Car $car, float $dailyRate): string
+    private function resolveAirportTag(Vehicle $vehicle, float $dailyRate): string
     {
-        $name = strtolower(trim(($car->name ?? '') . ' ' . ($car->make ?? '') . ' ' . ($car->model ?? '')));
-        $fuel = strtolower((string) ($car->fuel_type ?? ''));
+        $name = strtolower(trim(($vehicle->name ?? '') . ' ' . ($vehicle->make ?? '') . ' ' . ($vehicle->model ?? '')));
+        $fuel = strtolower((string) ($vehicle->fuel_type ?? ''));
 
         if (str_contains($name, 'largo') || str_contains($name, 'van') || str_contains($name, 'kdh')) {
             return 'Large Trunk Space';

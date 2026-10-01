@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agreement;
-use App\Models\Car;
+use App\Models\Vehicle;
 use App\Models\VehicleMaintenance;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -15,111 +15,111 @@ class VehicleMaintenanceController extends Controller
     {
         $user = $request->user();
         $month = $request->get('month');
-        $carId = $request->get('car_id');
+        $vehicleId = $request->get('vehicle_id');
 
         if ($user?->isCustomerPortal()) {
             $customerId = $user->customer_id;
             if (!$customerId) {
                 return view('vehicle-maintenance.index', [
-                    'cars' => collect(),
+                    'vehicles' => collect(),
                     'records' => collect(),
                     'month' => $month,
-                    'carId' => $carId,
+                    'vehicleId' => $vehicleId,
                     'total' => 0,
                 ]);
             }
 
-            $allowedCarIds = Agreement::query()
+            $allowedVehicleIds = Agreement::query()
                 ->where('customer_id', $customerId)
-                ->pluck('car_id')
+                ->pluck('vehicle_id')
                 ->unique()
                 ->filter()
                 ->values();
 
-            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
-            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+            $allowedVehicleIdList = $allowedVehicleIds->map(fn ($id) => (int) $id)->all();
+            if ($vehicleId !== null && $vehicleId !== '' && !in_array((int) $vehicleId, $allowedVehicleIdList, true)) {
                 abort(403, 'You do not have permission to access this vehicle.');
             }
 
-            $cars = $allowedCarIds->isEmpty()
+            $vehicles = $allowedVehicleIds->isEmpty()
                 ? collect()
-                : Car::query()->whereIn('id', $allowedCarIds)->orderBy('name')->get();
+                : Vehicle::query()->whereIn('id', $allowedVehicleIds)->orderBy('name')->get();
 
-            if ($allowedCarIds->isEmpty()) {
+            if ($allowedVehicleIds->isEmpty()) {
                 return view('vehicle-maintenance.index', [
-                    'cars' => $cars,
+                    'vehicles' => $vehicles,
                     'records' => collect(),
                     'month' => $month,
-                    'carId' => $carId,
+                    'vehicleId' => $vehicleId,
                     'total' => 0,
                 ]);
             }
 
             $records = VehicleMaintenance::query()
-                ->with('car')
-                ->whereIn('car_id', $allowedCarIds)
+                ->with('vehicle')
+                ->whereIn('vehicle_id', $allowedVehicleIds)
                 ->when($month, fn ($query) => $query->whereRaw("DATE_FORMAT(service_date, '%Y-%m') = ?", [$month]))
-                ->when($carId, fn ($query) => $query->where('car_id', $carId))
+                ->when($vehicleId, fn ($query) => $query->where('vehicle_id', $vehicleId))
                 ->orderByDesc('service_date')
                 ->orderByDesc('id')
                 ->get();
 
             $total = (float) $records->sum('amount');
 
-            return view('vehicle-maintenance.index', compact('cars', 'records', 'month', 'carId', 'total'));
+            return view('vehicle-maintenance.index', compact('vehicles', 'records', 'month', 'vehicleId', 'total'));
         }
 
         if ($user?->isPartner()) {
-            $allowedCarIds = Car::query()
+            $allowedVehicleIds = Vehicle::query()
                 ->where('partner_user_id', $user->id)
                 ->pluck('id');
 
-            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
-            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+            $allowedVehicleIdList = $allowedVehicleIds->map(fn ($id) => (int) $id)->all();
+            if ($vehicleId !== null && $vehicleId !== '' && !in_array((int) $vehicleId, $allowedVehicleIdList, true)) {
                 abort(403, 'You do not have permission to access this vehicle.');
             }
 
-            $cars = $allowedCarIds->isEmpty()
+            $vehicles = $allowedVehicleIds->isEmpty()
                 ? collect()
-                : Car::query()->whereIn('id', $allowedCarIds)->orderBy('name')->get();
+                : Vehicle::query()->whereIn('id', $allowedVehicleIds)->orderBy('name')->get();
 
-            if ($allowedCarIds->isEmpty()) {
+            if ($allowedVehicleIds->isEmpty()) {
                 return view('vehicle-maintenance.index', [
-                    'cars' => $cars,
+                    'vehicles' => $vehicles,
                     'records' => collect(),
                     'month' => $month,
-                    'carId' => $carId,
+                    'vehicleId' => $vehicleId,
                     'total' => 0,
                 ]);
             }
 
             $records = VehicleMaintenance::query()
-                ->with('car')
-                ->whereIn('car_id', $allowedCarIds)
+                ->with('vehicle')
+                ->whereIn('vehicle_id', $allowedVehicleIds)
                 ->when($month, fn ($query) => $query->whereRaw("DATE_FORMAT(service_date, '%Y-%m') = ?", [$month]))
-                ->when($carId, fn ($query) => $query->where('car_id', $carId))
+                ->when($vehicleId, fn ($query) => $query->where('vehicle_id', $vehicleId))
                 ->orderByDesc('service_date')
                 ->orderByDesc('id')
                 ->get();
 
             $total = (float) $records->sum('amount');
 
-            return view('vehicle-maintenance.index', compact('cars', 'records', 'month', 'carId', 'total'));
+            return view('vehicle-maintenance.index', compact('vehicles', 'records', 'month', 'vehicleId', 'total'));
         }
 
-        $cars = Car::query()->orderBy('name')->get();
+        $vehicles = Vehicle::query()->orderBy('name')->get();
 
         $records = VehicleMaintenance::query()
-            ->with('car')
+            ->with('vehicle')
             ->when($month, fn ($query) => $query->whereRaw("DATE_FORMAT(service_date, '%Y-%m') = ?", [$month]))
-            ->when($carId, fn ($query) => $query->where('car_id', $carId))
+            ->when($vehicleId, fn ($query) => $query->where('vehicle_id', $vehicleId))
             ->orderByDesc('service_date')
             ->orderByDesc('id')
             ->get();
 
         $total = (float) $records->sum('amount');
 
-        return view('vehicle-maintenance.index', compact('cars', 'records', 'month', 'carId', 'total'));
+        return view('vehicle-maintenance.index', compact('vehicles', 'records', 'month', 'vehicleId', 'total'));
     }
 
     public function exportPdf(Request $request): Response
@@ -130,32 +130,32 @@ class VehicleMaintenanceController extends Controller
         }
 
         $month = $request->get('month');
-        $carId = $request->get('car_id');
+        $vehicleId = $request->get('vehicle_id');
 
-        $recordsQuery = VehicleMaintenance::query()->with('car');
-        $selectedCar = null;
+        $recordsQuery = VehicleMaintenance::query()->with('vehicle');
+        $selectedVehicle = null;
 
         if ($user?->isPartner()) {
-            $allowedCarIds = Car::query()
+            $allowedVehicleIds = Vehicle::query()
                 ->where('partner_user_id', $user->id)
                 ->pluck('id');
-            $allowedCarIdList = $allowedCarIds->map(fn ($id) => (int) $id)->all();
+            $allowedVehicleIdList = $allowedVehicleIds->map(fn ($id) => (int) $id)->all();
 
-            if ($carId !== null && $carId !== '' && !in_array((int) $carId, $allowedCarIdList, true)) {
+            if ($vehicleId !== null && $vehicleId !== '' && !in_array((int) $vehicleId, $allowedVehicleIdList, true)) {
                 abort(403, 'You do not have permission to access this vehicle.');
             }
 
-            $recordsQuery->whereIn('car_id', $allowedCarIds);
-            $selectedCar = !empty($carId)
-                ? Car::query()->where('partner_user_id', $user->id)->find($carId)
+            $recordsQuery->whereIn('vehicle_id', $allowedVehicleIds);
+            $selectedVehicle = !empty($vehicleId)
+                ? Vehicle::query()->where('partner_user_id', $user->id)->find($vehicleId)
                 : null;
         } else {
-            $selectedCar = !empty($carId) ? Car::query()->find($carId) : null;
+            $selectedVehicle = !empty($vehicleId) ? Vehicle::query()->find($vehicleId) : null;
         }
 
         $records = $recordsQuery
             ->when($month, fn ($query) => $query->whereRaw("DATE_FORMAT(service_date, '%Y-%m') = ?", [$month]))
-            ->when($carId, fn ($query) => $query->where('car_id', $carId))
+            ->when($vehicleId, fn ($query) => $query->where('vehicle_id', $vehicleId))
             ->orderByDesc('service_date')
             ->orderByDesc('id')
             ->get();
@@ -163,12 +163,12 @@ class VehicleMaintenanceController extends Controller
         $total = (float) $records->sum('amount');
         $filename = 'vehicle-maintenance'
             . ($month ? '-'.$month : '-all-months')
-            . (!empty($carId) ? '-car-'.$carId : '-all-cars')
+            . (!empty($vehicleId) ? '-vehicle-'.$vehicleId : '-all-vehicles')
             . '.pdf';
 
         $pdf = Pdf::loadView('vehicle-maintenance.report-pdf', [
             'records' => $records,
-            'selectedCar' => $selectedCar,
+            'selectedVehicle' => $selectedVehicle,
             'month' => $month,
             'total' => $total,
         ])->setPaper('a4', 'landscape');
@@ -202,7 +202,7 @@ class VehicleMaintenanceController extends Controller
     private function validateRecord(Request $request): array
     {
         return $request->validate([
-            'car_id' => ['required', 'exists:cars,id'],
+            'vehicle_id' => ['required', 'exists:vehicles,id'],
             'service_date' => ['required', 'date'],
             'part_name' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0'],

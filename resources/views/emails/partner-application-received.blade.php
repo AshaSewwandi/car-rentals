@@ -35,7 +35,7 @@
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e1e8f3;border-radius:8px;overflow:hidden;background:#ffffff;">
                 <tr><td style="padding:12px 14px;border-bottom:1px solid #edf2f9;"><div style="font-size:11px;color:#7f91ad;letter-spacing:.08em;font-weight:700;">EMAIL ADDRESS</div><div style="margin-top:4px;font-size:18px;color:#162b4a;font-weight:700;">{{ $partner->email }}</div></td></tr>
                 <tr><td style="padding:12px 14px;border-bottom:1px solid #edf2f9;"><div style="font-size:11px;color:#7f91ad;letter-spacing:.08em;font-weight:700;">PHONE NUMBER</div><div style="margin-top:4px;font-size:18px;color:#162b4a;font-weight:700;">{{ $partner->phone ?: '-' }}</div></td></tr>
-                <tr><td style="padding:12px 14px;border-bottom:1px solid #edf2f9;"><div style="font-size:11px;color:#7f91ad;letter-spacing:.08em;font-weight:700;">VEHICLE</div><div style="margin-top:4px;font-size:18px;color:#162b4a;font-weight:700;">{{ $car->name }} ({{ $car->plate_no }})</div></td></tr>
+                <tr><td style="padding:12px 14px;border-bottom:1px solid #edf2f9;"><div style="font-size:11px;color:#7f91ad;letter-spacing:.08em;font-weight:700;">VEHICLE</div><div style="margin-top:4px;font-size:18px;color:#162b4a;font-weight:700;">{{ $vehicle->name }} ({{ $vehicle->plate_no }})</div></td></tr>
                 <tr><td style="padding:12px 14px;"><div style="font-size:11px;color:#7f91ad;letter-spacing:.08em;font-weight:700;">APPLICATION STATUS</div><div style="margin-top:6px;display:inline-block;background:#eef3fb;color:#334a6b;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:700;letter-spacing:.08em;">PENDING ADMIN REVIEW</div></td></tr>
               </table>
 

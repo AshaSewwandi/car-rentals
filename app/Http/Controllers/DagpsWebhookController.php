@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Car;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
 class DagpsWebhookController extends Controller
@@ -27,22 +27,22 @@ class DagpsWebhookController extends Controller
             'tracked_at' => ['nullable', 'date'],
         ]);
 
-        $car = null;
+        $vehicle = null;
         if (!empty($data['imei'])) {
-            $car = Car::query()->where('tracker_imei', $data['imei'])->first();
+            $vehicle = Vehicle::query()->where('tracker_imei', $data['imei'])->first();
         }
-        if (!$car && !empty($data['dagps_device_id'])) {
-            $car = Car::query()->where('dagps_device_id', $data['dagps_device_id'])->first();
+        if (!$vehicle && !empty($data['dagps_device_id'])) {
+            $vehicle = Vehicle::query()->where('dagps_device_id', $data['dagps_device_id'])->first();
         }
-        if (!$car && !empty($data['plate_no'])) {
-            $car = Car::query()->where('plate_no', $data['plate_no'])->first();
-        }
-
-        if (!$car) {
-            return response()->json(['message' => 'Car not found for incoming tracker payload'], 404);
+        if (!$vehicle && !empty($data['plate_no'])) {
+            $vehicle = Vehicle::query()->where('plate_no', $data['plate_no'])->first();
         }
 
-        $car->update([
+        if (!$vehicle) {
+            return response()->json(['message' => 'Vehicle not found for incoming tracker payload'], 404);
+        }
+
+        $vehicle->update([
             'latest_latitude' => $data['latitude'],
             'latest_longitude' => $data['longitude'],
             'latest_speed' => $data['speed'] ?? null,
@@ -52,8 +52,8 @@ class DagpsWebhookController extends Controller
 
         return response()->json([
             'message' => 'Location updated',
-            'car_id' => $car->id,
-            'plate_no' => $car->plate_no,
+            'vehicle_id' => $vehicle->id,
+            'plate_no' => $vehicle->plate_no,
         ]);
     }
 }

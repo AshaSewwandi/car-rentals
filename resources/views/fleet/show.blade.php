@@ -545,39 +545,21 @@
 
                 <aside>
                     <article class="panel book-panel">
-                        <div class="book-head">Book This Vehicle</div>
+                        <div class="book-head">Request This Vehicle</div>
                         <div class="book-body">
-                            <form id="vehicleQuickBookingForm" action="{{ route('booking.confirm') }}" method="get" novalidate>
-                                <input type="hidden" name="car_id" value="{{ $vehicle['id'] }}">
-                                <div class="field">
-                                    <label for="start_location">Pick-up Location</label>
-                                    <div class="field-control">
-                                        <input id="start_location" name="start_location" type="text" placeholder="City, Airport, or Address" aria-describedby="vehicle_start_location_error">
-                                    </div>
-                                    <small id="vehicle_start_location_error" class="field-error"></small>
-                                </div>
-                                <div class="field">
-                                    <label for="start_date">Date</label>
-                                    <div class="field-control date-control">
-                                        <input id="start_date" name="start_date" type="date" aria-describedby="vehicle_start_date_error">
-                                    </div>
-                                    <small id="vehicle_start_date_error" class="field-error"></small>
-                                </div>
-                                <div class="field">
-                                    <label for="end_date">Return Date</label>
-                                    <div class="field-control date-control">
-                                        <input id="end_date" name="end_date" type="date" aria-describedby="vehicle_end_date_error">
-                                    </div>
-                                    <small id="vehicle_end_date_error" class="field-error"></small>
-                                </div>
-                                <div class="book-total">
-                                    <small>Daily base rate</small>
-                                    <strong>Rs {{ number_format($vehicle['daily_rate'], 0) }}</strong>
-                                </div>
-                                <button type="submit" class="book-btn">Continue to Book</button>
-                            </form>
+                            <div class="book-total">
+                                <small>Daily base rate</small>
+                                <strong>Rs {{ number_format($vehicle['daily_rate'], 0) }}</strong>
+                            </div>
+                            <a
+                                class="book-btn"
+                                href="{{ route('rent-requests.create', ['vehicle' => $vehicle['name'] . ' (' . $vehicle['plate_no'] . ')']) }}"
+                                style="display:block;text-align:center;text-decoration:none;"
+                            >
+                                Request This Vehicle
+                            </a>
                             <div class="book-help">
-                                Need help booking? Call +94 77 717 3264
+                                Need help booking? Call 077 599 8951
                             </div>
                         </div>
                     </article>
@@ -665,95 +647,6 @@
             });
         })();
 
-        (function () {
-            const form = document.getElementById('vehicleQuickBookingForm');
-            const locationInput = document.getElementById('start_location');
-            const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
-            if (!form || !locationInput || !startDateInput || !endDateInput) return;
-
-            const errors = {
-                start_location: document.getElementById('vehicle_start_location_error'),
-                start_date: document.getElementById('vehicle_start_date_error'),
-                end_date: document.getElementById('vehicle_end_date_error'),
-            };
-
-            const setError = (input, key, message) => {
-                const shell = input.closest('.field-control');
-                if (shell) shell.classList.add('input-error');
-                if (errors[key]) {
-                    errors[key].textContent = message;
-                    errors[key].classList.add('show');
-                }
-            };
-
-            const clearError = (input, key) => {
-                const shell = input.closest('.field-control');
-                if (shell) shell.classList.remove('input-error');
-                if (errors[key]) {
-                    errors[key].textContent = '';
-                    errors[key].classList.remove('show');
-                }
-            };
-
-            const toISODate = (date) => {
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, '0');
-                const d = String(date.getDate()).padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            };
-
-            const today = new Date();
-            const minDate = toISODate(today);
-            startDateInput.min = minDate;
-            endDateInput.min = minDate;
-
-            const syncEndMin = () => {
-                endDateInput.min = startDateInput.value || minDate;
-                if (endDateInput.value && startDateInput.value && endDateInput.value < startDateInput.value) {
-                    endDateInput.value = '';
-                }
-            };
-
-            startDateInput.addEventListener('change', () => {
-                clearError(startDateInput, 'start_date');
-                syncEndMin();
-            });
-            locationInput.addEventListener('input', () => clearError(locationInput, 'start_location'));
-            endDateInput.addEventListener('change', () => clearError(endDateInput, 'end_date'));
-
-            form.addEventListener('submit', (event) => {
-                let hasError = false;
-                clearError(locationInput, 'start_location');
-                clearError(startDateInput, 'start_date');
-                clearError(endDateInput, 'end_date');
-
-                if (!locationInput.value.trim()) {
-                    setError(locationInput, 'start_location', 'Please enter pickup location.');
-                    hasError = true;
-                }
-
-                if (!startDateInput.value) {
-                    setError(startDateInput, 'start_date', 'Please select start date.');
-                    hasError = true;
-                } else if (startDateInput.value < minDate) {
-                    setError(startDateInput, 'start_date', 'Start date cannot be in the past.');
-                    hasError = true;
-                }
-
-                if (!endDateInput.value) {
-                    setError(endDateInput, 'end_date', 'Please select return date.');
-                    hasError = true;
-                } else if (startDateInput.value && endDateInput.value < startDateInput.value) {
-                    setError(endDateInput, 'end_date', 'Return date must be same day or after start date.');
-                    hasError = true;
-                }
-
-                if (hasError) {
-                    event.preventDefault();
-                }
-            });
-        })();
     </script>
 </body>
 </html>

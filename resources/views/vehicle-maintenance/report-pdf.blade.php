@@ -45,7 +45,7 @@
   <div class="header">
     <div class="title">Vehicle Maintenance Report</div>
     <div class="meta"><strong>Month:</strong> {{ $month ?: 'All months' }}</div>
-    <div class="meta"><strong>Vehicle:</strong> {{ $selectedCar ? $selectedCar->name.' ('.$selectedCar->plate_no.')' : 'All vehicles' }}</div>
+    <div class="meta"><strong>Vehicle:</strong> {{ $selectedVehicle ? $selectedVehicle->name.' ('.$selectedVehicle->plate_no.')' : 'All vehicles' }}</div>
     <div class="meta"><strong>Total Amount:</strong> Rs {{ number_format($total, 2) }}</div>
     <div class="meta"><strong>Records:</strong> {{ $records->count() }}</div>
   </div>
@@ -65,7 +65,7 @@
       @forelse($records as $record)
         <tr>
           <td>{{ $record->service_date->format('Y-m-d') }}</td>
-          <td>{{ $record->car?->name }}{{ $record->car?->plate_no ? ' ('.$record->car->plate_no.')' : '' }}</td>
+          <td>{{ $record->vehicle?->name }}{{ $record->vehicle?->plate_no ? ' ('.$record->vehicle->plate_no.')' : '' }}</td>
           <td>{{ $record->part_name }}</td>
           <td>{{ $record->mileage !== null ? number_format($record->mileage).' km' : '-' }}</td>
           <td class="num">Rs {{ number_format((float) $record->amount, 2) }}</td>
