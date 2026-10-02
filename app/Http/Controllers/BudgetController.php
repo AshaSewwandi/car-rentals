@@ -28,6 +28,9 @@ class BudgetController extends Controller
 
     private const DEFAULT_INCOME = ['Rental income'];
 
+    // Largest value a decimal(12,2) column can hold.
+    private const MAX_AMOUNT = 9999999999.99;
+
     // Bootstrap Icons admins can pick from for main and sub categories.
     public const ICONS = [
         'wallet2', 'credit-card', 'bank', 'piggy-bank', 'cash-coin', 'coin', 'receipt', 'graph-up-arrow',
@@ -121,7 +124,7 @@ class BudgetController extends Controller
 
         $data = $request->validate([
             'budget_category_id' => ['required', Rule::in($categoryIds->all())],
-            'amount' => ['required', 'numeric', 'gt:0'],
+            'amount' => ['required', 'numeric', 'gt:0', 'max:' . self::MAX_AMOUNT],
             'note' => ['nullable', 'string', 'max:255'],
             'date' => ['required', 'date_format:Y-m-d', 'starts_with:' . $month],
         ]);
@@ -155,7 +158,7 @@ class BudgetController extends Controller
     {
         $data = $request->validate([
             'name' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'amount' => ['sometimes', 'numeric', 'min:0'],
+            'amount' => ['sometimes', 'numeric', 'min:0', 'max:' . self::MAX_AMOUNT],
         ]);
         if (array_key_exists('name', $data)) {
             $data['name'] = trim((string) $data['name']) ?: 'Income';
@@ -185,7 +188,7 @@ class BudgetController extends Controller
             'icon' => ['nullable', Rule::in(self::ICONS)],
             'sub' => ['nullable', 'string', 'max:255'],
             'sub_icon' => ['nullable', Rule::in(self::ICONS)],
-            'budget' => ['nullable', 'numeric', 'min:0'],
+            'budget' => ['nullable', 'numeric', 'min:0', 'max:' . self::MAX_AMOUNT],
         ]);
         $budget = $request->user()->canManageData() ? ($data['budget'] ?? 0) : 0;
 
@@ -258,7 +261,7 @@ class BudgetController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'icon' => ['nullable', Rule::in(self::ICONS)],
-            'budget' => ['nullable', 'numeric', 'min:0'],
+            'budget' => ['nullable', 'numeric', 'min:0', 'max:' . self::MAX_AMOUNT],
         ]);
         $budget = $request->user()->canManageData() ? ($data['budget'] ?? 0) : 0;
 
@@ -285,7 +288,7 @@ class BudgetController extends Controller
         $data = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'icon' => ['sometimes', 'required', Rule::in(self::ICONS)],
-            'budget' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'budget' => ['sometimes', 'required', 'numeric', 'min:0', 'max:' . self::MAX_AMOUNT],
         ]);
 
         // Admins can rename and change icons; only super admins change budget amounts.
@@ -403,56 +406,6 @@ class BudgetController extends Controller
         return $kept ? "{$done}. Kept in {$kept} other " . ($kept > 1 ? 'months' : 'month') . ' that have spending logged.' : null;
     }
 
-    public function export(string $month)
-    {
-        abort_unless($this->validMonth($month), 404);
-        $budgetMonth = BudgetMonth::query()->where('month', $month)->firstOrFail();
-        $budgetMonth->load(['incomes', 'groups.categories', 'entries.category']);
-        $spentByCat = $budgetMonth->entries->groupBy('budget_category_id')->map->sum('amount');
-
-        $rows = [['Section', 'Group', 'Category', 'Budget', 'Spent', 'Left']];
-        foreach ($budgetMonth->groups as $group) {
-            foreach ($group->categories as $cat) {
-                $spent = (float) ($spentByCat[$cat->id] ?? 0);
-                $rows[] = ['Budget', $group->name, $cat->name, $cat->budget, $spent, $cat->budget - $spent];
-            }
-        }
-        $rows[] = [];
-        $rows[] = ['Section', 'Source', 'Amount'];
-        foreach ($budgetMonth->incomes as $income) {
-            $rows[] = ['Income', $income->name, $income->amount];
-        }
-        $rows[] = [];
-        $rows[] = ['Section', 'Date', 'Category', 'Note', 'Amount'];
-        foreach ($budgetMonth->entries->sortBy('date') as $entry) {
-            $rows[] = ['Spend', $entry->date->format('Y-m-d'), $entry->category?->name ?? '', $entry->note, $entry->amount];
-        }
-
-        return $this->csv("budget-{$month}.csv", $rows);
-    }
-
-    public function exportAll()
-    {
-        $rows = [['Month', 'Date', 'Group', 'Category', 'Note', 'Amount']];
-
-        BudgetEntry::query()
-            ->with(['month', 'category.group'])
-            ->orderBy('date')
-            ->orderBy('id')
-            ->each(function (BudgetEntry $entry) use (&$rows) {
-                $rows[] = [
-                    $entry->month->month,
-                    $entry->date->format('Y-m-d'),
-                    $entry->category?->group?->name ?? '',
-                    $entry->category?->name ?? '',
-                    $entry->note,
-                    $entry->amount,
-                ];
-            });
-
-        return $this->csv('budget-history.csv', $rows);
-    }
-
     private function validMonth(?string $month): ?string
     {
         return $month && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month) ? $month : null;
@@ -559,17 +512,5 @@ class BudgetController extends Controller
         $budgetMonth->forceFill(['touched_at' => now()])->save();
 
         return response()->json($this->monthPayload($budgetMonth->month, true) + ['notice' => $notice]);
-    }
-
-    private function csv(string $filename, array $rows)
-    {
-        return response()->streamDownload(function () use ($rows) {
-            $out = fopen('php://output', 'w');
-            foreach ($rows as $row) {
-                // Stop spreadsheet apps from running notes as formulas.
-                fputcsv($out, array_map(fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v, $row));
-            }
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
     }
 }

@@ -31,6 +31,8 @@
   .bp-btn { border:1px solid var(--line); background:var(--card); padding:8px 14px; border-radius:10px; font-weight:600; font-size:14px; }
   .bp-btn:hover { border-color:var(--ink-3); }
   .bp-btn.sm { padding:5px 10px; font-size:13px; }
+  .bp-btn-report { background:linear-gradient(135deg, var(--accent), var(--primary)); color:#fff; border-color:var(--primary); }
+  .bp-btn-report:hover { color:#fff; filter:brightness(1.08); }
   .bp-tabs { display:inline-flex; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:3px; gap:2px; }
   .bp-tabs button { border:0; background:none; padding:7px 14px; border-radius:9px; font-weight:700; font-size:14px; color:var(--ink-2); }
   .bp-tabs button[aria-selected="true"] { background:linear-gradient(135deg, var(--accent), var(--primary)); color:#fff; }
@@ -211,7 +213,8 @@
         <button role="tab" type="button" id="bpTabHist" aria-selected="false">History</button>
       </div>
       <span class="bp-status" id="bpStatus"></span>
-      <button class="bp-btn" type="button" id="bpExport">Export CSV</button>
+      <a class="bp-btn text-decoration-none text-reset" id="bpAnalysis" href="{{ route('budget.analysis', ['month' => $month]) }}"><i class="bi bi-bar-chart-line" aria-hidden="true"></i> Analysis</a>
+      <button class="bp-btn bp-btn-report" type="button" id="bpExport"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Download report</button>
     </div>
   </header>
 
@@ -506,7 +509,7 @@
     }).join('');
 
     $('bpHistView').innerHTML = `
-      <section class="bp-panel"><div class="bp-colhead"><h2>Every month</h2><a class="bp-btn sm text-decoration-none text-reset" href="${BASE}/export/all">Export all history</a></div>
+      <section class="bp-panel"><div class="bp-colhead"><h2>Every month</h2><a class="bp-btn sm text-decoration-none text-reset" href="${BASE}/report/history"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Download history report</a></div>
         <div class="bp-tw"><table class="bp-htable"><thead><tr><th>Month</th><th>Income</th><th>Budgeted</th><th>Spent</th><th>Left over</th><th>Entries</th></tr></thead>
         <tbody>${rows || '<tr><td colspan="6">No months yet.</td></tr>'}</tbody>
         <tfoot><tr><td>All time</td><td class="num">${rs(T.income)}</td><td class="num">${rs(T.budget)}</td><td class="num">${rs(T.spent)}</td><td class="num ${T.left < 0 ? 'bp-neg' : 'bp-pos'}">${rs(T.left)}</td><td></td></tr></tfoot></table></div>
@@ -529,6 +532,7 @@
       state = await api('GET', '/' + key(cur));
       filterCat = null;
       history.replaceState(null, '', `${BASE}?month=${key(cur)}`);
+      $('bpAnalysis').href = `${BASE}/analysis?month=${key(cur)}`;
       if (CAN_MANAGE) $('bpDate').value = '';
       render();
       setStatus(state.persisted ? '' : 'Preview of carried-over plan');
@@ -712,7 +716,7 @@
   $('bpNext').addEventListener('click', () => { cur = cur.m === 11 ? { y: cur.y + 1, m: 0 } : { y: cur.y, m: cur.m + 1 }; loadMonth(); });
   $('bpExport').addEventListener('click', () => {
     if (!state.persisted) { toast('Nothing saved for this month yet', true); return; }
-    window.location.href = `${BASE}/${key(cur)}/export`;
+    toast("Preparing report…"); window.location.href = `${BASE}/${key(cur)}/report`;
   });
 
   render();
