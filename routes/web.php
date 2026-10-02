@@ -5,6 +5,7 @@ use App\Http\Controllers\AvailabilityCheckController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BudgetReportController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -113,9 +114,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:budget')->group(function () {
         Route::get('/budget', [BudgetController::class, 'index'])->name('budget.index');
         Route::get('/budget/history', [BudgetController::class, 'history'])->name('budget.history');
-        Route::get('/budget/export/all', [BudgetController::class, 'exportAll'])->name('budget.export-all');
+        Route::get('/budget/report/history', [BudgetReportController::class, 'history'])->name('budget.report-history');
+        Route::get('/budget/analysis', [BudgetReportController::class, 'analysis'])->name('budget.analysis');
         Route::get('/budget/{month}', [BudgetController::class, 'show'])->where('month', '\d{4}-\d{2}')->name('budget.show');
-        Route::get('/budget/{month}/export', [BudgetController::class, 'export'])->where('month', '\d{4}-\d{2}')->name('budget.export');
+        Route::get('/budget/{month}/report', [BudgetReportController::class, 'month'])->where('month', '\d{4}-\d{2}')->name('budget.report');
     });
     Route::middleware(['role:super_admin', 'permission:budget'])->group(function () {
         Route::post('/budget/{month}/entries', [BudgetController::class, 'storeEntry'])->where('month', '\d{4}-\d{2}')->name('budget.entries.store');
