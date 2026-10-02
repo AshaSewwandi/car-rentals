@@ -4,6 +4,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AvailabilityCheckController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -107,6 +108,31 @@ Route::middleware('auth')->group(function () {
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    });
+
+    Route::middleware('permission:budget')->group(function () {
+        Route::get('/budget', [BudgetController::class, 'index'])->name('budget.index');
+        Route::get('/budget/history', [BudgetController::class, 'history'])->name('budget.history');
+        Route::get('/budget/export/all', [BudgetController::class, 'exportAll'])->name('budget.export-all');
+        Route::get('/budget/{month}', [BudgetController::class, 'show'])->where('month', '\d{4}-\d{2}')->name('budget.show');
+        Route::get('/budget/{month}/export', [BudgetController::class, 'export'])->where('month', '\d{4}-\d{2}')->name('budget.export');
+    });
+    Route::middleware(['role:super_admin', 'permission:budget'])->group(function () {
+        Route::post('/budget/{month}/entries', [BudgetController::class, 'storeEntry'])->where('month', '\d{4}-\d{2}')->name('budget.entries.store');
+        Route::delete('/budget/entries/{entry}', [BudgetController::class, 'destroyEntry'])->name('budget.entries.destroy');
+        Route::post('/budget/{month}/incomes', [BudgetController::class, 'storeIncome'])->where('month', '\d{4}-\d{2}')->name('budget.incomes.store');
+        Route::put('/budget/incomes/{income}', [BudgetController::class, 'updateIncome'])->name('budget.incomes.update');
+        Route::delete('/budget/incomes/{income}', [BudgetController::class, 'destroyIncome'])->name('budget.incomes.destroy');
+    });
+    // Main and sub categories: admins and super admins (budget amounts stay super admin only, checked in the controller).
+    Route::middleware(['role:admin', 'permission:budget'])->group(function () {
+        Route::post('/budget/{month}/groups', [BudgetController::class, 'storeGroup'])->where('month', '\d{4}-\d{2}')->name('budget.groups.store');
+        Route::post('/budget/{month}/sync-plan', [BudgetController::class, 'syncPlan'])->where('month', '\d{4}-\d{2}')->name('budget.sync-plan');
+        Route::put('/budget/groups/{group}', [BudgetController::class, 'updateGroup'])->name('budget.groups.update');
+        Route::delete('/budget/groups/{group}', [BudgetController::class, 'destroyGroup'])->name('budget.groups.destroy');
+        Route::post('/budget/groups/{group}/categories', [BudgetController::class, 'storeCategory'])->name('budget.categories.store');
+        Route::put('/budget/categories/{category}', [BudgetController::class, 'updateCategory'])->name('budget.categories.update');
+        Route::delete('/budget/categories/{category}', [BudgetController::class, 'destroyCategory'])->name('budget.categories.destroy');
     });
 
     Route::middleware('permission:vehicle_maintenance')->group(function () {

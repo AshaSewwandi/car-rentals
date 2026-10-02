@@ -920,6 +920,9 @@
           @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
             <a class="mobile-admin-link" href="{{ route('expenses.index') }}">Expenses</a>
           @endif
+          @if(auth()->user()->canAccess('budget') && \Illuminate\Support\Facades\Route::has('budget.index'))
+            <a class="mobile-admin-link" href="{{ route('budget.index') }}">Budget Planner</a>
+          @endif
           @if(auth()->user()->canAccess('agreements') && \Illuminate\Support\Facades\Route::has('agreements.index'))
             <a class="mobile-admin-link" href="{{ route('agreements.index') }}">Agreements</a>
           @endif
@@ -1003,6 +1006,9 @@
           @endif
           @if(auth()->user()->canAccess('expenses') && \Illuminate\Support\Facades\Route::has('expenses.index'))
             <a class="menu-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}" href="{{ route('expenses.index') }}"><span class="menu-dot"></span>Expenses</a>
+          @endif
+          @if(auth()->user()->canAccess('budget') && \Illuminate\Support\Facades\Route::has('budget.index'))
+            <a class="menu-link {{ request()->routeIs('budget.*') ? 'active' : '' }}" href="{{ route('budget.index') }}"><span class="menu-dot"></span>Budget Planner</a>
           @endif
           @if((auth()->user()->canAccess('vehicle_maintenance') || auth()->user()->isPartner()) && \Illuminate\Support\Facades\Route::has('vehicle-maintenance.index'))
             <a class="menu-link {{ request()->routeIs('vehicle-maintenance.*') ? 'active' : '' }}" href="{{ route('vehicle-maintenance.index') }}"><span class="menu-dot"></span>Maintenance</a>
