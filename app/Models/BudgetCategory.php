@@ -9,7 +9,7 @@ class BudgetCategory extends Model
 {
     protected $fillable = ['budget_group_id','plan_key','name','icon','emoji','budget','sort'];
 
-    protected $casts = ['budget' => 'float'];
+    protected $casts = ['budget' => 'float', 'budget_group_id' => 'integer'];
 
     public function group(): BelongsTo { return $this->belongsTo(BudgetGroup::class, 'budget_group_id'); }
 }

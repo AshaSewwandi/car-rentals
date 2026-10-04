@@ -9,7 +9,7 @@ class BudgetIncome extends Model
 {
     protected $fillable = ['budget_month_id','name','amount','sort'];
 
-    protected $casts = ['amount' => 'float'];
+    protected $casts = ['amount' => 'float', 'budget_month_id' => 'integer'];
 
     public function month(): BelongsTo { return $this->belongsTo(BudgetMonth::class, 'budget_month_id'); }
 }

@@ -10,6 +10,8 @@ class BudgetGroup extends Model
 {
     protected $fillable = ['budget_month_id','plan_key','name','icon','sort'];
 
+    protected $casts = ['budget_month_id' => 'integer', 'sort' => 'integer'];
+
     public function month(): BelongsTo { return $this->belongsTo(BudgetMonth::class, 'budget_month_id'); }
     public function categories(): HasMany { return $this->hasMany(BudgetCategory::class)->orderBy('sort')->orderBy('id'); }
 }
