@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/budget/analysis', [BudgetReportController::class, 'analysis'])->name('budget.analysis');
         Route::get('/budget/{month}', [BudgetController::class, 'show'])->where('month', '\d{4}-\d{2}')->name('budget.show');
         Route::get('/budget/{month}/report', [BudgetReportController::class, 'month'])->where('month', '\d{4}-\d{2}')->name('budget.report');
+        Route::get('/budget/{month}/compare/{other}/report', [BudgetReportController::class, 'compare'])->where(['month' => '\d{4}-\d{2}', 'other' => '\d{4}-\d{2}'])->name('budget.compare-report');
     });
     Route::middleware(['role:super_admin', 'permission:budget'])->group(function () {
         Route::post('/budget/{month}/entries', [BudgetController::class, 'storeEntry'])->where('month', '\d{4}-\d{2}')->name('budget.entries.store');

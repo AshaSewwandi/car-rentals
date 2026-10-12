@@ -120,7 +120,10 @@
         </select>
       </div>
       <noscript><button class="ba-btn" type="submit">Show</button></noscript>
-      <a class="ba-btn primary" href="{{ route('budget.report', ['month' => $month, 'compare' => $compare['month'] ?? 'none']) }}"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Download PDF</a>
+      <a class="ba-btn primary" href="{{ route('budget.report', ['month' => $month]) }}" title="{{ $monthLabel }} only, category by category"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Monthly report</a>
+      @if($compare)
+        <a class="ba-btn primary" href="{{ route('budget.compare-report', ['month' => $month, 'other' => $compare['month']]) }}" title="{{ $monthLabel }} vs {{ $compare['monthLabel'] }}"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Comparison report</a>
+      @endif
       <a class="ba-btn" href="{{ route('budget.index', ['month' => $month]) }}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Planner</a>
     </form>
   </div>

@@ -33,6 +33,25 @@
   .bp-btn.sm { padding:5px 10px; font-size:13px; }
   .bp-btn-report { background:linear-gradient(135deg, var(--accent), var(--primary)); color:#fff; border-color:var(--primary); }
   .bp-btn-report:hover { color:#fff; filter:brightness(1.08); }
+  .bp-btn-report.dropdown-toggle::after { margin-left:.45em; vertical-align:.15em; transition:transform .2s; }
+  .bp-btn-report.show::after { transform:rotate(180deg); }
+
+  /* Report menu */
+  .bp-report-menu { width:320px; padding:6px; margin-top:8px !important; border:1px solid var(--line); border-radius:16px; box-shadow:0 16px 40px rgba(10,63,143,.16), 0 2px 6px rgba(10,63,143,.06); }
+  .bp-rm-head { padding:8px 10px 6px; font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); }
+  .bp-rm-item { display:flex; align-items:center; gap:12px; width:100%; padding:10px; border:0; border-radius:12px; background:none; text-align:left; color:var(--ink); text-decoration:none; transition:background .15s; }
+  .bp-rm-item.dropdown-item { white-space:normal; }
+  .bp-rm-item:hover, .bp-rm-item:focus-visible, .bp-rm-item:active { background:var(--field); color:var(--ink); outline:none; }
+  .bp-rm-item:focus-visible { box-shadow:0 0 0 2px var(--accent); }
+  .bp-rm-icon { flex:none; width:38px; height:38px; display:grid; place-items:center; border-radius:11px; font-size:17px; color:#fff; background:linear-gradient(135deg, var(--accent), var(--primary)); box-shadow:0 4px 10px rgba(15,102,195,.25); }
+  .bp-rm-icon.cmp { background:linear-gradient(135deg, #f08a52, #eb6834); box-shadow:0 4px 10px rgba(235,104,52,.25); }
+  .bp-rm-icon.soft { color:var(--accent); background:var(--accent-soft); box-shadow:none; }
+  .bp-rm-text { display:flex; flex-direction:column; min-width:0; flex:1; }
+  .bp-rm-title { font-weight:700; font-size:14px; line-height:1.3; }
+  .bp-rm-desc { font-size:12.5px; color:var(--ink-3); line-height:1.35; margin-top:1px; }
+  .bp-rm-link { margin-top:4px; border-top:1px solid var(--line); border-radius:0 0 12px 12px; padding-top:12px; }
+  .bp-rm-go { color:var(--ink-3); font-size:13px; transition:transform .15s; }
+  .bp-rm-link:hover .bp-rm-go { transform:translateX(2px); color:var(--accent); }
   .bp-tabs { display:inline-flex; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:3px; gap:2px; }
   .bp-tabs button { border:0; background:none; padding:7px 14px; border-radius:9px; font-weight:700; font-size:14px; color:var(--ink-2); }
   .bp-tabs button[aria-selected="true"] { background:linear-gradient(135deg, var(--accent), var(--primary)); color:#fff; }
@@ -214,7 +233,25 @@
       </div>
       <span class="bp-status" id="bpStatus"></span>
       <a class="bp-btn text-decoration-none text-reset" id="bpAnalysis" href="{{ route('budget.analysis', ['month' => $month]) }}"><i class="bi bi-bar-chart-line" aria-hidden="true"></i> Analysis</a>
-      <button class="bp-btn bp-btn-report" type="button" id="bpExport"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Download report</button>
+      <div class="dropdown">
+        <button class="bp-btn bp-btn-report dropdown-toggle" type="button" id="bpExport" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i> Download report</button>
+        <div class="dropdown-menu dropdown-menu-end bp-report-menu" aria-labelledby="bpExport">
+          <div class="bp-rm-head">Download a PDF report</div>
+          <button class="bp-rm-item dropdown-item" type="button" data-report="month">
+            <span class="bp-rm-icon"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
+            <span class="bp-rm-text"><span class="bp-rm-title">Monthly report</span><span class="bp-rm-desc" id="bpRmMonth">Category by category</span></span>
+          </button>
+          <button class="bp-rm-item dropdown-item" type="button" data-report="previous">
+            <span class="bp-rm-icon cmp"><i class="bi bi-arrow-left-right" aria-hidden="true"></i></span>
+            <span class="bp-rm-text"><span class="bp-rm-title">Compare with previous month</span><span class="bp-rm-desc" id="bpRmPrev">Side by side, with changes</span></span>
+          </button>
+          <a class="bp-rm-item bp-rm-link dropdown-item" id="bpCompareOther" href="{{ route('budget.analysis', ['month' => $month]) }}">
+            <span class="bp-rm-icon soft"><i class="bi bi-calendar2-range" aria-hidden="true"></i></span>
+            <span class="bp-rm-text"><span class="bp-rm-title">Compare with another month</span><span class="bp-rm-desc">Choose any two months to compare</span></span>
+            <i class="bi bi-chevron-right bp-rm-go" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -334,7 +371,14 @@
   function defaultDate() { return isCurMonth() ? todayStr() : `${key(cur)}-01`; }
 
   // ---------- render ----------
+  function renderReportMenu() {
+    const prev = cur.m === 0 ? { y: cur.y - 1, m: 11 } : { y: cur.y, m: cur.m - 1 };
+    $('bpRmMonth').textContent = `${MONTHS[cur.m]} ${cur.y}, category by category`;
+    $('bpRmPrev').textContent = `${MONTHS[cur.m].slice(0, 3)} vs ${MONTHS[prev.m].slice(0, 3)} ${prev.y}, side by side`;
+  }
+
   function render() {
+    renderReportMenu();
     $('bpMonthTitle').textContent = `${MONTHS[cur.m]} ${cur.y}`;
     const income = state.income.reduce((a, i) => a + (+i.amount || 0), 0);
     const budget = allCats().reduce((a, c) => a + (+c.budget || 0), 0);
@@ -533,6 +577,7 @@
       filterCat = null;
       history.replaceState(null, '', `${BASE}?month=${key(cur)}`);
       $('bpAnalysis').href = `${BASE}/analysis?month=${key(cur)}`;
+      $('bpCompareOther').href = `${BASE}/analysis?month=${key(cur)}`;
       if (CAN_MANAGE) $('bpDate').value = '';
       render();
       setStatus(state.persisted ? '' : 'Preview of carried-over plan');
@@ -714,10 +759,17 @@
   $('bpTabHist').addEventListener('click', () => showView('hist'));
   $('bpPrev').addEventListener('click', () => { cur = cur.m === 0 ? { y: cur.y - 1, m: 11 } : { y: cur.y, m: cur.m - 1 }; loadMonth(); });
   $('bpNext').addEventListener('click', () => { cur = cur.m === 11 ? { y: cur.y + 1, m: 0 } : { y: cur.y, m: cur.m + 1 }; loadMonth(); });
-  $('bpExport').addEventListener('click', () => {
+  document.querySelectorAll('[data-report]').forEach(item => item.addEventListener('click', () => {
     if (!state.persisted) { toast('Nothing saved for this month yet', true); return; }
-    toast("Preparing report…"); window.location.href = `${BASE}/${key(cur)}/report`;
-  });
+    if (item.dataset.report === 'month') {
+      toast('Preparing report…');
+      window.location.href = `${BASE}/${key(cur)}/report`;
+      return;
+    }
+    const prev = cur.m === 0 ? { y: cur.y - 1, m: 11 } : { y: cur.y, m: cur.m - 1 };
+    toast('Preparing comparison…');
+    window.location.href = `${BASE}/${key(cur)}/compare/${key(prev)}/report`;
+  }));
 
   render();
   if (!state.persisted) setStatus('Preview of carried-over plan');
