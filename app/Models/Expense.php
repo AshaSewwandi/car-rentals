@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Expense extends Model
@@ -30,7 +31,7 @@ class Expense extends Model
 
     public static function syncOnce(callable $callback): void
     {
-        if (static::$syncing) {
+        if (static::$syncing || !static::syncAvailable()) {
             return;
         }
         static::$syncing = true;
@@ -39,6 +40,15 @@ class Expense extends Model
         } finally {
             static::$syncing = false;
         }
+    }
+
+    // The sync needs the vehicle_maintenances.expense_id column. Until that migration has run,
+    // skip syncing so saving an expense or maintenance record still works.
+    private static ?bool $syncAvailable = null;
+
+    public static function syncAvailable(): bool
+    {
+        return static::$syncAvailable ??= Schema::hasColumn('vehicle_maintenances', 'expense_id');
     }
 
     public function syncMaintenance(): void
