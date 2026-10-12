@@ -570,7 +570,7 @@
           <div class="pl-label"><i class="bi {{ $plStateIcon }}" aria-hidden="true"></i> {{ $plStateLabel }}</div>
           <div class="pl-value">{{ $pl['net'] < 0 ? '−' : '' }}Rs {{ number_format(abs($pl['net']), 0) }}</div>
           @if($plState === 'none')
-            <div class="pl-sub">No payments, trips, expenses or maintenance recorded for {{ $plMonth }}.</div>
+            <div class="pl-sub">No payments, trips or expenses recorded for {{ $plMonth }}.</div>
           @endif
           <div class="pl-sub">
             @if($pl['margin'] !== null) {{ round($pl['margin']) }}% margin · @endif
@@ -614,7 +614,7 @@
             ->map(fn ($label, $key) => $label . ' Rs ' . number_format($parts[$key], 0))->implode(' · ');
     };
     $incomeLabels = ['rentals' => 'Long-term', 'trips' => 'Trips', 'extras' => 'Extra km'];
-    $costLabels = ['expenses' => 'Expenses', 'maintenance' => 'Maintenance', 'partner' => 'Partner'];
+    $costLabels = ['expenses' => 'Expenses', 'partner' => 'Partner'];
   @endphp
   <div class="card panel-card vp-card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">

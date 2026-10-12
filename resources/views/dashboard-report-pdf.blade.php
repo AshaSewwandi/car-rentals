@@ -46,7 +46,7 @@
   <table class="kpis" style="margin-top:12px">
     <tr>
       <td><div class="kpi"><div class="k">Income</div><div class="v">{{ $rs($pl['income']) }}</div><div class="s">Money received</div></div></td>
-      <td><div class="kpi"><div class="k">Costs</div><div class="v">{{ $rs($pl['costs']) }}</div><div class="s">Expenses, maintenance, partner share</div></div></td>
+      <td><div class="kpi"><div class="k">Costs</div><div class="v">{{ $rs($pl['costs']) }}</div><div class="s">Expenses and partner share</div></div></td>
       <td><div class="result {{ $netClass($pl['net']) }}">
         <div class="k">{{ $resultWord }}</div>
         <div class="v">{{ $rs($pl['net']) }}</div>
@@ -194,7 +194,7 @@
 
   <p class="small muted" style="margin-top:14px">
     Cash basis: income is money marked as received (long-term payments for this month, trip base payments for trips starting this month,
-    and extra-km charges paid this month). Costs are expenses and maintenance dated this month plus the partner's share of the trip income received.
+    and extra-km charges paid this month). Costs are expenses dated this month plus the partner's share of the trip income received.
     This is an internal management view, not an accounting statement.
   </p>
 </body>

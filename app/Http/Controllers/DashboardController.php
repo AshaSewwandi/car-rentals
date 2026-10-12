@@ -199,7 +199,7 @@ class DashboardController extends Controller
             $out[] = ['info', $pl['label'] . ' is still in progress, so these figures will change as more payments and costs are recorded.'];
         }
         if (!$pl['hasActivity']) {
-            $out[] = ['info', 'No payments, trips, expenses or maintenance were recorded for ' . $pl['label'] . '.'];
+            $out[] = ['info', 'No payments, trips or expenses were recorded for ' . $pl['label'] . '.'];
             return $out;
         }
 

@@ -6,7 +6,6 @@ use App\Models\Booking;
 use App\Models\Expense;
 use App\Models\Payment;
 use App\Models\Vehicle;
-use App\Models\VehicleMaintenance;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -17,7 +16,7 @@ use Illuminate\Support\Collection;
  */
 class ProfitLoss
 {
-    private const KEYS = ['rentals', 'trips', 'extras', 'expenses', 'maintenance', 'partner'];
+    private const KEYS = ['rentals', 'trips', 'extras', 'expenses', 'partner'];
 
     public static function forMonth(Carbon $month, bool $withDetails = false): array
     {
@@ -98,18 +97,12 @@ class ProfitLoss
             }
         }
 
+        // Vehicle maintenance records are not counted: the same costs are already entered as expenses.
         foreach (Expense::query()->with('vehicle')->whereBetween('date', [$from, $to])->get() as $e) {
             $add($e->vehicle_id, 'expenses', (float) $e->amount);
             $details['costs']->push([
                 'date' => $e->date, 'type' => 'Expense · ' . ucfirst((string) $e->type), 'vehicle' => $vehicleName($e->vehicle),
                 'who' => null, 'note' => $e->note, 'amount' => (float) $e->amount,
-            ]);
-        }
-        foreach (VehicleMaintenance::query()->with('vehicle')->whereBetween('service_date', [$from, $to])->get() as $m) {
-            $add($m->vehicle_id, 'maintenance', (float) $m->amount);
-            $details['costs']->push([
-                'date' => $m->service_date, 'type' => 'Maintenance', 'vehicle' => $vehicleName($m->vehicle),
-                'who' => null, 'note' => $m->part_name, 'amount' => (float) $m->amount,
             ]);
         }
 
@@ -123,7 +116,7 @@ class ProfitLoss
 
         $sum = fn (string $key) => (float) $rows->sum(fn ($r) => $r['parts'][$key]);
         $income = $sum('rentals') + $sum('trips') + $sum('extras');
-        $costs = $sum('expenses') + $sum('maintenance') + $sum('partner');
+        $costs = $sum('expenses') + $sum('partner');
 
         $result = [
             'month' => $month->format('Y-m'),
@@ -142,7 +135,6 @@ class ProfitLoss
                 ],
                 'costs' => [
                     ['label' => 'Expenses', 'amount' => $sum('expenses')],
-                    ['label' => 'Vehicle maintenance', 'amount' => $sum('maintenance')],
                     ['label' => 'Partner share of trips', 'amount' => $sum('partner')],
                 ],
             ],
@@ -159,7 +151,7 @@ class ProfitLoss
     private static function vehicleRow(string $name, ?string $plate, array $parts): array
     {
         $income = $parts['rentals'] + $parts['trips'] + $parts['extras'];
-        $costs = $parts['expenses'] + $parts['maintenance'] + $parts['partner'];
+        $costs = $parts['expenses'] + $parts['partner'];
 
         return [
             'name' => $name,
