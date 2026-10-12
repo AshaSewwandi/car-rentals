@@ -183,6 +183,11 @@
       border-radius: 6px;
     }
   }
+  .blocked-by { margin-top: .6rem; padding: .55rem .65rem; border-radius: .6rem; background: #fef2f2; border: 1px solid #fecaca; font-size: .8rem; }
+  .blocked-by-title { font-weight: 700; color: #991b1b; margin-bottom: .2rem; }
+  .blocked-by-item { padding: .15rem 0; color: #7f1d1d; }
+  .blocked-by-item a { color: #b91c1c; font-weight: 600; }
+  .blocked-by-warn { display: block; font-size: .72rem; color: #b45309; font-weight: 600; }
 </style>
 
 <div class="page-toolbar">
@@ -250,6 +255,25 @@
                 <div class="label">Free</div>
               </div>
             </div>
+            @if($row['blocked_by']->isNotEmpty())
+              <div class="blocked-by">
+                <div class="blocked-by-title">Not available because of</div>
+                @foreach($row['blocked_by'] as $block)
+                  @php
+                    $link = match ($block['source']) {
+                      'Agreement' => \Illuminate\Support\Facades\Route::has('agreements.index') ? route('agreements.index') : null,
+                      'Booking' => \Illuminate\Support\Facades\Route::has('rental-trips.index') ? route('rental-trips.index') : null,
+                      'Rental' => \Illuminate\Support\Facades\Route::has('rentals.index') ? route('rentals.index') : null,
+                      default => null,
+                    };
+                  @endphp
+                  <div class="blocked-by-item">
+                    @if($link)<a href="{{ $link }}">{{ $block['label'] }}</a>@else{{ $block['label'] }}@endif
+                    @if($block['open_ended'])<span class="blocked-by-warn">No end date: blocks every day after it starts</span>@endif
+                  </div>
+                @endforeach
+              </div>
+            @endif
           </div>
         @empty
           <div class="text-muted small">No vehicles found.</div>
@@ -278,7 +302,7 @@
                     <div class="small text-muted">{{ $row['plate_no'] }}</div>
                   </td>
                   @foreach($row['cells'] as $cell)
-                    <td class="timeline-cell {{ $cell['is_booked'] ? 'rented' : 'available' }}" title="{{ $cell['date'] }}">
+                    <td class="timeline-cell {{ $cell['is_booked'] ? 'rented' : 'available' }}" title="{{ $cell['date'] }}{{ $cell['is_booked'] ? ' · ' . implode(', ', $cell['reasons']) : ' · Free' }}">
                       {{ $cell['is_booked'] ? 'Rented' : 'Free' }}
                     </td>
                   @endforeach

@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/bookings/{booking}/invoice/pdf', [ProfileController::class, 'invoicePdf'])->name('profile.bookings.invoice-pdf');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard')->name('dashboard');
+    Route::get('/dashboard/report', [DashboardController::class, 'report'])->middleware(['permission:dashboard', 'role:admin'])->name('dashboard.report');
     Route::middleware('permission:vehicles')->group(function () {
         Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
         Route::get('/vehicle-pricings', [VehicleController::class, 'pricingIndex'])->name('vehicle-pricings.index');
