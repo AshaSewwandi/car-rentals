@@ -16,14 +16,96 @@ class BudgetReportController extends Controller
     public function month(Request $request, string $month)
     {
         abort_unless($this->isMonth($month), 404);
-        $data = $this->buildMonthReport($month, $this->compareMonth($request, $month));
+        // The monthly report covers one month only: how it was spent, category by category.
+        $data = $this->buildMonthReport($month, null);
         $data['generatedBy'] = $request->user()->name;
-
-        $suffix = $data['compare'] ? '-vs-' . $data['compare']['month'] : '';
 
         return Pdf::loadView('budget.report-month-pdf', $data)
             ->setPaper('a4')
-            ->download("budget-report-{$month}{$suffix}.pdf");
+            ->download("budget-report-{$month}.pdf");
+    }
+
+    // Side-by-side PDF of two months: totals, main and sub categories, weeks and income.
+    public function compare(Request $request, string $month, string $other)
+    {
+        abort_unless($this->isMonth($month) && $this->isMonth($other) && $month !== $other, 404);
+        foreach ([$month, $other] as $key) {
+            if (!BudgetMonth::query()->where('month', $key)->exists()) {
+                $label = Carbon::createFromFormat('Y-m-d', $key . '-01')->format('F Y');
+                return redirect()->route('budget.index', ['month' => $month])
+                    ->with('error', "There is no budget for {$label} yet, so it can't be compared.");
+            }
+        }
+
+        $data = $this->buildMonthReport($month, $other);
+        $data['insights'] = $this->compareReportInsights($data);
+        $data['incomeRows'] = $this->incomeComparison($data['incomes'], $data['compare']['incomes']);
+        $data['generatedBy'] = $request->user()->name;
+
+        return Pdf::loadView('budget.report-compare-pdf', $data)
+            ->setPaper('a4')
+            ->download("budget-comparison-{$month}-vs-{$other}.pdf");
+    }
+
+    private function incomeComparison(Collection $a, Collection $b): Collection
+    {
+        $names = $a->pluck('name')->merge($b->pluck('name'))->unique()->values();
+
+        return $names->map(function ($name) use ($a, $b) {
+            $x = (float) $a->where('name', $name)->sum('amount');
+            $y = (float) $b->where('name', $name)->sum('amount');
+            return ['name' => $name, 'a' => $x, 'b' => $y, 'diff' => $x - $y, 'pct' => $y != 0 ? ($x - $y) / abs($y) * 100 : null];
+        });
+    }
+
+    private function compareReportInsights(array $d): array
+    {
+        $rs = fn ($n) => 'Rs ' . number_format(round($n));
+        $a = $d['monthLabel'];
+        $b = $d['compare']['monthLabel'];
+        $c = $d['comparison'];
+        $out = [];
+
+        if ($d['state'] === 'current') {
+            $out[] = ['info', "{$a} is still in progress (day {$d['daysElapsed']} of {$d['daysInMonth']}), so its totals will keep growing."];
+        }
+
+        $s = $c['spent'];
+        if ($s['b'] > 0 || $s['a'] > 0) {
+            $out[] = $s['diff'] == 0
+                ? ['info', "Spending is the same in both months ({$rs($s['a'])})."]
+                : [$s['diff'] > 0 ? 'warn' : 'good', sprintf('%s spent %s %s than %s (%s vs %s%s).',
+                    $a, $rs(abs($s['diff'])), $s['diff'] > 0 ? 'more' : 'less', $b, $rs($s['a']), $rs($s['b']),
+                    $s['pct'] !== null ? ', ' . ($s['diff'] > 0 ? '+' : '−') . round(abs($s['pct'])) . '%' : '')];
+        }
+
+        $perDayA = $d['daysElapsed'] > 0 ? $d['spent'] / $d['daysElapsed'] : 0;
+        $perDayB = $d['compare']['daysElapsed'] > 0 ? $d['compare']['spent'] / $d['compare']['daysElapsed'] : 0;
+        if ($perDayA > 0 || $perDayB > 0) {
+            $out[] = ['info', "Average spending per day: {$rs($perDayA)} in {$a} vs {$rs($perDayB)} in {$b}."];
+        }
+
+        $l = $c['left'];
+        if ($d['income'] > 0 || $d['compare']['income'] > 0) {
+            $out[] = [$l['diff'] >= 0 ? 'good' : 'warn', "Money left after spending: {$rs($l['a'])} in {$a} vs {$rs($l['b'])} in {$b}."];
+        }
+
+        foreach ($this->comparisonInsights($d) as $insight) {
+            $out[] = $insight;
+        }
+
+        $stopped = $c['cats']->filter(fn ($x) => $x['b'] > 0 && $x['a'] == 0);
+        if ($stopped->isNotEmpty()) {
+            $out[] = ['info', "Spent in {$b} but not in {$a}: " . $stopped->pluck('name')->implode(', ') . '.'];
+        }
+
+        $overA = $d['groups']->flatMap->cats->where('status', 'Over budget')->count();
+        $overB = $d['compare']['groups']->flatMap->cats->where('status', 'Over budget')->count();
+        if ($overA || $overB) {
+            $out[] = [$overA > $overB ? 'bad' : ($overA < $overB ? 'good' : 'info'), "Sub categories over budget: {$overA} in {$a} vs {$overB} in {$b}."];
+        }
+
+        return $out;
     }
 
     // Interactive analysis page with charts and an optional comparison month.
@@ -196,16 +278,24 @@ class BudgetReportController extends Controller
         $daysInMonth = $start->daysInMonth;
         $spentByCat = $m->entries->groupBy('budget_category_id')->map->sum('amount');
         $countByCat = $m->entries->groupBy('budget_category_id')->map->count();
+        $entriesByCat = $m->entries->groupBy('budget_category_id');
 
         $income = (float) $m->incomes->sum('amount');
         $budget = (float) $m->groups->flatMap->categories->sum('budget');
         $spent = (float) $m->entries->sum('amount');
 
-        $groups = $m->groups->map(function ($g) use ($spentByCat, $countByCat, $spent) {
-            $cats = $g->categories->map(function ($c) use ($spentByCat, $countByCat) {
+        // Entries whose sub category was deleted, so they still show up in the report.
+        $monthCatIds = $m->groups->flatMap->categories->pluck('id')->all();
+        $uncategorised = $m->entries
+            ->filter(fn ($e) => !in_array($e->budget_category_id, $monthCatIds, true))
+            ->sortBy([['date', 'asc'], ['id', 'asc']])->values();
+
+        $groups = $m->groups->map(function ($g) use ($spentByCat, $countByCat, $entriesByCat, $spent) {
+            $cats = $g->categories->map(function ($c) use ($spentByCat, $countByCat, $entriesByCat) {
                 $s = (float) ($spentByCat[$c->id] ?? 0);
                 $b = (float) $c->budget;
                 return [
+                    'items' => ($entriesByCat[$c->id] ?? collect())->sortBy([['date', 'asc'], ['id', 'asc']])->values(),
                     'name' => $c->name,
                     'budget' => $b,
                     'spent' => $s,
@@ -257,6 +347,7 @@ class BudgetReportController extends Controller
             'used' => $budget > 0 ? $spent / $budget * 100 : 0,
             'savingsRate' => $income > 0 ? ($income - $spent) / $income * 100 : null,
             'groups' => $groups,
+            'uncategorised' => $uncategorised,
             'incomes' => $m->incomes,
             'entries' => $m->entries->sortBy([['date', 'asc'], ['id', 'asc']])->values(),
             'topEntries' => $m->entries->sortByDesc('amount')->take(5)->values(),
